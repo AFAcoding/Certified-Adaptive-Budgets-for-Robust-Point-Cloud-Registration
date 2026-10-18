@@ -1,0 +1,5602 @@
+[
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/0_0",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0191422999996576,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3536946999993233,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.030041600002732594,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/2_2",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.4262975999990886,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03130029999738326,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.026821800001926,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/6_6",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.033317000001261476,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9939516999984335,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3440946000009717,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/8_8",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0237721000012243,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3322045000022626,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.031938000000081956,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/12_12",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.362645999997767,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03275950000170269,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9923520000011194,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/14_14",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.029284000000188826,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.035631700000522,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.396935000000667,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/26_26",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0850160000009055,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04697250000026543,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.028560700000525685,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/34_34",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.04130850000001374,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.028205200000229524,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9887592999984918,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/36_36",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.029473599999619182,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0755396000022301,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.05044310000084806,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/46_46",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0083869000009145,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04732490000242251,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.028562800001964206,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/54_54",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3433122000024014,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029356300001381896,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9983729000014137,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/64_64",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.029506099999707658,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.01843480000025,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04729299999962677,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/72_72",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0044855999985884,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.361002699999517,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03289540000332636,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/98_98",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.04176250000091386,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.02711799999815412,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9739644000001135,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/110_110",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.0285957000014605,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0387768000000506,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04853999999977532,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/112_112",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0306081999988237,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3713293000000704,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03311790000225301,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/116_116",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.04105400000116788,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.02691439999762224,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.024321199998667,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/122_122",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.02891029999955208,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9905297999976028,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04735390000132611,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/128_128",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.04388210000252,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3554707000002963,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03272380000271369,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/132_132",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.4505128000018885,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.039857699997810414,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.8400982999992266,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/142_142",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.035405700000410434,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1816296999968472,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.4706670000014128,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/154_154",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9985220999988087,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3989506999969308,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.031459100002393825,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/160_160",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.4052363999981026,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03347890000077314,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0765442000010808,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/168_168",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.029871600003389176,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0142626000015298,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3793920000025537,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/176_176",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.03394340000159,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.53109509999922,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03252190000057453,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/178_178",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3700152999990678,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03277680000246619,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9954447000018263,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/184_184",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.027380700001231162,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0002996000002895,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.054610999999567866,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/186_186",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0322138000010455,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.4190822999989905,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029388800001470372,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/188_188",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.04789109999910579,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.031275400000595255,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0331914000016695,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/192_192",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028926699997100513,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0269642000021122,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.418888699998206,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/208_208",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0923444999971252,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.5001669000012043,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.034754599997540936,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/212_212",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.401643300003343,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.032688200000848155,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.013013799998589,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/220_220",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.02839700000185985,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0193537999984983,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.36296179999772,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/226_226",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0273568000011437,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3707888999997522,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.040491300002031494,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/228_228",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.04278160000103526,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.02724099999977625,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.068514900001901,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/230_230",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.02674000000115484,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0137618000007933,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3758054999998421,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/232_232",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0164631999978155,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04560270000001765,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.027166899999429006,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/236_236",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.040205500001320615,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.027798299997812137,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9896413999995275,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/244_244",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.027708800000254996,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0485542000023997,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.4487316999984614,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/246_246",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.027400700000726,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.349185999999463,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029984199998580152,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/260_260",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3536636999997427,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03222449999884702,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0071386999989045,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/266_266",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.02761559999999008,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9876406000003044,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3560041000018828,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/268_268",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0184866999989026,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3441104999983509,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.02913599999737926,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/272_272",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3723523000007845,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03031099999861908,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0029826999998477,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/280_280",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028028000000631437,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0079546000015398,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3612805000011576,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/282_282",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0410221000020101,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04611500000100932,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.027382199998100987,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/292_292",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3571248000007472,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.033820399999967776,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0087098000003607,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/296_296",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028539499999169493,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9983776999979455,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3554165999994439,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/300_300",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9960336000003736,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3809851999976672,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029555699999036733,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/302_302",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3582387999995262,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03171730000030948,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9911489999976766,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/304_304",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.030519899999490008,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0604763999981515,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.070899800000916,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/308_308",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0392787999990105,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.365183400001115,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.030143200001475634,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/312_312",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3762680999971053,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03080029999910039,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0178279000028851,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/316_316",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.030551600000762846,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0403202999987116,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3718994000009843,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/322_322",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0266838999996253,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3974784000020009,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0315671000025759,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/326_326",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3957879000008688,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029710700000578072,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0241258000023663,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/330_330",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 1.3742077999995672,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "full": {
+   "s": 1.0300906999982544,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3836407000017061,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/338_338",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9895619999988412,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.357023799999297,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03267559999949299,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/340_340",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3599896999985503,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0420698000016273,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1368010000005597,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/346_346",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.03163499999936903,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0103132000003825,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.371014299998933,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/348_348",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0513737000001129,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.4108124999984284,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.031698799997684546,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/352_352",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3569435000026715,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.030905600000551203,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9990130000005593,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/354_354",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.0312688000012713,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9962316999990435,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.049254999998083804,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/362_362",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.01890750000166,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3762787000014214,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0298852000014449,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/364_364",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3618787999985216,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.034728200000245124,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0037831000008737,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/370_370",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.030571100000088336,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0324648999994679,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.4050380000007863,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/374_374",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0263638000033097,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3755229000016698,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.031088600000657607,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/378_378",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3481562999986636,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03154480000011972,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0036757000016223,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/384_384",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028775599999789847,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9924666000006255,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3480878000009398,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/388_388",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0049935999995796,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.362454300000536,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.028020800000376767,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/400_400",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.386362300003384,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 1.372008400001505,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "full": {
+   "s": 1.0467884999998205,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/406_406",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.02968509999845992,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.990656999998464,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.045501900000090245,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/416_416",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9906388999988849,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.046058600000833394,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.028168999997433275,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/424_424",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.04318699999930686,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.02785079999739537,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9943352999980561,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/434_434",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.03159140000207117,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0064079000003403,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.372002000000066,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/438_438",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0035296999994898,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04708260000188602,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.025582199999917066,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/444_444",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.4178252999990946,
+   "ok": false,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03054369999881601,
+   "ok": false,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0151703999981692,
+   "ok": false,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/450_450",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.02732119999927818,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.00610990000132,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.4067022999988694,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/456_456",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0273033999983454,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.380119500001456,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.030675099998916266,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/458_458",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3587453000000096,
+   "ok": false,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.031233900001097936,
+   "ok": false,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9973793999997724,
+   "ok": false,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/460_460",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.027771499997470528,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.006834499999968,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3594081000010192,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/462_462",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0302779000012379,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.0495052999976906,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.027898500000446802,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/464_464",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.08012509999753092,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.03037409999888041,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0310651999971014,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/466_466",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.027951400003075833,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0001128000003519,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3556785000000673,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/478_478",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9973329000022204,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.351306200002,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029890999998315237,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/480_480",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3580258000001777,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.02967490000082762,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9908938999979,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/486_486",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028155500000139,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.002432499997667,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3759329999993497,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/488_488",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0014772000031371,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3517590000010387,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03265870000177529,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/500_500",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3539635999986785,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029264600001624785,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9986779999999271,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/502_502",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028253500000573695,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0017320999977528,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.359174000001076,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/506_506",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0010555000008026,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.3380835999996634,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029504300000553485,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/508_508",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3114521999996214,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.03147829999943497,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9489620999993349,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/514_514",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.028447899996535853,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9082827999991423,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.263945300001069,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/516_516",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.0137517000002845,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.047507600000244565,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.027624199999991106,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/530_530",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.3442883999996411,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.028923499998199986,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9937135000000126,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/534_534",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.030344599999807542,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0037413999998535,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.04640840000138269,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/536_536",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9968836000007286,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.049469999998109415,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.02727910000248812,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/548_548",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.2451688000001013,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029446199998346856,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 0.9386465000025055,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/552_552",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.029669299998204224,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.0034768000004988,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.0510950000025332,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "sc2",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/554_554",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 0.9705443999991985,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.2974260000009963,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.029722100000071805,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/0_0",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2115832999988925,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6855808000000252,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07020879999981844,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/2_2",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6901250000009895,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0710730999999214,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1543267000015476,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/6_6",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06746679999923799,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1911436000009417,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09454610000102548,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/8_8",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2273624000008567,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7515017000005173,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07061310000062804,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/12_12",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09554560000105994,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06613580000339425,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2201424999984738,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/14_14",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06712740000148187,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.160009600000194,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6615612999994482,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/26_26",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1706386000005296,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09454749999713385,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06736090000049444,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/34_34",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09255049999774201,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06724039999971865,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2218833999977505,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/36_36",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06945600000108243,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1371614999989106,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.02445109999825945,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/46_46",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2464058000005025,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09593609999865294,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06720940000013798,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/54_54",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09394819999943138,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06705420000071172,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2177782999970077,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/64_64",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06875629999922239,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2975320000005013,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.10359940000125789,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/72_72",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1689409999999043,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7014555999994627,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06927450000148383,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/98_98",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.0956573000003118,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06612259999747039,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2584309999983816,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/110_110",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06741979999787873,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.209904399998777,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09685679999893182,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/112_112",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.216932999999699,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7232261999997718,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07982839999749558,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/116_116",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09312869999848772,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06671819999974105,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2185148000025947,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/122_122",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06653920000098879,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2606496999978845,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09625779999987572,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/128_128",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.195230500001344,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7037855999988096,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06992799999716226,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/132_132",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09401639999850886,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06626010000036331,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2664401999973052,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/142_142",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06830360000094515,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1912565999991784,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6946515000017826,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/154_154",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2243410000010044,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09734570000000531,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06858090000241646,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/160_160",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6717027000013331,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06838559999960125,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.179215700001805,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/168_168",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06726980000166805,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2253459999992629,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7534053000017593,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/176_176",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1992821999992884,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.10625930000242079,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.07457729999805451,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/178_178",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.8833789000018442,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07340189999740687,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.23996569999872,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/184_184",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06917930000054184,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2418297000003804,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09867909999957192,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/186_186",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2109582999983104,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6991866000025766,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06768530000044848,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/188_188",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09072939999896334,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06736000000091735,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.139562600001227,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/192_192",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.0758696000011696,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1857968000003893,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7054705000009562,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/208_208",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.260180000001128,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6989293000006,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0688516999980493,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/212_212",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6464640000012878,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07011740000234568,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1636402999974962,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/220_220",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.07240539999838802,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1597211999978754,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6734712999968906,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/226_226",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2015209999990475,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7115064000026905,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06847969999944326,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/228_228",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09247859999959473,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06678320000355598,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1967882999997528,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/230_230",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06627389999994193,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1991901000001235,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6892665000013949,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/232_232",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.254801099999895,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09744109999883221,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06715859999894747,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/236_236",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09199230000012903,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.0659406000013405,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2174130999992485,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/244_244",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.07601609999983339,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2746118000031856,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7230209999979706,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/246_246",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2756618000021263,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.10108279999985825,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06709549999868614,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/260_260",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6940568999998504,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07499159999861149,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1808344999990368,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/266_266",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06745679999949061,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2001278000025195,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7089717000017117,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/268_268",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2203674000011233,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7364967999965302,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06687329999840586,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/272_272",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6999921999995422,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.068924799998058,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2005725000017264,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/280_280",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06855480000012903,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1813885999981721,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09871950000160723,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/282_282",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1391404999994847,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.06946340000286,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06574629999886383,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/292_292",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.7022504000015033,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06798039999921457,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2011777000006987,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/296_296",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.0688756999988982,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.186600000000908,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6932990999994217,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/300_300",
+  "scene": "08",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2077098000008846,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7222617000006721,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07083699999930104,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/302_302",
+  "scene": "08",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.7040622000022267,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07471559999976307,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.19132990000071,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/08/304_304",
+  "scene": "08",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.0683156000013696,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1149460999986331,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.02508319999833475,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/308_308",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1938474999988102,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6956411999999546,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06878260000303271,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/312_312",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.754018100000394,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06838900000002468,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2242284000021755,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/316_316",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06966540000212262,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2137079000021913,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7325986000032572,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/322_322",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2035189000016544,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6956729000012274,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06914010000036797,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/326_326",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6525971000010031,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06827720000001136,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1474714999967546,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/330_330",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 1.6239926999987802,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "full": {
+   "s": 1.144027999998798,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6436306000032346,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/338_338",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.215172899999743,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.0949880000007397,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06598220000159927,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/340_340",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.7306250000001455,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0738216999998258,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2182834999985062,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/346_346",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.07125830000222777,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2037731999989774,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.718484900000476,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/348_348",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1824939999969502,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6773570000004838,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07260640000095009,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/352_352",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.707142200000817,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06934479999836185,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1981780999994953,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/354_354",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06612519999907818,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.207984500000748,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09813569999823812,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/362_362",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2044527999969432,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.715314600001875,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07020410000041011,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/364_364",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6837821000008262,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07198000000062166,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.178826499999559,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/370_370",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06755119999797898,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.162687599997298,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6571689000011247,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/374_374",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1697882999978901,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.646298100000422,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07070670000030077,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/378_378",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09082190000117407,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.066595000000234,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1873835999977018,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/384_384",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06813479999982519,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2224279000001843,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09501980000277399,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/388_388",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2750878000006196,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09759280000071158,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.0667446999977983,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/400_400",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6438706999979331,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 1.6280766999989282,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "full": {
+   "s": 1.1456832000003487,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/406_406",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06763910000154283,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2396115000010468,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09885519999807002,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/416_416",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2489176000017324,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.0959249000006821,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06638150000071619,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/424_424",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09486420000030193,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06681480000042939,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2345439000018814,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/434_434",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.082974999997532,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.24677789999987,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7159064000006765,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/438_438",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1980789999979606,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09604639999815845,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06542919999992591,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/444_444",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.6702020999982778,
+   "ok": false,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06873970000015106,
+   "ok": false,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1737980999969295,
+   "ok": false,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/450_450",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06994470000063302,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2135132000003068,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.729506499999843,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/456_456",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2131489999992482,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7228428999987955,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06949539999914123,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/458_458",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09185480000087409,
+   "ok": false,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.0726518000010401,
+   "ok": false,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2198975999999675,
+   "ok": false,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/460_460",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06612990000212449,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2198528000008082,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09433659999922384,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/462_462",
+  "scene": "09",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.135595400002785,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.03831989999889629,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06754960000034771,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/464_464",
+  "scene": "09",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.020873900000879075,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06667440000092029,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1136960000003455,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/09/466_466",
+  "scene": "09",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06703010000273935,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2031628000004275,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09741959999882965,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/478_478",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.1978978000006464,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7114172000001417,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0673720000013418,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/480_480",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.696881099996972,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.07096399999863934,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2030150000027788,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/486_486",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06727829999726964,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1731723999982933,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6736951999992016,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/488_488",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2084419000020716,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7041224999993574,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0703469000000041,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/500_500",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.09806249999746797,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06636359999902197,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2133474000002025,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/502_502",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06599779999669408,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2164736000013363,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09626650000063819,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/506_506",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2043359999988752,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7003207000016118,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.0723230000003241,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/508_508",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.7280749999990803,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06838849999985541,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2316093999979785,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/514_514",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06750049999754992,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.1801119000010658,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.6779122000007192,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/516_516",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.151416099997732,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09427230000073905,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06792959999802406,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/530_530",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 0.10269640000115032,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06533240000135265,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.270931399998517,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/534_534",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.06777080000028946,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2181569000022137,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09829119999994873,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/536_536",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.240428900000552,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09750120000171592,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "budgetc": {
+   "s": 0.06550849999985076,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/548_548",
+  "scene": "10",
+  "run_order": [
+   "budget",
+   "budgetc",
+   "full"
+  ],
+  "budget": {
+   "s": 1.731100700002571,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06975319999764906,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2161796000000322,
+   "ok": true,
+   "stop": null
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/552_552",
+  "scene": "10",
+  "run_order": [
+   "budgetc",
+   "full",
+   "budget"
+  ],
+  "budgetc": {
+   "s": 0.0685139999986859,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  },
+  "full": {
+   "s": 1.2179643999988912,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 0.09754509999766015,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ },
+ {
+  "est": "turbo",
+  "subset": "fcgf_kitti_test",
+  "pair_id": "fcgf_kitti_test/10/554_554",
+  "scene": "10",
+  "run_order": [
+   "full",
+   "budget",
+   "budgetc"
+  ],
+  "full": {
+   "s": 1.2293150999976206,
+   "ok": true,
+   "stop": null
+  },
+  "budget": {
+   "s": 1.7344899999989138,
+   "ok": true,
+   "stop": 2,
+   "offline_stop": 2
+  },
+  "budgetc": {
+   "s": 0.06987020000087796,
+   "ok": true,
+   "stop": 0,
+   "offline_stop": 0
+  }
+ }
+]

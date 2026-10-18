@@ -1,0 +1,8 @@
+# Tested with Python 3.13.3 on Windows 11 (CPU only).
+numpy==2.5.4
+scipy==1.18.1
+scikit-learn==1.9.1
+open3d==0.20.0
+matplotlib==3.11.2
+# Only needed by scripts/prepare_3dmatch.py (Predator's 3DMatch fragments are torch-pickled):
+# torch==2.14.1

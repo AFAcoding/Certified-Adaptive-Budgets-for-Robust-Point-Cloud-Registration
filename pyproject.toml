@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acpr"
+version = "1.0.0"
+description = "Certified adaptive budgets for robust point cloud registration (research code)"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "scipy>=1.13",
+    "scikit-learn>=1.5",
+    "open3d>=0.18",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+prepare = ["torch"]  # scripts/prepare_3dmatch.py only
+
+[tool.setuptools.packages.find]
+where = ["src"]
