@@ -1,0 +1,1020 @@
+{
+ "fpfh_indoor": {
+  "sc2": {
+   "3DMatch": {
+    "groups": [
+     {
+      "n": 443,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 438,
+      "risk_group": 0.00684931506849315,
+      "risk_marginal": 0.02511415525114155
+     },
+     {
+      "n": 742,
+      "risk_group": 0.0026954177897574125,
+      "risk_marginal": 0.0026954177897574125
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 506,
+      "risk": 0.0,
+      "speedup": 1.9366916079122047
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 156,
+      "risk": 0.0,
+      "speedup": 2.53343285600088
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 208,
+      "risk": 0.0,
+      "speedup": 1.950827298755921
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 226,
+      "risk": 0.0,
+      "speedup": 2.67557430988398
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 104,
+      "risk": 0.0,
+      "speedup": 1.8755039625127716
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 54,
+      "risk": 0.0,
+      "speedup": 2.236742566547828
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 292,
+      "risk": 0.017123287671232876,
+      "speedup": 1.5857376927634912
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 77,
+      "risk": 0.0,
+      "speedup": 1.7360824859074309
+     }
+    },
+    "worst_group": 0.00684931506849315,
+    "worst_marginal": 0.02511415525114155,
+    "bootstrap": [
+     {
+      "speedup": 2.013085636823875,
+      "risk": 0.0036968576709796672
+     },
+     {
+      "speedup": 1.8683640439641827,
+      "risk": 0.0018484288354898336
+     },
+     {
+      "speedup": 1.8172648375383111,
+      "risk": 0.0018484288354898336
+     },
+     {
+      "speedup": 1.7932525274167113,
+      "risk": 0.0012322858903265558
+     },
+     {
+      "speedup": 1.767217806003551,
+      "risk": 0.0018484288354898336
+     },
+     {
+      "speedup": 1.9573358474581075,
+      "risk": 0.0030807147258163892
+     },
+     {
+      "speedup": 1.9581899751886995,
+      "risk": 0.0030807147258163892
+     },
+     {
+      "speedup": 1.7896763929937405,
+      "risk": 0.0012322858903265558
+     },
+     {
+      "speedup": 1.976738249986283,
+      "risk": 0.0036968576709796672
+     },
+     {
+      "speedup": 1.7335221620013666,
+      "risk": 0.0018484288354898336
+     }
+    ]
+   },
+   "3DLoMatch": {
+    "groups": [
+     {
+      "n": 1282,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 426,
+      "risk_group": 0.0,
+      "risk_marginal": 0.004694835680751174
+     },
+     {
+      "n": 73,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 525,
+      "risk": 0.0,
+      "speedup": 1.0077270529135962
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 289,
+      "risk": 0.0,
+      "speedup": 1.0247133177852261
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 230,
+      "risk": 0.0,
+      "speedup": 1.1044182376653962
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 218,
+      "risk": 0.0,
+      "speedup": 1.1363444542508365
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 158,
+      "risk": 0.0,
+      "speedup": 1.0360475611544504
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 49,
+      "risk": 0.0,
+      "speedup": 1.1167756975061385
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 240,
+      "risk": 0.0,
+      "speedup": 0.9999552180814314
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 72,
+      "risk": 0.0,
+      "speedup": 0.9913411623119763
+     }
+    },
+    "worst_group": 0.0,
+    "worst_marginal": 0.004694835680751174,
+    "bootstrap": [
+     {
+      "speedup": 1.0525939668910689,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0262836184767616,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0206935395050403,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.019226924398863,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0160167943412086,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0398332470132559,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0397945439939735,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.019465503307118,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.041045014122228,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0131511904917303,
+      "risk": 0.0
+     }
+    ]
+   }
+  },
+  "turbo": {
+   "3DMatch": {
+    "groups": [
+     {
+      "n": 448,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 434,
+      "risk_group": 0.009216589861751152,
+      "risk_marginal": 0.02534562211981567
+     },
+     {
+      "n": 741,
+      "risk_group": 0.002699055330634278,
+      "risk_marginal": 0.002699055330634278
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 506,
+      "risk": 0.0,
+      "speedup": 1.7916035476066239
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 156,
+      "risk": 0.0,
+      "speedup": 2.50073012918606
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 208,
+      "risk": 0.0,
+      "speedup": 1.7600160756824041
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 226,
+      "risk": 0.0,
+      "speedup": 2.4901674786774657
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 104,
+      "risk": 0.009615384615384616,
+      "speedup": 1.7208234022504176
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 54,
+      "risk": 0.0,
+      "speedup": 1.9172432028074335
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 292,
+      "risk": 0.0136986301369863,
+      "speedup": 1.53280358493104
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 77,
+      "risk": 0.012987012987012988,
+      "speedup": 1.5963491370130096
+     }
+    },
+    "worst_group": 0.009216589861751152,
+    "worst_marginal": 0.02534562211981567,
+    "bootstrap": [
+     {
+      "speedup": 1.8042989332431247,
+      "risk": 0.0030807147258163892
+     },
+     {
+      "speedup": 1.8089798877127419,
+      "risk": 0.0036968576709796672
+     },
+     {
+      "speedup": 1.8365507279215472,
+      "risk": 0.0036968576709796672
+     },
+     {
+      "speedup": 1.8243515352384272,
+      "risk": 0.0036968576709796672
+     },
+     {
+      "speedup": 1.8620379622051617,
+      "risk": 0.0036968576709796672
+     },
+     {
+      "speedup": 1.8318682886115052,
+      "risk": 0.004313000616142945
+     },
+     {
+      "speedup": 1.846492529975572,
+      "risk": 0.004313000616142945
+     },
+     {
+      "speedup": 1.8410961478484023,
+      "risk": 0.0030807147258163892
+     },
+     {
+      "speedup": 1.796102544269371,
+      "risk": 0.0030807147258163892
+     },
+     {
+      "speedup": 1.7909647156054112,
+      "risk": 0.0030807147258163892
+     }
+    ]
+   },
+   "3DLoMatch": {
+    "groups": [
+     {
+      "n": 1301,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 406,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0024630541871921183
+     },
+     {
+      "n": 74,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 525,
+      "risk": 0.0,
+      "speedup": 0.9880496318971078
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 289,
+      "risk": 0.0,
+      "speedup": 1.0098281399527533
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 230,
+      "risk": 0.0,
+      "speedup": 1.0933572673844014
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 218,
+      "risk": 0.0,
+      "speedup": 1.116856495299024
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 158,
+      "risk": 0.0,
+      "speedup": 1.0246435569777552
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 49,
+      "risk": 0.0,
+      "speedup": 1.093489718701232
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 240,
+      "risk": 0.0,
+      "speedup": 0.9983907534621942
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 72,
+      "risk": 0.0,
+      "speedup": 0.9938624172466229
+     }
+    },
+    "worst_group": 0.0,
+    "worst_marginal": 0.0024630541871921183,
+    "bootstrap": [
+     {
+      "speedup": 1.0233936557357721,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0239064560293751,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0296932691716771,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.025889967982343,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0269538835244554,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0264830485771972,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0285617126115503,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0304791069100836,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.024252193637329,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.020417830920283,
+      "risk": 0.0
+     }
+    ]
+   }
+  }
+ },
+ "fpfh_kitti": {
+  "sc2": {
+   "kitti_test": {
+    "groups": [
+     {
+      "n": 226,
+      "risk_group": 0.0,
+      "risk_marginal": 0.01327433628318584
+     },
+     {
+      "n": 176,
+      "risk_group": 0.005681818181818182,
+      "risk_marginal": 0.017045454545454544
+     },
+     {
+      "n": 153,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     }
+    ],
+    "scenes": {
+     "08": {
+      "n": 306,
+      "risk": 0.0032679738562091504,
+      "speedup": 1.1421865256116495
+     },
+     "09": {
+      "n": 162,
+      "risk": 0.0,
+      "speedup": 1.4892344757190326
+     },
+     "10": {
+      "n": 87,
+      "risk": 0.0,
+      "speedup": 1.6727220103929406
+     }
+    },
+    "worst_group": 0.005681818181818182,
+    "worst_marginal": 0.017045454545454544,
+    "bootstrap": [
+     {
+      "speedup": 1.2876364613165339,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.264533562713081,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.2405286789695347,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.3277318782067138,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.3072288944353359,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.3261775622843919,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.315167185699374,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.2866976314083534,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.3215709204720052,
+      "risk": 0.007207207207207207
+     },
+     {
+      "speedup": 1.3060978740203966,
+      "risk": 0.0036036036036036037
+     }
+    ]
+   }
+  },
+  "turbo": {
+   "kitti_test": {
+    "groups": [
+     {
+      "n": 217,
+      "risk_group": 0.004608294930875576,
+      "risk_marginal": 0.027649769585253458
+     },
+     {
+      "n": 183,
+      "risk_group": 0.01092896174863388,
+      "risk_marginal": 0.01092896174863388
+     },
+     {
+      "n": 155,
+      "risk_group": 0.0064516129032258064,
+      "risk_marginal": 0.0064516129032258064
+     }
+    ],
+    "scenes": {
+     "08": {
+      "n": 306,
+      "risk": 0.013071895424836602,
+      "speedup": 1.2087014315343836
+     },
+     "09": {
+      "n": 162,
+      "risk": 0.0,
+      "speedup": 1.5249179162736268
+     },
+     "10": {
+      "n": 87,
+      "risk": 0.0,
+      "speedup": 1.7530654131347243
+     }
+    },
+    "worst_group": 0.01092896174863388,
+    "worst_marginal": 0.027649769585253458,
+    "bootstrap": [
+     {
+      "speedup": 1.3400381329044653,
+      "risk": 0.005405405405405406
+     },
+     {
+      "speedup": 1.350605182222441,
+      "risk": 0.005405405405405406
+     },
+     {
+      "speedup": 1.2472149321510955,
+      "risk": 0.005405405405405406
+     },
+     {
+      "speedup": 1.358660860011326,
+      "risk": 0.010810810810810811
+     },
+     {
+      "speedup": 1.311875411619931,
+      "risk": 0.005405405405405406
+     },
+     {
+      "speedup": 1.3208928385244991,
+      "risk": 0.007207207207207207
+     },
+     {
+      "speedup": 1.3432801184030145,
+      "risk": 0.007207207207207207
+     },
+     {
+      "speedup": 1.2620290507719223,
+      "risk": 0.0018018018018018018
+     },
+     {
+      "speedup": 1.2927826704431833,
+      "risk": 0.007207207207207207
+     },
+     {
+      "speedup": 1.3187331567495337,
+      "risk": 0.005405405405405406
+     }
+    ]
+   }
+  }
+ },
+ "fcgf_indoor": {
+  "sc2": {
+   "fcgf_3DMatch": {
+    "groups": [
+     {
+      "n": 74,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 228,
+      "risk_group": 0.008771929824561403,
+      "risk_marginal": 0.03070175438596491
+     },
+     {
+      "n": 510,
+      "risk_group": 0.00196078431372549,
+      "risk_marginal": 0.00196078431372549
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 253,
+      "risk": 0.003952569169960474,
+      "speedup": 3.8154964745966002
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 78,
+      "risk": 0.0,
+      "speedup": 3.625270853046942
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 104,
+      "risk": 0.0,
+      "speedup": 2.2803125829352098
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 113,
+      "risk": 0.0,
+      "speedup": 4.939769712557051
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 52,
+      "risk": 0.019230769230769232,
+      "speedup": 4.045317012530277
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 27,
+      "risk": 0.0,
+      "speedup": 4.064962297409888
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 146,
+      "risk": 0.00684931506849315,
+      "speedup": 2.547898944187005
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 39,
+      "risk": 0.0,
+      "speedup": 3.0613370213718625
+     }
+    },
+    "worst_group": 0.008771929824561403,
+    "worst_marginal": 0.03070175438596491,
+    "bootstrap": [
+     {
+      "speedup": 2.7154046124144564,
+      "risk": 0.0024630541871921183
+     },
+     {
+      "speedup": 2.3093936494361613,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 2.7363847947935875,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 3.6089394555343137,
+      "risk": 0.0049261083743842365
+     },
+     {
+      "speedup": 2.384052488257237,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 3.089515787540837,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 2.9621602746147477,
+      "risk": 0.003694581280788177
+     },
+     {
+      "speedup": 3.5242037015988315,
+      "risk": 0.003694581280788177
+     },
+     {
+      "speedup": 2.9926087503924896,
+      "risk": 0.0024630541871921183
+     },
+     {
+      "speedup": 3.1811325365566763,
+      "risk": 0.003694581280788177
+     }
+    ]
+   },
+   "fcgf_3DLoMatch": {
+    "groups": [
+     {
+      "n": 482,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 338,
+      "risk_group": 0.0,
+      "risk_marginal": 0.008875739644970414
+     },
+     {
+      "n": 71,
+      "risk_group": 0.0,
+      "risk_marginal": 0.014084507042253521
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 263,
+      "risk": 0.0,
+      "speedup": 1.0054403180028157
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 144,
+      "risk": 0.0,
+      "speedup": 0.9837053238337204
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 115,
+      "risk": 0.0,
+      "speedup": 1.1370478080519855
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 109,
+      "risk": 0.0,
+      "speedup": 1.119537760899295
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 79,
+      "risk": 0.0,
+      "speedup": 1.0299402950247396
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 25,
+      "risk": 0.0,
+      "speedup": 1.4063713852059845
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 120,
+      "risk": 0.0,
+      "speedup": 0.9920662477894887
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 36,
+      "risk": 0.0,
+      "speedup": 1.062836315977034
+     }
+    },
+    "worst_group": 0.0,
+    "worst_marginal": 0.014084507042253521,
+    "bootstrap": [
+     {
+      "speedup": 0.9927692669357776,
+      "risk": 0.0
+     },
+     {
+      "speedup": 0.9657927204567457,
+      "risk": 0.0
+     },
+     {
+      "speedup": 0.9894981724223617,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0631734475769363,
+      "risk": 0.003367003367003367
+     },
+     {
+      "speedup": 0.9626550717629057,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0111169091468226,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0260715394566104,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.065512664898367,
+      "risk": 0.0
+     },
+     {
+      "speedup": 0.9994144068785589,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0206376351045687,
+      "risk": 0.0
+     }
+    ]
+   }
+  },
+  "turbo": {
+   "fcgf_3DMatch": {
+    "groups": [
+     {
+      "n": 74,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     },
+     {
+      "n": 227,
+      "risk_group": 0.004405286343612335,
+      "risk_marginal": 0.013215859030837005
+     },
+     {
+      "n": 511,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 253,
+      "risk": 0.0,
+      "speedup": 2.2945109362130935
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 78,
+      "risk": 0.0,
+      "speedup": 2.7323173048894964
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 104,
+      "risk": 0.0,
+      "speedup": 1.9661075814400686
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 113,
+      "risk": 0.0,
+      "speedup": 3.189581707967281
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 52,
+      "risk": 0.0,
+      "speedup": 2.1183126836175497
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 27,
+      "risk": 0.0,
+      "speedup": 2.731631689852763
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 146,
+      "risk": 0.00684931506849315,
+      "speedup": 1.9523461508814373
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 39,
+      "risk": 0.0,
+      "speedup": 2.4689565332371073
+     }
+    },
+    "worst_group": 0.004405286343612335,
+    "worst_marginal": 0.013215859030837005,
+    "bootstrap": [
+     {
+      "speedup": 1.3112561493592736,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.8281034928792979,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.6198653505914211,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 2.48952261516385,
+      "risk": 0.0024630541871921183
+     },
+     {
+      "speedup": 0.9799816071077591,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 1.0077831271459121,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.6505854121846313,
+      "risk": 0.0024630541871921183
+     },
+     {
+      "speedup": 2.185148788777422,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 1.7768564537975118,
+      "risk": 0.0012315270935960591
+     },
+     {
+      "speedup": 2.2650092890997207,
+      "risk": 0.0012315270935960591
+     }
+    ]
+   },
+   "fcgf_3DLoMatch": {
+    "groups": [
+     {
+      "n": 481,
+      "risk_group": 0.0,
+      "risk_marginal": 0.004158004158004158
+     },
+     {
+      "n": 338,
+      "risk_group": 0.0,
+      "risk_marginal": 0.005917159763313609
+     },
+     {
+      "n": 72,
+      "risk_group": 0.0,
+      "risk_marginal": 0.0
+     }
+    ],
+    "scenes": {
+     "7-scenes-redkitchen": {
+      "n": 263,
+      "risk": 0.0,
+      "speedup": 1.0030379664420754
+     },
+     "sun3d-home_at-home_at_scan1_2013_jan_1": {
+      "n": 144,
+      "risk": 0.0,
+      "speedup": 0.9897717922583777
+     },
+     "sun3d-home_md-home_md_scan9_2012_sep_30": {
+      "n": 115,
+      "risk": 0.0,
+      "speedup": 1.0925561836516147
+     },
+     "sun3d-hotel_uc-scan3": {
+      "n": 109,
+      "risk": 0.0,
+      "speedup": 1.0885926220063804
+     },
+     "sun3d-hotel_umd-maryland_hotel1": {
+      "n": 79,
+      "risk": 0.0,
+      "speedup": 1.0614258337711013
+     },
+     "sun3d-hotel_umd-maryland_hotel3": {
+      "n": 25,
+      "risk": 0.0,
+      "speedup": 1.3551246160733852
+     },
+     "sun3d-mit_76_studyroom-76-1studyroom2": {
+      "n": 120,
+      "risk": 0.0,
+      "speedup": 1.0659946313781277
+     },
+     "sun3d-mit_lab_hj-lab_hj_tea_nov_2_2012_scan1_erika": {
+      "n": 36,
+      "risk": 0.0,
+      "speedup": 1.009146960529151
+     }
+    },
+    "worst_group": 0.0,
+    "worst_marginal": 0.005917159763313609,
+    "bootstrap": [
+     {
+      "speedup": 0.97569421293365,
+      "risk": 0.001122334455667789
+     },
+     {
+      "speedup": 0.9889888927570604,
+      "risk": 0.001122334455667789
+     },
+     {
+      "speedup": 0.9890466932867596,
+      "risk": 0.001122334455667789
+     },
+     {
+      "speedup": 1.1187319217595837,
+      "risk": 0.002244668911335578
+     },
+     {
+      "speedup": 0.9727902932905024,
+      "risk": 0.001122334455667789
+     },
+     {
+      "speedup": 0.948911916076897,
+      "risk": 0.001122334455667789
+     },
+     {
+      "speedup": 1.0422985518414152,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0474298785845109,
+      "risk": 0.0
+     },
+     {
+      "speedup": 0.9991619836097754,
+      "risk": 0.0
+     },
+     {
+      "speedup": 1.0440295814843312,
+      "risk": 0.0
+     }
+    ]
+   }
+  }
+ }
+}

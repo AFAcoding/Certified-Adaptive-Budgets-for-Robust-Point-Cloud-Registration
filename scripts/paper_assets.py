@@ -64,6 +64,10 @@ VALS: dict[str, str] = {}
 
 INK, INK2, MUTED, GRID = "#0b0b0b", "#52514e", "#898781", "#e1e0d9"
 GRAY, BLUE, ORANGE, AQUA, PURPLE, OCHRE = "#9a9890", "#2a78d6", "#eb6834", "#1baf7a", "#8a5cc8", "#c79a2e"
+# main-paper figures (validated reference palette): blue = ours (CAB, its ordering), light blue = our ordering with a
+# fixed budget, grey = the standard baselines, other slots = alternatives; red only for transferred certificates
+BLUE_L, VIOLET, MAGENTA, RED, LIGHT = "#86b6ef", "#6250d6", "#e87ba4", "#e34948", "#d4d2cb"
+FS_TICK, FS_LABEL, FS_TITLE, FS_LEGEND = 6.6, 7.0, 7.6, 6.5
 
 
 def val(key, x, fmt="{:.2f}"):
@@ -404,36 +408,53 @@ def anchors_and_headroom(ds, logs):
 
     # figure: (a) success at N=250 by true anchors (indoor test sets pooled); (b) difficulty mix of every test set
     labels = [b[2].replace("--", "–").replace("$\\geq$", "≥") for b in edges]
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.35, 1.8), dpi=200, gridspec_kw={"width_ratios": [1.2, 1]})
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.35, 2.05), dpi=200, gridspec_kw={"width_ratios": [1.15, 1]})
     x = np.arange(len(edges))
     rows = bins["indoor"]
     w = 0.27
-    for i, (col, key, lab) in enumerate(((GRAY, 3, "ratio order, $N$=250"), (BLUE, 4, "compat. order, $N$=250"),
+    for i, (col, key, lab) in enumerate(((GRAY, 3, "ratio order, $N$=250"), (BLUE, 4, "our ordering, $N$=250"),
                                          (INK2, 2, "full budget"))):
-        ax1.bar(x + (i - 1) * w, [r[key] for r in rows], width=w * 0.92, color=col, label=lab, edgecolor="white", linewidth=0.3)
-    ax1.set_xticks(x, labels, fontsize=5.5)
-    ax1.set_ylim(0, 132)
+        ax1.bar(x + (i - 1) * w, [r[key] for r in rows], width=w * 0.9, color=col, label=lab, edgecolor="white",
+                linewidth=0.5)
+    ax1.set_xticks(x, labels, fontsize=FS_TICK)
+    ax1.set_ylim(0, 142)
     ax1.set_yticks([0, 25, 50, 75, 100])
-    ax1.set_ylabel("SC² success (%)", fontsize=6, color=INK2)
-    ax1.set_xlabel("true anchors (of 100)", fontsize=6, color=INK2)
-    ax1.set_title("(a) 3DMatch + 3DLoMatch", fontsize=6.5, loc="left", color=INK)
-    ax1.legend(frameon=False, fontsize=4.6, loc="upper left", labelcolor=INK2, handlelength=1.0, ncol=2, columnspacing=0.8)
-    sets_ = [("m", AQUA), ("lo", ORANGE)] + ([("ki", PURPLE)] if "ki" in ds else [])
-    wb = 0.8 / len(sets_)
-    for i, (d, col) in enumerate(sets_):
+    ax1.set_ylabel("SC$^2$-PCR success (%)", fontsize=FS_LABEL, color=INK2)
+    ax1.set_xlabel("true anchors (of 100)", fontsize=FS_LABEL, color=INK2)
+    ax1.set_title("(a) 3DMatch + 3DLoMatch", fontsize=FS_TITLE, loc="left", color=INK)
+    ax1.legend(frameon=False, fontsize=FS_LEGEND - 0.4, loc="upper left", labelcolor=INK2, handlelength=1.0,
+               borderaxespad=0.1, labelspacing=0.25)
+    # (b) composition of every test set: fewer than 5 true anchors (a cheap budget cannot be rescued),
+    # 5-49 (the ordering helps; blue, as in (a)) and 50 or more (already easy)
+    groups = [("<5: ordering cannot help", 0, 5, INK2), ("5–49: ordering helps", 5, 50, BLUE),
+              ("≥50: already easy", 50, 10 ** 6, LIGHT)]
+    sets_ = [d for d in ("m", "lo", "ki") if d in ds]
+    for j, d in enumerate(sets_):
         a = np.array([r["anchors_true"] for r in logs[(d, "compat")]])
-        share = [100 * np.mean((a >= lo) & (a < hi)) for lo, hi, _ in edges]
-        ax2.bar(x + (i - (len(sets_) - 1) / 2) * wb, share, width=wb * 0.95, color=col, label=DNAME[d], edgecolor="white", linewidth=0.3)
-    ax2.set_xticks(x, labels, fontsize=5.5)
-    ax2.set_ylabel("share of pairs (%)", fontsize=6, color=INK2)
-    ax2.set_xlabel("true anchors (of 100)", fontsize=6, color=INK2)
-    ax2.set_title("(b) difficulty mix", fontsize=6.5, loc="left", color=INK)
-    ax2.legend(frameon=False, fontsize=5, loc="upper center", labelcolor=INK2, handlelength=1.0)
+        left = 0.0
+        for gname, lo, hi, col in groups:
+            share = 100 * np.mean((a >= lo) & (a < hi))
+            ax2.barh(j, share, left=left, height=0.62, color=col, edgecolor="white", linewidth=0.8,
+                     label=gname if j == 0 else None)
+            if share >= 9:
+                ax2.text(left + share / 2, j, f"{share:.0f}", ha="center", va="center", fontsize=FS_TICK,
+                         color="white" if col != LIGHT else INK)
+            left += share
+    ax2.set_yticks(range(len(sets_)), [DNAME[d] for d in sets_], fontsize=FS_TICK)
+    ax2.set_ylim(len(sets_) - 0.5, -0.5)
+    ax2.set_xlim(0, 100)
+    ax2.set_xticks([0, 50, 100])
+    ax2.set_xlabel("share of pairs (%)", fontsize=FS_LABEL, color=INK2)
+    ax2.set_title("(b) difficulty mix", fontsize=FS_TITLE, loc="left", color=INK)
+    ax2.legend(frameon=False, fontsize=FS_LEGEND - 0.4, loc="upper center", bbox_to_anchor=(0.42, -0.42),
+               labelcolor=INK2, handlelength=1.0, ncol=1, labelspacing=0.2, borderaxespad=0)
     for ax in (ax1, ax2):
-        style(ax, 5.5)
-        ax.grid(False, axis="x")
-    fig.tight_layout(pad=0.3, w_pad=0.8)
-    fig.savefig(FIG / "anchors.pdf", facecolor="white")
+        style(ax, FS_TICK)
+    ax1.grid(False, axis="x")
+    ax2.grid(False, axis="y")
+    ax2.tick_params(axis="y", length=0)
+    fig.tight_layout(pad=0.3, w_pad=0.6)
+    fig.savefig(FIG / "anchors.pdf", facecolor="white", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
 
     # headroom: CAB (group-cond.) vs two oracles on CAB's own (selected) ladder, both orders:
@@ -626,40 +647,52 @@ def risk_ledger(ax):
     CAB with group-conditional certificates against the alternatives that carry no valid guarantee there."""
     sets_ = [d for d in ("m", "lo", "ki", "fm", "flo", "fki") if f"sc.{d}.compat.group.risk" in VALS]
     series = [  # (label, key pattern, color, marker, filled)
-        ("CAB, group-conditional", "{e}.{d}.compat.group.risk", BLUE, "o", True),
-        ("CAB, marginal certificate", "{e}.{d}.compat.marg.risk", GRAY, "o", False),
-        ("uniform sampling, N=2,000", "eq.{e}.{d}.rand2000.risk", OCHRE, "^", True),
-        ("FPFH certificate on FCGF", "{e}.{d}.compat.group.xfer.risk", ORANGE, "X", True),
+        ("CAB, group-conditional (ours)", "{e}.{d}.compat.group.risk", BLUE, "o", True),
+        ("CAB, marginal certificate", "{e}.{d}.compat.marg.risk", BLUE, "o", False),
+        ("uniform sampling, $N$=2,000", "eq.{e}.{d}.rand2000.risk", ORANGE, "^", True),
+        ("FPFH certificate reused on FCGF", "{e}.{d}.compat.group.xfer.risk", RED, "X", True),
     ]
     cab = [num(f"{e}.{d}.compat.group.risk") for d in sets_ for e in ESTS]
     val("cab.risk.max", max(cab), "{:.2f}")
     val("cab.risk.n", str(len(cab)))
-    off = {"sc": -0.17, "tr": 0.17}
+    # horizontal dot plot: one row per test set (upper dot SC2-PCR, lower TurboReg), risk on a symlog axis
+    off = {"sc": -0.16, "tr": 0.16}
+    XMAX = 14
+    ax.axvspan(1.0, XMAX, color=RED, alpha=0.07, lw=0, zorder=0)
+    ax.axvline(1.0, color=INK, lw=0.8, ls=(0, (3, 2)), zorder=2)
     for si, (label, pat, col, mk, filled) in enumerate(series):
         xs, ys = [], []
         for i, d in enumerate(sets_):
             for e in ESTS:
                 k = pat.format(e=e, d=d)
                 if k in VALS:
-                    xs.append(i + off[e] + (si - 1.5) * 0.045)
-                    ys.append(num(k))
+                    xs.append(num(k))
+                    ys.append(i + off[e])
         if xs:
-            ax.plot(xs, ys, mk, ls="none", ms=3.8 if mk != "X" else 4.4, color=col,
-                    mfc=col if filled else "white", mec="none" if filled else col, mew=0.0 if filled else 0.9,
-                    label=label, zorder=4 if si == 0 else 3)
-    ax.axhline(1.0, color=INK, lw=0.7, ls=(0, (3, 2)), zorder=2)
-    ax.text(-0.42, 1.1, "certified level, 1 %", fontsize=5.2, color=INK, ha="left", va="bottom")
-    ax.set_yscale("symlog", linthresh=1.0, linscale=1.0)
-    ax.set_ylim(-0.05, 14)
-    ax.set_yticks([0, 0.5, 1, 2, 5, 10])
-    ax.set_yticklabels(["0", "0.5", "1", "2", "5", "10"])
-    ax.set_xticks(range(len(sets_)))
-    ax.set_xticklabels([DNAME[d] + ("\nFCGF" if d in FCGF else "\nFPFH") for d in sets_], fontsize=5.2)
-    ax.set_xlim(-0.5, len(sets_) - 0.5)
-    ax.set_ylabel("pairs lost vs. full budget (%)", fontsize=6.5, color=INK2)
-    ax.set_title("Risk on every test set", fontsize=7, color=INK, loc="left")
-    style(ax, 5.5)
-    ax.grid(False, axis="x")
+            ax.plot(xs, ys, mk, ls="none", ms=5.0, color=col, mfc=col if filled else "white",
+                    mec=col, mew=1.0 if not filled else 0.4,
+                    label=label, zorder=5 if si == 0 else 4)
+    for i in range(len(sets_) - 1):
+        ax.axhline(i + 0.5, color=GRID, lw=0.5, zorder=1)
+    if "fm" in sets_:  # separate descriptors
+        ax.axhline(sets_.index("fm") - 0.5, color=INK2, lw=0.6, zorder=1)
+    ax.text(0.95, -0.78, "certified level 1 %", fontsize=FS_LEGEND - 0.4, color=INK, ha="right", va="center")
+    ax.text(1.1, -0.78, "exceeds it", fontsize=FS_LEGEND - 0.4, color=INK, ha="left", va="center", style="italic")
+    ax.set_xscale("symlog", linthresh=1.0, linscale=1.0)
+    ax.set_xlim(-0.05, XMAX)
+    ax.set_xticks([0, 0.5, 1, 2, 5, 10])
+    ax.set_xticklabels(["0", "0.5", "1", "2", "5", "10"])
+    ax.set_yticks(range(len(sets_)))
+    ax.set_yticklabels([("FCGF " if d in FCGF else "FPFH ") + DNAME[d] for d in sets_], fontsize=FS_TICK)
+    ax.set_ylim(len(sets_) - 0.5, -2.9)  # band above the rows for the legend
+    ax.legend(loc="upper center", ncol=2, fontsize=FS_LEGEND - 0.6, frameon=True, facecolor="white", edgecolor="none",
+              framealpha=1.0, labelcolor=INK2, handlelength=1.0, handletextpad=0.3, columnspacing=0.6,
+              borderaxespad=0.15, borderpad=0.25)
+    ax.set_xlabel("pairs lost vs. the full budget (%)", fontsize=FS_LABEL, color=INK2)
+    ax.set_title("Risk on every test set", fontsize=FS_TITLE, color=INK, loc="left")
+    style(ax, FS_TICK)
+    ax.grid(False, axis="y")
+    ax.tick_params(axis="y", length=0)
 
 
 def _equal_time_live(variants):
@@ -668,8 +701,11 @@ def _equal_time_live(variants):
         return
     rows = json.loads(path.read_text())
     L = []
-    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.3), dpi=200, gridspec_kw={"width_ratios": [1, 1, 1.25]})
-    colors = {"rand": OCHRE, "fm1": ORANGE, "fm2": PURPLE, "ratio": GRAY, "compat": BLUE, "cheap": INK2}
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.65), dpi=200, gridspec_kw={"width_ratios": [1, 1, 1.15]})
+    colors = {"rand": ORANGE, "fm1": VIOLET, "fm2": MAGENTA, "ratio": GRAY, "compat": BLUE_L, "cheap": INK2}
+    legend_name = {"rand": "uniform sampling", "fm1": "FastMAC-style, 1st-order graph",
+                   "fm2": "FastMAC-style, 2nd-order graph", "ratio": "fixed budget, ratio order",
+                   "compat": "fixed budget, our ordering", "cheap": "fewer seeds / cliques"}
     for ax, (e, E) in zip(axes[:2], ESTS.items()):
         rs = [r for r in rows if r["est"] == E]
         t = {k: 1e3 * np.mean([r[k] for r in rs]) for k in rs[0] if isinstance(rs[0][k], float)}
@@ -717,33 +753,44 @@ def _equal_time_live(variants):
                      f"{reach:,.0f} ({reach / cab_t:.1f}\\X)" if reach is not None else "never"]
             L.append(" & ".join(cells) + " \\\\")
             xs, ys = [p[0] for p in curve], [p[1] for p in curve]
-            label = name.replace("\\ ", " ").replace("\\", "").replace("$", "").replace("{=}", "=")
             if v == "cheap":
-                ax.plot([p[0] for p in pts], [p[1] for p in pts], "v", color=colors[v], ms=4.5, mec="white", mew=0.4,
-                        label="fewer seeds" if e == "sc" else "fewer cliques")
+                ax.plot([p[0] for p in pts], [p[1] for p in pts], "v", color=colors[v], ms=5.2, mec=colors[v], mew=0.4,
+                        label=legend_name[v], zorder=4)
             else:
-                ax.plot(xs, ys, "-o", color=colors[v], lw=1.1, ms=2.6, mec="white", mew=0.4, label=label)
-        ax.plot([t["full"]], [full_rr], "D", color=INK, ms=4.2, label="full budget")
-        ax.plot([cab_t], [cab_rr], "*", color=BLUE, ms=10, mec=INK, mew=0.6, label="CAB (ours)", zorder=6)
+                ax.plot(xs, ys, "-o", color=colors[v], lw=1.4, ms=3.2, mec=colors[v], mew=0.4, label=legend_name[v],
+                        zorder=3)
+        # equal time: the guide marks CAB's time; every curve is read where it crosses the guide
+        ax.axvline(cab_t, color=BLUE, lw=0.8, ls=(0, (2, 2)), zorder=2)
+        ax.plot([t["full"]], [full_rr], "D", color=INK, ms=5.0, mec=INK, mew=0.4, label="full budget", zorder=5)
+        ax.plot([cab_t], [cab_rr], "*", color=BLUE, ms=14, mec=INK, mew=0.6, label="CAB (ours)", zorder=6)
+        ax.text(cab_t / 1.07, 83.55, f"CAB: {t['full'] / cab_t:.2f}$\\times$ faster", fontsize=FS_LEGEND, color=INK,
+                ha="right", va="center")
         ax.set_xscale("log")
-        ax.set_xlabel("live time per pair (ms, log scale)", fontsize=6.5, color=INK2)
-        ax.set_ylabel("recall (%)", fontsize=6.5, color=INK2)
-        ax.set_title(f"{ENAME[e].replace('$^2$', '²')}, 3DMatch", fontsize=7, color=INK, loc="left")
-        style(ax)
+        ax.set_xlim(100, 1300)
+        ax.set_ylim(70, 84.3)
+        ax.set_yticks([70, 74, 78, 82])
+        ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([100, 200, 500, 1000]))
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["100", "200", "500", "1000"]))
+        ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        ax.set_xlabel("live time per pair (ms, log scale)", fontsize=FS_LABEL, color=INK2)
+        ax.set_ylabel("recall (%)", fontsize=FS_LABEL, color=INK2)
+        ax.set_title(f"{ENAME[e].replace('$^2$', '²')}, 3DMatch", fontsize=FS_TITLE, color=INK, loc="left")
+        style(ax, FS_TICK)
         L.append("\\midrule" if e == "sc" else "\\bottomrule")
-    h, lab = axes[0].get_legend_handles_labels()
-    h2, lab2 = axes[1].get_legend_handles_labels()
-    extra = [(hh, ll) for hh, ll in zip(h2, lab2) if ll not in lab]
-    risk_ledger(axes[2])
-    fig.tight_layout(rect=(0, 0.15, 1, 1), w_pad=1.0)
-    # equal-time legend under the two equal-time panels, ledger legend under the ledger
+    handles = {}
+    for ax in axes[:2]:
+        for hh, ll in zip(*ax.get_legend_handles_labels()):
+            handles.setdefault(ll, hh)
+    order = ["CAB (ours)", "full budget", legend_name["compat"], legend_name["ratio"], legend_name["rand"],
+             legend_name["fm1"], legend_name["fm2"], legend_name["cheap"]]
+    order = [o for o in order if o in handles]
+    risk_ledger(axes[2])  # its legend sits inside the panel
+    fig.tight_layout(rect=(0, 0.2, 1, 1), w_pad=1.2)
+    # equal-time legend under the two equal-time panels
     x0, x1 = axes[0].get_position().x0, axes[1].get_position().x1
-    fig.legend(h + [x[0] for x in extra], lab + [x[1] for x in extra], loc="lower center", ncol=4, fontsize=5.3,
-               frameon=False, labelcolor=INK2, bbox_to_anchor=((x0 + x1) / 2, 0.0), columnspacing=1.0, handlelength=1.6)
-    hl, ll = axes[2].get_legend_handles_labels()
-    fig.legend(hl, ll, loc="lower center", ncol=2, fontsize=5.3, frameon=False, labelcolor=INK2,
-               bbox_to_anchor=((axes[2].get_position().x0 + axes[2].get_position().x1) / 2, 0.0),
-               columnspacing=1.0, handlelength=1.2)
+    fig.legend([handles[o] for o in order], order, loc="lower center", ncol=3, fontsize=FS_LEGEND, frameon=False,
+               labelcolor=INK2, bbox_to_anchor=((x0 + x1) / 2, 0.0), columnspacing=1.2, handlelength=1.8,
+               markerscale=0.75)
     fig.savefig(FIG / "teaser.pdf", facecolor="white")
     plt.close(fig)
     (TAB / "equal_time.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
@@ -774,17 +821,22 @@ def qualitative():
     _, _, vt = np.linalg.svd(c[np.random.default_rng(0).choice(len(c), min(5000, len(c)), replace=False)], full_matrices=False)
     proj = lambda X: (X - rp.mean(0)) @ vt[:2].T  # noqa: E731
     bg = proj(rp)
-    fig, axes = plt.subplots(1, 2, figsize=(3.35, 1.75), dpi=220)
+    fig, axes = plt.subplots(1, 2, figsize=(3.35, 2.0), dpi=220)
     for ax, (title, idx) in zip(axes, (("250 most distinctive", np.arange(250)), ("250 most consistent (ours)", perm[:250]))):
-        ax.scatter(bg[:, 0], bg[:, 1], s=0.15, c="#cfcdc6", lw=0, rasterized=True)
+        ax.scatter(bg[:, 0], bg[:, 1], s=0.2, c=LIGHT, lw=0, rasterized=True)
         q = proj(Q[idx])
         ok = gt[idx]
-        ax.scatter(q[~ok, 0], q[~ok, 1], s=2.2, c="#d6453d", lw=0, label="outlier")
-        ax.scatter(q[ok, 0], q[ok, 1], s=2.2, c="#1a9e4a", lw=0, label="inlier")
-        ax.set_title(f"{title}: {ok.sum()} inliers", fontsize=5.8, color=INK)
+        # outliers first, true correspondences on top; solid markers (an edge in the fill colour renders everywhere)
+        ax.scatter(q[~ok, 0], q[~ok, 1], s=4.5, c=ORANGE, edgecolors=ORANGE, linewidths=0.3, label="outlier")
+        ax.scatter(q[ok, 0], q[ok, 1], s=6.5, c=BLUE, edgecolors=BLUE, linewidths=0.3, label="true correspondence",
+                   zorder=3)
+        ax.set_title(f"{title}\n{ok.sum()} true correspondences", fontsize=FS_LABEL, color=INK, linespacing=1.15)
         ax.set_aspect("equal")
         ax.axis("off")
-    fig.tight_layout(pad=0.2, w_pad=0.3)
+    h, lab = axes[1].get_legend_handles_labels()
+    fig.legend(h[::-1], lab[::-1], loc="lower center", ncol=2, fontsize=FS_LEGEND, frameon=False, labelcolor=INK2,
+               markerscale=2.2, handletextpad=0.3, columnspacing=1.5)
+    fig.tight_layout(rect=(0, 0.08, 1, 1), pad=0.2, w_pad=0.3)
     fig.savefig(FIG / "qualitative.pdf", facecolor="white")
     plt.close(fig)
     val("qual.pair", p.pair_id.replace("_", "\\_"))
@@ -991,6 +1043,204 @@ def kitti_meta():
     (TAB / "supp_kitti_thresholds.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
+def latency():
+    """Supp table: per-pair live latency percentiles (ms) of the full budget and CAB (compatibility order), and the
+    share of pairs on which CAB is slower than the full budget (the first-stage overhead on hard pairs)."""
+    L = []
+    for fam, sets_ in (("3dmatch", [("m", "3DMatch"), ("lo", "3DLoMatch")]), ("kitti", [("ki", "kitti_test")]),
+                       ("fcgf3dmatch", [("fm", "fcgf_3DMatch"), ("flo", "fcgf_3DLoMatch")])):
+        path = RB / LIVE[fam]
+        if not path.exists():
+            continue
+        rows = json.loads(path.read_text())
+        for d, s in sets_:
+            for e, E in ESTS.items():
+                rs = [r for r in rows if r["est"] == E and r["subset"] == s]
+                if not rs:
+                    continue
+                f = 1e3 * np.array([r["full"]["s"] for r in rs])
+                c = 1e3 * np.array([r["budgetc"]["s"] for r in rs])
+                q = lambda x, p: float(np.percentile(x, p))  # noqa: E731
+                slower = 100 * np.mean(c > f)
+                k = f"lat.{e}.{d}"
+                for p in (50, 90, 99):
+                    val(f"{k}.full.p{p}", q(f, p), "{:,.0f}")
+                    val(f"{k}.cab.p{p}", q(c, p), "{:,.0f}")
+                val(k + ".slower", slower, "{:.0f}")
+                val(k + ".overhead.p99", 100 * (q(c, 99) / q(f, 99) - 1), "{:+.0f}")
+                L.append(f"{ENAME[e]}, {dlabel(d)} & {len(rs)} & {q(f, 50):,.0f} / {q(c, 50):,.0f} & "
+                         f"{q(f, 90):,.0f} / {q(c, 90):,.0f} & {q(f, 99):,.0f} / {q(c, 99):,.0f} & {slower:.0f} \\\\")
+    (TAB / "supp_latency.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+def evidence_extra():
+    """Supp table from results/budget/evidence_extra.json: worst-case mixture risk (largest group risk) for CAB and
+    the marginal certificate, largest per-scene risk, and the controller re-fitted on bootstrap resamples."""
+    path = RB / "evidence_extra.json"
+    if not path.exists():
+        return
+    data = json.loads(path.read_text())
+    names = {"3DMatch": "3DMatch", "3DLoMatch": "3DLoMatch", "kitti_test": "KITTI", "fcgf_3DMatch": "3DMatch (FCGF)",
+             "fcgf_3DLoMatch": "3DLoMatch (FCGF)"}
+    L, wg, wm, groups, over = [], [], [], 0, []
+    for dname in ("fpfh_indoor", "fpfh_kitti", "fcgf_indoor"):
+        for e, E in ESTS.items():
+            for t, r in data[dname][E].items():
+                sp = np.array([b["speedup"] for b in r["bootstrap"]])
+                rk = np.array([b["risk"] for b in r["bootstrap"]])
+                scene_risk = max(v["risk"] for v in r["scenes"].values())
+                wg.append(100 * r["worst_group"])
+                wm.append(100 * r["worst_marginal"])
+                for g in r["groups"]:
+                    groups += 1
+                    if g["risk_group"] > 0.01:
+                        over.append((g["risk_group"], g["n"]))
+                L.append(f"{ENAME[e]}, {names[t]} & {100 * r['worst_group']:.2f} & {100 * r['worst_marginal']:.2f} & "
+                         f"{100 * scene_risk:.2f} & {sp.mean():.2f}\\X\\,[{sp.min():.2f}, {sp.max():.2f}] & {100 * rk.max():.2f} \\\\")
+    val("ev.worst.group.max", max(wg), "{:.2f}")
+    val("ev.worst.marg.max", max(wm), "{:.2f}")
+    val("ev.worst.marg.min", min(wm), "{:.2f}")
+    val("ev.groups.n", str(groups))
+    val("ev.groups.over", str(len(over)))
+    if over:
+        r, n = max(over)
+        val("ev.groups.over.risk", 100 * r, "{:.2f}")
+        val("ev.groups.over.lost", str(int(round(r * n))))
+        val("ev.groups.over.n", str(n))
+    (TAB / "supp_evidence.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+def sensitivity():
+    """Supp table from results/budget/sensitivity.json: offline speed-up (risk) per (epsilon, G) setting."""
+    path = RB / "sensitivity.json"
+    if not path.exists():
+        return
+    data = json.loads(path.read_text())
+    settings = [("0.005", "3"), ("0.01", "3"), ("0.02", "3"), ("0.05", "3"), ("0.01", "1"), ("0.01", "2"),
+                ("0.01", "4"), ("0.01", "5")]
+    cols = [("3dmatch", "3DMatch"), ("kitti", "kitti_test")]
+    L, viol = [], 0
+    for eps, g in settings:
+        key = f"{float(eps)}_{g}"
+        cells = [f"{100 * float(eps):g}", g]
+        for dname, test in cols:
+            for e, E in ESTS.items():
+                r = data[dname][E][test][key]
+                over = r["risk"] > float(eps)
+                viol += over
+                risk = f"{100 * r['risk']:.2f}"
+                cells.append(f"{r['speedup']:.2f}\\X\\,({'\\textbf{' + risk + '}' if over else risk})")
+                val(f"sens.{e}.{dname}.{eps}.{g}.speed", r["speedup"])
+                val(f"sens.{e}.{dname}.{eps}.{g}.risk", 100 * r["risk"], "{:.2f}")
+        L.append(" & ".join(cells) + " \\\\")
+        if (eps, g) == ("0.05", "3"):
+            L.append("\\midrule")
+    val("sens.violations", str(viol))
+    (TAB / "supp_sensitivity.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+def fcgf_scene_disjoint():
+    """Supp table from results/budget/fcgf_scene_disjoint.json (cross-fitting over scenes, compatibility order)."""
+    path = RB / "fcgf_scene_disjoint.json"
+    if not path.exists():
+        return
+    data = json.loads(path.read_text())
+    L, risks_g, risks_m = [], [], []
+    names = {"fcgf_3DMatch": ("fm", "3DMatch"), "fcgf_3DLoMatch": ("flo", "3DLoMatch"), "fcgf_kitti_test": ("fki", "KITTI")}
+    for s, (d, nm) in names.items():
+        if s not in data:
+            continue
+        for e, E in ESTS.items():
+            g, m = data[s][E]["compat"]["mondrian"], data[s][E]["compat"]["marginal"]
+            k = f"fsd.{e}.{d}"
+            val(k + ".speed", g["speedup"])
+            val(k + ".risk", 100 * g["risk"], "{:.2f}")
+            val(k + ".loss", 100 * g["delta_rr"], "{:.2f}")
+            val(k + ".ub", 100 * g["ub95"], "{:.2f}")
+            val(k + ".marg.risk", 100 * m["risk"], "{:.2f}")
+            risks_g.append(100 * g["risk"])
+            risks_m.append(100 * m["risk"])
+            ni = "\\cmark" if g["non_inferior"] else "\\xmark"
+            L.append(f"{ENAME[e]}, {nm} & {100 * g['delta_rr']:.2f} [{100 * g['ub95']:.2f}] {ni} & {g['speedup']:.2f}\\X & "
+                     f"{100 * g['risk']:.2f} & {100 * m['risk']:.2f} \\\\")
+    if risks_g:
+        val("fsd.group.risk.max", max(risks_g), "{:.2f}")
+        val("fsd.marg.risk.max", max(risks_m), "{:.2f}")
+    (TAB / "supp_fcgf_scene.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+def calibration_size():
+    """Supp table from results/budget/calibration_size.json: smallest calibration pool that certifies, and how often
+    the certificates exceed the 1 % level on test (over all subset sizes)."""
+    path = RB / "calibration_size.json"
+    if not path.exists():
+        return
+    data = json.loads(path.read_text())
+    L = []
+    names = {"3DMatch": "3DMatch", "3DLoMatch": "3DLoMatch", "kitti_test": "KITTI"}
+    for dname, ests in data.items():
+        for e, E in ESTS.items():
+            for test, tags in ests[E].items():
+                cells = [f"{ENAME[e]}, {names[test]}"]
+                for tag in ("mondrian", "marginal"):
+                    by_n = {int(n): recs for n, recs in tags[tag].items()}
+                    nmin = min((n for n, recs in by_n.items() if np.mean([r["certified"] for r in recs]) >= 0.5),
+                               default=None)
+                    cert = [r for recs in by_n.values() for r in recs if r["certified"]]
+                    over = 100 * np.mean([r["risk"] > 0.01 for r in cert]) if cert else float("nan")
+                    worst = 100 * max(r["risk"] for r in cert) if cert else float("nan")
+                    k = f"cal.{e}.{test}.{tag}"
+                    if nmin is not None:
+                        val(k + ".nmin", f"{nmin:,}")
+                    val(k + ".over", over, "{:.0f}")
+                    val(k + ".worst", worst, "{:.2f}")
+                    cells += [f"{nmin:,}" if nmin else "--", f"{over:.0f}", f"{worst:.2f}"]
+                L.append(" & ".join(cells) + " \\\\")
+    # summary keys for the text: the share of marginal certificates above 1 % on KITTI, and the group-conditional maximum
+    over_k = [num(f"cal.{e}.kitti_test.marginal.over") for e in ESTS if f"cal.{e}.kitti_test.marginal.over" in VALS]
+    if over_k:
+        val("cal.kitti.marg.over.max", max(over_k), "{:.0f}")
+    worst_g = [num(k) for k in VALS if k.startswith("cal.") and k.endswith(".mondrian.worst")]
+    if worst_g:
+        val("cal.group.worst.max", max(worst_g), "{:.2f}")
+    (TAB / "supp_calibration_size.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+# published full-budget recall (%) under the same success criteria, from TurboReg (Yan et al., ICCV 2025), Tables 1, 2
+# and 4: SC2-PCR, and TurboReg with K1 = 2,000 indoors and 500 pivots on KITTI
+PUBLISHED_RR = {("sc", "fpfh"): (83.73, 38.57, 96.40), ("tr", "fpfh"): (84.10, 40.99, 97.84),
+                ("sc", "fcgf"): (93.16, 58.73, 97.12), ("tr", "fcgf"): (93.59, 59.74, 98.20)}
+
+
+def fidelity():
+    """Supp table: full-budget recall of our re-implementations vs published, with FPFH (test sets) and with the
+    released FCGF features (all test pairs: even-indexed and held-out)."""
+    L = []
+    for desc in ("fpfh", "fcgf"):
+        for e, E in ESTS.items():
+            ours = []
+            for d, s in (("m", "3DMatch"), ("lo", "3DLoMatch"), ("ki", "kitti_test")):
+                if desc == "fpfh":
+                    ours.append(num(f"{e}.{d}.ratio.group.full"))
+                else:
+                    recs = B.load(f"fcgf_{s}", "budgetc") + B.load(f"fcgf_{s}_cal", "budgetc")
+                    ours.append(100 * np.mean([r[E][4]["ok15"] for r in recs]) if recs else float("nan"))
+            pub = PUBLISHED_RR[(e, desc)]
+            for (d, o, p) in zip(("m", "lo", "ki"), ours, pub):
+                val(f"fid.{e}.{desc}.{d}.ours", o, "{:.1f}")
+                val(f"fid.{e}.{desc}.{d}.gap", p - o, "{:.1f}")
+            cells = [f"{ENAME[e]}, {desc.upper()}"] + [x for o, p in zip(ours, pub) for x in (f"{o:.1f}", f"{p:.1f}")]
+            L.append(" & ".join(cells) + " \\\\")
+    for desc in ("fpfh", "fcgf"):  # gap ranges for the text (indoor sets, both estimators)
+        g = [num(f"fid.{e}.{desc}.{d}.gap") for e in ESTS for d in ("m", "lo")]
+        val(f"fid.{desc}.indoor.gap.min", min(g), "{:.1f}")
+        val(f"fid.{desc}.indoor.gap.max", max(g), "{:.1f}")
+        gk = [num(f"fid.{e}.{desc}.ki.gap") for e in ESTS]
+        val(f"fid.{desc}.kitti.gap.min", min(gk), "{:.1f}")
+        val(f"fid.{desc}.kitti.gap.max", max(gk), "{:.1f}")
+    (TAB / "supp_reimpl.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     TAB.mkdir(parents=True, exist_ok=True)
@@ -1007,6 +1257,12 @@ def main():
     registrability()
     ablations()
     kitti_meta()
+    calibration_size()
+    fidelity()
+    fcgf_scene_disjoint()
+    sensitivity()
+    evidence_extra()
+    latency()
     lines = ["% generated by scripts/paper_assets.py -- do not edit"]
     lines += [f"\\defval{{{k}}}{{{v}}}" for k, v in sorted(VALS.items())]
     (PAPER / "numbers.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")

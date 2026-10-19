@@ -44,13 +44,18 @@ python -I scripts/evaluate_transfer.py                                   # FPFH 
 python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {fcgf3dmatch|fcgfkitti}
 python -I scripts/split_fcgf_cal.py
 python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset fcgf3dmatch_refit
+# further checks (all from the logs)
+python -I scripts/fcgf_scene_disjoint.py   # FCGF calibrated on other scenes only (cross-fitting over scenes)
+python -I scripts/calibration_size.py      # certification on random calibration subsets of growing size
+python -I scripts/sensitivity.py           # risk level epsilon and number of difficulty groups
+python -I scripts/evidence_extra.py        # group-wise and worst-case risk, per-scene results, re-fitted controllers
 # every number, table and figure of the paper
 python -I scripts/paper_assets.py                                        # -> paper/numbers.tex, paper/tables/, paper/figures/
 ```
 
 `{a|b}` means "run once with each value". The outputs should match the files in `results/`.
 
-Live speed-ups are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*.json`). On other hardware, re-measure them with the `live_*` scripts below.
+Live speed-ups are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*.json`, 300 test pairs per set). On other hardware, re-measure them with `bash scripts/run_live_300.sh` on an otherwise idle machine.
 
 ## Full rerun from the data
 

@@ -1,0 +1,22 @@
+# Additional evidence (compatibility order)
+
+- fpfh_indoor sc2 3DMatch: group risks (CAB) 0.00% (n=443), 0.68% (n=438), 0.27% (n=742); worst-case mixture CAB 0.68%, marginal 2.51%; scenes: max risk 1.71%, speed-up 1.59-2.68x
+- fpfh_indoor sc2 3DLoMatch: group risks (CAB) 0.00% (n=1282), 0.00% (n=426), 0.00% (n=73); worst-case mixture CAB 0.00%, marginal 0.47%; scenes: max risk 0.00%, speed-up 0.99-1.14x
+- fpfh_indoor sc2 3DMatch: re-fitted controller (10 resamples): speed-up 1.87 [1.73, 2.01], risk max 0.37%
+- fpfh_indoor sc2 3DLoMatch: re-fitted controller (10 resamples): speed-up 1.03 [1.01, 1.05], risk max 0.00%
+- fpfh_indoor turbo 3DMatch: group risks (CAB) 0.00% (n=448), 0.92% (n=434), 0.27% (n=741); worst-case mixture CAB 0.92%, marginal 2.53%; scenes: max risk 1.37%, speed-up 1.53-2.50x
+- fpfh_indoor turbo 3DLoMatch: group risks (CAB) 0.00% (n=1301), 0.00% (n=406), 0.00% (n=74); worst-case mixture CAB 0.00%, marginal 0.25%; scenes: max risk 0.00%, speed-up 0.99-1.12x
+- fpfh_indoor turbo 3DMatch: re-fitted controller (10 resamples): speed-up 1.82 [1.79, 1.86], risk max 0.43%
+- fpfh_indoor turbo 3DLoMatch: re-fitted controller (10 resamples): speed-up 1.03 [1.02, 1.03], risk max 0.00%
+- fpfh_kitti sc2 kitti_test: group risks (CAB) 0.00% (n=226), 0.57% (n=176), 0.00% (n=153); worst-case mixture CAB 0.57%, marginal 1.70%; scenes: max risk 0.33%, speed-up 1.14-1.67x
+- fpfh_kitti sc2 kitti_test: re-fitted controller (10 resamples): speed-up 1.30 [1.24, 1.33], risk max 0.72%
+- fpfh_kitti turbo kitti_test: group risks (CAB) 0.46% (n=217), 1.09% (n=183), 0.65% (n=155); worst-case mixture CAB 1.09%, marginal 2.76%; scenes: max risk 1.31%, speed-up 1.21-1.75x
+- fpfh_kitti turbo kitti_test: re-fitted controller (10 resamples): speed-up 1.31 [1.25, 1.36], risk max 1.08%
+- fcgf_indoor sc2 fcgf_3DMatch: group risks (CAB) 0.00% (n=74), 0.88% (n=228), 0.20% (n=510); worst-case mixture CAB 0.88%, marginal 3.07%; scenes: max risk 1.92%, speed-up 2.28-4.94x
+- fcgf_indoor sc2 fcgf_3DLoMatch: group risks (CAB) 0.00% (n=482), 0.00% (n=338), 0.00% (n=71); worst-case mixture CAB 0.00%, marginal 1.41%; scenes: max risk 0.00%, speed-up 0.98-1.41x
+- fcgf_indoor sc2 fcgf_3DMatch: re-fitted controller (10 resamples): speed-up 2.95 [2.31, 3.61], risk max 0.49%
+- fcgf_indoor sc2 fcgf_3DLoMatch: re-fitted controller (10 resamples): speed-up 1.01 [0.96, 1.07], risk max 0.34%
+- fcgf_indoor turbo fcgf_3DMatch: group risks (CAB) 0.00% (n=74), 0.44% (n=227), 0.00% (n=511); worst-case mixture CAB 0.44%, marginal 1.32%; scenes: max risk 0.68%, speed-up 1.95-3.19x
+- fcgf_indoor turbo fcgf_3DLoMatch: group risks (CAB) 0.00% (n=481), 0.00% (n=338), 0.00% (n=72); worst-case mixture CAB 0.00%, marginal 0.59%; scenes: max risk 0.00%, speed-up 0.99-1.36x
+- fcgf_indoor turbo fcgf_3DMatch: re-fitted controller (10 resamples): speed-up 1.71 [0.98, 2.49], risk max 0.25%
+- fcgf_indoor turbo fcgf_3DLoMatch: re-fitted controller (10 resamples): speed-up 1.01 [0.95, 1.12], risk max 0.22%
