@@ -196,64 +196,43 @@ class Controller:
         return next((st["stage"] for st in tro if st["p_now"] >= self.lams[g]), len(tro) - 1)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--per-set", type=int, default=100)
-    ap.add_argument("--prefixes", default="budget")
-    ap.add_argument("--ladders", default="base", choices=["base", "extended"])
-    ap.add_argument("--dataset", default="3dmatch", choices=["3dmatch", "kitti", "fcgf3dmatch", "fcgfkitti"])
-    ap.add_argument("--recal", action="store_true", help="FCGF: use the selection re-certified on FCGF")
-    ap.add_argument("--refit", action="store_true", help="FCGF: controller re-fitted and re-certified on FCGF")
-    args = ap.parse_args()
-    prefixes = args.prefixes.split(",")
-    ds = {"3dmatch": ThreeDMatch, "kitti": Kitti, "fcgf3dmatch": FcgfThreeDMatch, "fcgfkitti": FcgfKitti}[args.dataset]()
-    if args.recal:  # FCGF: configuration re-certified on the held-out FCGF pairs instead of transferred from FPFH
+def make_dataset(name, recal=False, refit=False):
+    ds = {"3dmatch": ThreeDMatch, "kitti": Kitti, "fcgf3dmatch": FcgfThreeDMatch, "fcgfkitti": FcgfKitti}[name]()
+    if recal:  # FCGF: configuration re-certified on the held-out FCGF pairs instead of transferred from FPFH
         assert ds.name.startswith("fcgf"), "--recal applies to the FCGF datasets"
         ds.suffix, ds.val, ds.outtag = f"_{ds.name}", S.DATASETS[ds.name]["val"], ds.outtag + "_recal"
-    if args.refit:  # FCGF: controller re-fitted and re-certified on disjoint parts of the held-out FCGF pool
+    if refit:  # FCGF: controller re-fitted and re-certified on disjoint parts of the held-out FCGF pool
         key = f"{ds.name}_refit"
         assert key in S.DATASETS, f"no re-fit protocol for {ds.name}"
         ds.suffix, ds.train, ds.val = f"_{key}", S.DATASETS[key]["train"], S.DATASETS[key]["val"]
         ds.outtag += "_refit"
-    sys.stdout.reconfigure(encoding="utf-8")
-    rows = []
-    for est in ["sc2", "turbo"]:
-        ctrls = {pf: Controller(pf, est, args.ladders, ds) for pf in prefixes}
-        fn, kw = FNS[est], ds.kwargs(est)
-        for subset in ds.tests:
-            offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf)} for pf in prefixes}
-            ids = set.intersection(*[set(v) for v in offline.values()])
-            pairs = [p for p in ds.pairs(subset) if p.pair_id in ids]
-            rng = np.random.default_rng(0)
-            pairs = [pairs[i] for i in sorted(rng.choice(len(pairs), min(args.per_set, len(pairs)), replace=False))]
-            for j, p in enumerate(pairs):
-                info = ds.info(p)
-                rp, rf, sp, sf = ds.features_pair(p)
-                P, Q, ratio = ds.corr(sp, sf, rp, rf)
-                N_all = min(P.shape[0], 4000)
-                P, Q, ratio = P[:N_all], Q[:N_all], ratio[:N_all]
-                jobs = ["full"] + prefixes
-                jobs = jobs[j % len(jobs):] + jobs[: j % len(jobs)]
-                row = {"est": est, "subset": subset, "pair_id": p.pair_id, "scene": p.scene, "run_order": jobs}
-                for job in jobs:
-                    t0 = time.perf_counter()
-                    if job == "full":  # standard estimator: one full-budget run
-                        T, _ = fn(P, Q, **kw)
-                        stop = None
-                    else:
-                        T, stop = ctrls[job].run(fn, P, Q, ratio, info, p)
-                    secs = time.perf_counter() - t0
-                    row[job] = {"s": secs, "ok": ds.ok(p, T, info), "stop": stop}
-                    if job != "full":
-                        row[job]["offline_stop"] = ctrls[job].offline_stop(offline[job][p.pair_id])
-                rows.append(row)
-            print(f"  {est} {subset}: done", flush=True)
-    if prefixes == ["budget"] and args.ladders == "base" and ds.name == "3dmatch":
-        name = "live_budget.json"
-    else:
-        name = f"live_budget_compare{'' if args.ladders == 'base' else '_ext'}{ds.outtag}.json"
-    with open(RESULTS_ROOT / "budget" / name, "w") as f:
-        json.dump(rows, f, indent=1)
+    return ds
+
+
+def time_pair(ds, est, ctrls, p, jobs, offline):
+    """Time, on pair p and in the order `jobs`, the standard estimator ("full") and the adaptive configurations."""
+    fn, kw = FNS[est], ds.kwargs(est)
+    info = ds.info(p)
+    rp, rf, sp, sf = ds.features_pair(p)
+    P, Q, ratio = ds.corr(sp, sf, rp, rf)
+    N_all = min(P.shape[0], 4000)
+    P, Q, ratio = P[:N_all], Q[:N_all], ratio[:N_all]
+    out = {}
+    for job in jobs:
+        t0 = time.perf_counter()
+        if job == "full":  # standard estimator: one full-budget run
+            T, _ = fn(P, Q, **kw)
+            stop = None
+        else:
+            T, stop = ctrls[job].run(fn, P, Q, ratio, info, p)
+        secs = time.perf_counter() - t0
+        out[job] = {"s": secs, "ok": ds.ok(p, T, info), "stop": stop}
+        if job != "full":
+            out[job]["offline_stop"] = ctrls[job].offline_stop(offline[job][p.pair_id])
+    return out
+
+
+def summary(rows, ds, prefixes):
     print("\nlive single-process benchmark (adaptive budget vs. standard full-budget estimator):")
     for est in ["sc2", "turbo"]:
         for subset in ds.tests:
@@ -271,6 +250,43 @@ def main():
                          f"{tb.mean() / ta.mean():.2f}x [{np.quantile(sp, .025):.2f}, {np.quantile(sp, .975):.2f}] "
                          f"agree {100 * agree:.0f}%")
             print(line)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--per-set", type=int, default=100)
+    ap.add_argument("--prefixes", default="budget")
+    ap.add_argument("--ladders", default="base", choices=["base", "extended"])
+    ap.add_argument("--dataset", default="3dmatch", choices=["3dmatch", "kitti", "fcgf3dmatch", "fcgfkitti"])
+    ap.add_argument("--recal", action="store_true", help="FCGF: use the selection re-certified on FCGF")
+    ap.add_argument("--refit", action="store_true", help="FCGF: controller re-fitted and re-certified on FCGF")
+    args = ap.parse_args()
+    prefixes = args.prefixes.split(",")
+    ds = make_dataset(args.dataset, args.recal, args.refit)
+    sys.stdout.reconfigure(encoding="utf-8")
+    rows = []
+    for est in ["sc2", "turbo"]:
+        ctrls = {pf: Controller(pf, est, args.ladders, ds) for pf in prefixes}
+        for subset in ds.tests:
+            offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf)} for pf in prefixes}
+            ids = set.intersection(*[set(v) for v in offline.values()])
+            pairs = [p for p in ds.pairs(subset) if p.pair_id in ids]
+            rng = np.random.default_rng(0)
+            pairs = [pairs[i] for i in sorted(rng.choice(len(pairs), min(args.per_set, len(pairs)), replace=False))]
+            for j, p in enumerate(pairs):
+                jobs = ["full"] + prefixes
+                jobs = jobs[j % len(jobs):] + jobs[: j % len(jobs)]
+                row = {"est": est, "subset": subset, "pair_id": p.pair_id, "scene": p.scene, "run_order": jobs}
+                row.update(time_pair(ds, est, ctrls, p, jobs, offline))
+                rows.append(row)
+            print(f"  {est} {subset}: done", flush=True)
+    if prefixes == ["budget"] and args.ladders == "base" and ds.name == "3dmatch":
+        name = "live_budget.json"
+    else:
+        name = f"live_budget_compare{'' if args.ladders == 'base' else '_ext'}{ds.outtag}.json"
+    with open(RESULTS_ROOT / "budget" / name, "w") as f:
+        json.dump(rows, f, indent=1)
+    summary(rows, ds, prefixes)
 
 
 if __name__ == "__main__":

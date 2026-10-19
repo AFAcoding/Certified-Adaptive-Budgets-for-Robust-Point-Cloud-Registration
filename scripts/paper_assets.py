@@ -67,7 +67,24 @@ GRAY, BLUE, ORANGE, AQUA, PURPLE, OCHRE = "#9a9890", "#2a78d6", "#eb6834", "#1ba
 # main-paper figures (validated reference palette): blue = ours (CAB, its ordering), light blue = our ordering with a
 # fixed budget, grey = the standard baselines, other slots = alternatives; red only for transferred certificates
 BLUE_L, VIOLET, MAGENTA, RED, LIGHT = "#86b6ef", "#6250d6", "#e87ba4", "#e34948", "#d4d2cb"
-FS_TICK, FS_LABEL, FS_TITLE, FS_LEGEND = 6.6, 7.0, 7.6, 6.5
+DARK, AXIS = "#6f6d66", "#8f8d86"  # dark grey fill; spines and tick marks
+# figures are drawn at their printed width (7.0 in for full-width, 3.35 in for one column), so these are point sizes
+FS_TICK, FS_LABEL, FS_TITLE, FS_LEGEND = 7.5, 8.0, 8.5, 7.5
+
+
+def setup_style():
+    plt.rcParams.update({
+        "font.family": "sans-serif", "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+        "mathtext.fontset": "custom", "mathtext.rm": "Arial", "mathtext.it": "Arial:italic", "mathtext.bf": "Arial:bold",
+        "pdf.fonttype": 42, "savefig.dpi": 400,
+        "axes.edgecolor": AXIS, "axes.linewidth": 0.7, "axes.labelcolor": INK, "axes.titlecolor": INK,
+        "axes.titleweight": "bold", "axes.titlesize": FS_TITLE, "axes.labelsize": FS_LABEL,
+        "xtick.color": AXIS, "ytick.color": AXIS, "xtick.labelcolor": INK2, "ytick.labelcolor": INK2,
+        "xtick.labelsize": FS_TICK, "ytick.labelsize": FS_TICK,
+        "xtick.major.width": 0.7, "ytick.major.width": 0.7, "xtick.major.size": 2.5, "ytick.major.size": 2.5,
+        "legend.frameon": False, "legend.fontsize": FS_LEGEND, "legend.handletextpad": 0.45,
+        "legend.columnspacing": 1.2, "legend.labelcolor": INK,
+        "lines.solid_capstyle": "round", "lines.solid_joinstyle": "round"})
 
 
 def val(key, x, fmt="{:.2f}"):
@@ -96,10 +113,10 @@ def boot_ratio(numr, den, scenes, seed):
     return float(numr.mean() / den.mean()), float(np.quantile(b, 0.025)), float(np.quantile(b, 0.975))
 
 
-def style(ax, fs=6):
-    ax.grid(True, color=GRID, lw=0.5)
+def style(ax, fs=FS_TICK):
+    ax.grid(True, color=GRID, lw=0.6)
     ax.set_axisbelow(True)
-    ax.tick_params(labelsize=fs, colors=INK2, length=2)
+    ax.tick_params(labelsize=fs, labelcolor=INK2, color=AXIS, length=2.5, width=0.7)
     for sp_ in ("top", "right"):
         ax.spines[sp_].set_visible(False)
 
@@ -175,6 +192,10 @@ def cab_results():
                     val(k + ".speed", t["speedup"])
                     val(k + ".speedlo", t["speedup_ci"][0])
                     val(k + ".speedhi", t["speedup_ci"][1])
+                    # hardware-independent cost: analytic operation count of every stage run, ordering included
+                    val(k + ".ops", t["ops_ratio"])
+                    val(k + ".opslo", t["ops_ratio_ci"][0])
+                    val(k + ".opshi", t["ops_ratio_ci"][1])
                     val(k + ".risk", 100 * t["risk"], "{:.2f}")
                     val(k + ".nlost", str(int(round(t["risk"] * len(logs[(d, o)])))))
                     if cert == "marg":
@@ -203,12 +224,14 @@ def cab_results():
         val(f"{d}.marg.risk.min", min(rs), "{:.2f}")
         val(f"{d}.marg.risk.max", max(rs), "{:.2f}")
     # live (group-conditional configurations; full budget and both orderings on the same pairs)
-    agrees = []
+    agrees, stalls = [], []
     for fam, fname, lk in [(f, n, "live") for f, n in LIVE.items()] + [(f, n, "xlive") for f, n in LIVE_XFER.items()]:
         path = RB / fname
         if not path.exists():
             continue
         rows = json.loads(path.read_text())
+        if lk == "live":  # pairs re-timed after a system stall (scripts/retime_stalls.py)
+            stalls += [max(r["stalled"].values()) for r in rows if "stalled" in r]
         for d in [d for d in ds if DS[d][1] == fam]:
             log = DS[d][0]
             for e, E in ESTS.items():
@@ -238,6 +261,11 @@ def cab_results():
                 val(f"{e}.{d}.{lk}.compatvsratiohi", hi)
     if agrees:
         val("live.agree.min", 100 * min(agrees), "{:.0f}")
+    eq_path = RB / "live_equal_time_3DMatch.json"
+    if eq_path.exists():
+        stalls += [max(r["stalled"].values()) for r in json.loads(eq_path.read_text()) if "stalled" in r]
+    val("live.retimed", str(len(stalls)))
+    val("live.stall.s", max(stalls, default=0.0), "{:,.0f}")
     # worst live speed-up of CAB (compat order, group-conditional): its overhead where there is nothing to save
     worst = min(((num(f"{e}.{d}.compat.live.speed"), e, d) for d in ds for e in ESTS
                  if f"{e}.{d}.compat.live.speed" in VALS), default=None)
@@ -282,17 +310,17 @@ def cab_results():
     for title, cols in blocks:
       if not any(d in ds for d in cols):
         continue
-      L.append(f"\\multicolumn{{13}}{{@{{}}l}}{{\\textbf{{{title}}}}} \\\\")
+      L.append(f"\\multicolumn{{16}}{{@{{}}l}}{{\\textbf{{{title}}}}} \\\\")
       for e in ESTS:
-        L.append(f"\\multicolumn{{13}}{{@{{}}l}}{{\\textit{{{ENAME[e]}}}}} \\\\")
+        L.append(f"\\multicolumn{{16}}{{@{{}}l}}{{\\textit{{{ENAME[e]}}}}} \\\\")
         for lab, o in (("Full budget (standard)", None), ("\\method, ratio order", "ratio"), ("\\textbf{\\method (ours)}", "compat")):
             cells = [lab]
             for d in cols:
                 if d not in ds:
-                    cells += ["--"] * 4
+                    cells += ["--"] * 5
                     continue
                 if o is None:
-                    cells += [VALS[f"{e}.{d}.ratio.group.full"], "--", "1.00\\X", "--"]
+                    cells += [VALS[f"{e}.{d}.ratio.group.full"], "--", "1.00\\X", "1.00\\X", "--"]
                     continue
                 k = f"{e}.{d}.{o}.group"
                 ni = "\\cmark" if VALS[k + ".ni"] == "yes" else "\\xmark"
@@ -304,7 +332,9 @@ def cab_results():
                     lv = f"{VALS[k + '.speed']}$\\times^*$"
                 rr =f"\\textbf{{{VALS[k + '.rr']}}}" if o == "compat" else VALS[k + ".rr"]
                 lvb = f"\\textbf{{{lv}}}" if o == "compat" else lv
-                cells += [rr, f"{VALS[k + '.loss']} [{VALS[k + '.ub']}] {ni}", lvb, VALS[k + ".risk"]]
+                ops = f"{VALS[k + '.ops']}\\X"
+                cells += [rr, f"{VALS[k + '.loss']} [{VALS[k + '.ub']}] {ni}", lvb,
+                          f"\\textbf{{{ops}}}" if o == "compat" else ops, VALS[k + ".risk"]]
             L.append(" & ".join(cells) + " \\\\")
       L.append("\\midrule")
     L[-1] = "\\bottomrule"
@@ -336,35 +366,42 @@ def cab_results():
             L.append(" & ".join(cells) + " \\\\")
     (TAB / "supp_fixed_budgets.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
-    # ---- figure (supp): recall vs relative time, every dataset and estimator
+    fig_tradeoff_all(ds, fixed)
+    return ds, logs, fixed
+
+
+def fig_tradeoff_all(ds, fixed):
+    """Supplementary figure: recall vs relative time of every fixed budget, with CAB's certified operating points
+    (colour: ordering; filled diamond: group-conditional certificate; open square: marginal certificate)."""
     dsf = [d for d in ds if d not in FCGF]
-    panels = [(e, d) for e in ESTS for d in dsf]
-    fig, axes = plt.subplots(len(ESTS), len(dsf), figsize=(7.0, 1.75 * len(ESTS) + 0.35), dpi=200, squeeze=False)
-    for (e, d), ax in zip(panels, axes.reshape(-1)):
-        for o, col, lab in (("ratio", GRAY, "fixed budgets, ratio order"), ("compat", BLUE, "fixed budgets, compat. order")):
-            pts = fixed[(d, o, e)]
-            xs = [p[0] / pts[-1][0] for p in pts]
-            ys = [100 * p[1] for p in pts]
-            ax.plot(xs, ys, "-", color=col, lw=1.1, label=lab, zorder=2)
-            ax.plot(xs, ys, "o", color=col, ms=2.6, zorder=3, mec="white", mew=0.4)
-            for cert, mk in (("group", "D"), ("marg", "s")):
-                k = f"{e}.{d}.{o}.{cert}"
-                ax.plot([1.0 / num(k + ".speed")], [num(k + ".rr")], mk, color=(BLUE if o == "compat" else "#6f6d66"),
-                        ms=5.0, mec=INK, mew=0.6, zorder=4,
-                        label=f"CAB, {'compat.' if o == 'compat' else 'ratio'} order, {'group-cond.' if cert == 'group' else 'marginal'}")
-        ax.set_xlim(0, 1.05)
-        ax.set_title(f"{ENAME[e].replace('$^2$', '²')}, {DNAME[d]}", fontsize=7, color=INK, loc="left")
-        style(ax)
-        ax.set_xlabel("time / full-budget time", fontsize=6, color=INK2)
-        ax.set_ylabel("recall (%)", fontsize=6, color=INK2)
-    h, lab = axes[0, 0].get_legend_handles_labels()
-    order = [0, 3, 1, 4, 2, 5]
-    fig.legend([h[i] for i in order], [lab[i] for i in order], loc="lower center", ncol=3, fontsize=6, frameon=False,
-               labelcolor=INK2)
-    fig.tight_layout(rect=(0, 0.09, 1, 1), w_pad=0.6, h_pad=0.6)
+    fig, axes = plt.subplots(len(ESTS), len(dsf), figsize=(7.0, 2.05 * len(ESTS) + 0.45), squeeze=False)
+    for r, e in enumerate(ESTS):
+        for c, d in enumerate(dsf):
+            ax = axes[r, c]
+            for o, col, name in (("ratio", GRAY, "ratio order"), ("compat", BLUE, "our ordering")):
+                pts = fixed[(d, o, e)]
+                ax.plot([p[0] / pts[-1][0] for p in pts], [100 * p[1] for p in pts], "-o", color=col, lw=1.5, ms=3.6,
+                        mec="white", mew=0.6, label=f"fixed budgets, {name}", zorder=2)
+            for cert, mk, cname in (("group", "D", "group-conditional"), ("marg", "s", "marginal")):
+                for o, col, name in (("ratio", DARK, "ratio order"), ("compat", BLUE, "our ordering")):
+                    k = f"{e}.{d}.{o}.{cert}"
+                    ax.plot([1.0 / num(k + ".speed")], [num(k + ".rr")], mk, ls="none", ms=6.0 if mk == "D" else 5.6,
+                            color=col, mfc=col if cert == "group" else "white", mec="white" if cert == "group" else col,
+                            mew=0.6 if cert == "group" else 1.3, zorder=5 if cert == "group" else 4,
+                            label=f"CAB, {name}, {cname}")
+            ax.set_xlim(0, 1.04)
+            ax.set_title(f"{ENAME[e].replace('$^2$', '²')}, {DNAME[d]}", loc="left")
+            style(ax)
+            if r == len(ESTS) - 1:
+                ax.set_xlabel("time / full-budget time")
+            if c == 0:
+                ax.set_ylabel("recall (%)")
+    fig.tight_layout(rect=(0, 0.085, 1, 1), w_pad=1.0, h_pad=0.8)
+    # legend columns: fixed budgets | CAB, group-conditional | CAB, marginal
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.0),
+               handlelength=1.8)
     fig.savefig(FIG / "tradeoff_all.pdf", facecolor="white")
     plt.close(fig)
-    return ds, logs, fixed
 
 
 # ============================================================================ which pairs / headroom
@@ -408,53 +445,56 @@ def anchors_and_headroom(ds, logs):
 
     # figure: (a) success at N=250 by true anchors (indoor test sets pooled); (b) difficulty mix of every test set
     labels = [b[2].replace("--", "–").replace("$\\geq$", "≥") for b in edges]
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.35, 2.05), dpi=200, gridspec_kw={"width_ratios": [1.15, 1]})
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(3.35, 3.05), gridspec_kw={"height_ratios": [1.75, 1]})
     x = np.arange(len(edges))
     rows = bins["indoor"]
     w = 0.27
-    for i, (col, key, lab) in enumerate(((GRAY, 3, "ratio order, $N$=250"), (BLUE, 4, "our ordering, $N$=250"),
-                                         (INK2, 2, "full budget"))):
-        ax1.bar(x + (i - 1) * w, [r[key] for r in rows], width=w * 0.9, color=col, label=lab, edgecolor="white",
-                linewidth=0.5)
-    ax1.set_xticks(x, labels, fontsize=FS_TICK)
-    ax1.set_ylim(0, 142)
+    # 5-49 true anchors: where the ordering rescues the cheap budget (blue band, the blue segment of (b))
+    mid = [i for i, b in enumerate(edges) if 5 <= b[0] < 50]
+    ax1.axvspan(min(mid) - 0.5, max(mid) + 0.5, color=BLUE, alpha=0.08, lw=0, zorder=0)
+    ax1.text((min(mid) + max(mid)) / 2, 104, "the ordering helps", ha="center", va="bottom", fontsize=FS_LEGEND,
+             color=INK, style="italic")
+    for i, (col, key, lab) in enumerate(((GRAY, 3, "ratio order, $N$ = 250"), (BLUE, 4, "our ordering, $N$ = 250"),
+                                         (INK, 2, "full budget"))):
+        ax1.bar(x + (i - 1) * w, [r[key] for r in rows], width=w * 0.92, color=col, label=lab, edgecolor="white",
+                linewidth=0.6, zorder=2)
+    ax1.set_xticks(x, labels)
+    ax1.set_xlim(-0.55, len(edges) - 0.45)
+    ax1.set_ylim(0, 115)
     ax1.set_yticks([0, 25, 50, 75, 100])
-    ax1.set_ylabel("SC$^2$-PCR success (%)", fontsize=FS_LABEL, color=INK2)
-    ax1.set_xlabel("true anchors (of 100)", fontsize=FS_LABEL, color=INK2)
-    ax1.set_title("(a) 3DMatch + 3DLoMatch", fontsize=FS_TITLE, loc="left", color=INK)
-    ax1.legend(frameon=False, fontsize=FS_LEGEND - 0.4, loc="upper left", labelcolor=INK2, handlelength=1.0,
-               borderaxespad=0.1, labelspacing=0.25)
+    ax1.set_ylabel("SC²-PCR success (%)")
+    ax1.set_xlabel("true correspondences among the 100 anchors")
+    ax1.set_title("(a) Success by true anchors", loc="left", fontsize=FS_LABEL)
+    ax1.legend(loc="upper left", bbox_to_anchor=(0.0, 0.93), handlelength=1.0, labelspacing=0.3, borderaxespad=0.2)
     # (b) composition of every test set: fewer than 5 true anchors (a cheap budget cannot be rescued),
-    # 5-49 (the ordering helps; blue, as in (a)) and 50 or more (already easy)
-    groups = [("<5: ordering cannot help", 0, 5, INK2), ("5–49: ordering helps", 5, 50, BLUE),
-              ("≥50: already easy", 50, 10 ** 6, LIGHT)]
+    # 5-49 (the ordering helps; blue, as the band in (a)) and 50 or more (already easy)
+    groups = [("< 5 true anchors", 0, 5, DARK), ("5–49", 5, 50, BLUE), ("≥ 50", 50, 10 ** 6, LIGHT)]
     sets_ = [d for d in ("m", "lo", "ki") if d in ds]
     for j, d in enumerate(sets_):
         a = np.array([r["anchors_true"] for r in logs[(d, "compat")]])
         left = 0.0
         for gname, lo, hi, col in groups:
             share = 100 * np.mean((a >= lo) & (a < hi))
-            ax2.barh(j, share, left=left, height=0.62, color=col, edgecolor="white", linewidth=0.8,
+            ax2.barh(j, share, left=left, height=0.66, color=col, edgecolor="white", linewidth=1.0,
                      label=gname if j == 0 else None)
-            if share >= 9:
+            if share >= 8:
                 ax2.text(left + share / 2, j, f"{share:.0f}", ha="center", va="center", fontsize=FS_TICK,
-                         color="white" if col != LIGHT else INK)
+                         color="white" if col != LIGHT else INK, weight="bold")
             left += share
-    ax2.set_yticks(range(len(sets_)), [DNAME[d] for d in sets_], fontsize=FS_TICK)
+    ax2.set_yticks(range(len(sets_)), [DNAME[d] for d in sets_])
     ax2.set_ylim(len(sets_) - 0.5, -0.5)
     ax2.set_xlim(0, 100)
-    ax2.set_xticks([0, 50, 100])
-    ax2.set_xlabel("share of pairs (%)", fontsize=FS_LABEL, color=INK2)
-    ax2.set_title("(b) difficulty mix", fontsize=FS_TITLE, loc="left", color=INK)
-    ax2.legend(frameon=False, fontsize=FS_LEGEND - 0.4, loc="upper center", bbox_to_anchor=(0.42, -0.42),
-               labelcolor=INK2, handlelength=1.0, ncol=1, labelspacing=0.2, borderaxespad=0)
+    ax2.set_xticks([0, 25, 50, 75, 100])
+    ax2.set_title("(b) Share of test pairs (%)", loc="left", fontsize=FS_LABEL, pad=13)
+    ax2.legend(loc="lower left", bbox_to_anchor=(0.0, 0.98), ncol=3, handlelength=1.0, borderaxespad=0,
+               columnspacing=1.0)
     for ax in (ax1, ax2):
-        style(ax, FS_TICK)
+        style(ax)
     ax1.grid(False, axis="x")
     ax2.grid(False, axis="y")
     ax2.tick_params(axis="y", length=0)
-    fig.tight_layout(pad=0.3, w_pad=0.6)
-    fig.savefig(FIG / "anchors.pdf", facecolor="white", bbox_inches="tight", pad_inches=0.02)
+    fig.tight_layout(pad=0.3, h_pad=0.9)
+    fig.savefig(FIG / "anchors.pdf", facecolor="white")
     plt.close(fig)
 
     # headroom: CAB (group-cond.) vs two oracles on CAB's own (selected) ladder, both orders:
@@ -647,19 +687,19 @@ def risk_ledger(ax):
     CAB with group-conditional certificates against the alternatives that carry no valid guarantee there."""
     sets_ = [d for d in ("m", "lo", "ki", "fm", "flo", "fki") if f"sc.{d}.compat.group.risk" in VALS]
     series = [  # (label, key pattern, color, marker, filled)
-        ("CAB, group-conditional (ours)", "{e}.{d}.compat.group.risk", BLUE, "o", True),
-        ("CAB, marginal certificate", "{e}.{d}.compat.marg.risk", BLUE, "o", False),
-        ("uniform sampling, $N$=2,000", "eq.{e}.{d}.rand2000.risk", ORANGE, "^", True),
-        ("FPFH certificate reused on FCGF", "{e}.{d}.compat.group.xfer.risk", RED, "X", True),
+        ("CAB, group-cond. (ours)", "{e}.{d}.compat.group.risk", BLUE, "o", True),
+        ("CAB, marginal cert.", "{e}.{d}.compat.marg.risk", BLUE, "o", False),
+        ("uniform sampling", "eq.{e}.{d}.rand2000.risk", ORANGE, "^", True),
+        ("FPFH cert. on FCGF", "{e}.{d}.compat.group.xfer.risk", RED, "X", True),
     ]
     cab = [num(f"{e}.{d}.compat.group.risk") for d in sets_ for e in ESTS]
     val("cab.risk.max", max(cab), "{:.2f}")
     val("cab.risk.n", str(len(cab)))
     # horizontal dot plot: one row per test set (upper dot SC2-PCR, lower TurboReg), risk on a symlog axis
-    off = {"sc": -0.16, "tr": 0.16}
+    off = {"sc": -0.18, "tr": 0.18}
     XMAX = 14
-    ax.axvspan(1.0, XMAX, color=RED, alpha=0.07, lw=0, zorder=0)
-    ax.axvline(1.0, color=INK, lw=0.8, ls=(0, (3, 2)), zorder=2)
+    ax.axvspan(1.0, XMAX, color=RED, alpha=0.08, lw=0, zorder=0)
+    ax.axvline(1.0, color=INK, lw=0.9, ls=(0, (3, 2)), zorder=2)
     for si, (label, pat, col, mk, filled) in enumerate(series):
         xs, ys = [], []
         for i, d in enumerate(sets_):
@@ -669,30 +709,34 @@ def risk_ledger(ax):
                     xs.append(num(k))
                     ys.append(i + off[e])
         if xs:
-            ax.plot(xs, ys, mk, ls="none", ms=5.0, color=col, mfc=col if filled else "white",
-                    mec=col, mew=1.0 if not filled else 0.4,
-                    label=label, zorder=5 if si == 0 else 4)
+            ax.plot(xs, ys, mk, ls="none", ms={"^": 6.2, "X": 6.0}.get(mk, 6.6 if filled else 5.8), color=col,
+                    mfc=col if filled else "white", mec=col if mk == "X" or not filled else "white",
+                    mew={"X": 0.3}.get(mk, 0.6 if filled else 1.3), label=label,
+                    zorder=6 if si == 0 else 4, clip_on=False)
     for i in range(len(sets_) - 1):
-        ax.axhline(i + 0.5, color=GRID, lw=0.5, zorder=1)
-    if "fm" in sets_:  # separate descriptors
-        ax.axhline(sets_.index("fm") - 0.5, color=INK2, lw=0.6, zorder=1)
-    ax.text(0.95, -0.78, "certified level 1 %", fontsize=FS_LEGEND - 0.4, color=INK, ha="right", va="center")
-    ax.text(1.1, -0.78, "exceeds it", fontsize=FS_LEGEND - 0.4, color=INK, ha="left", va="center", style="italic")
+        ax.axhline(i + 0.5, color=GRID, lw=0.6, zorder=1)
+    for name, rows_ in (("FPFH", [i for i, d in enumerate(sets_) if d not in FCGF]),
+                        ("FCGF", [i for i, d in enumerate(sets_) if d in FCGF])):
+        if rows_:  # descriptor of each block of rows, left of the row labels
+            ax.annotate(name, xy=(0, np.mean(rows_)), xycoords=("axes fraction", "data"), xytext=(-49, 0),
+                        textcoords="offset points", rotation=90, ha="center", va="center", fontsize=FS_LABEL,
+                        weight="bold", color=INK)
+            if name == "FCGF":
+                ax.axhline(min(rows_) - 0.5, color=AXIS, lw=0.8, zorder=1)
+    ax.text(0.93, -0.8, "level ε = 1 %", fontsize=FS_LEGEND, color=INK, ha="right", va="center")
+    ax.text(1.12, -0.8, "exceeds ε", fontsize=FS_LEGEND, color=INK, ha="left", va="center", style="italic")
     ax.set_xscale("symlog", linthresh=1.0, linscale=1.0)
     ax.set_xlim(-0.05, XMAX)
     ax.set_xticks([0, 0.5, 1, 2, 5, 10])
     ax.set_xticklabels(["0", "0.5", "1", "2", "5", "10"])
-    ax.set_yticks(range(len(sets_)))
-    ax.set_yticklabels([("FCGF " if d in FCGF else "FPFH ") + DNAME[d] for d in sets_], fontsize=FS_TICK)
-    ax.set_ylim(len(sets_) - 0.5, -2.9)  # band above the rows for the legend
-    ax.legend(loc="upper center", ncol=2, fontsize=FS_LEGEND - 0.6, frameon=True, facecolor="white", edgecolor="none",
-              framealpha=1.0, labelcolor=INK2, handlelength=1.0, handletextpad=0.3, columnspacing=0.6,
-              borderaxespad=0.15, borderpad=0.25)
-    ax.set_xlabel("pairs lost vs. the full budget (%)", fontsize=FS_LABEL, color=INK2)
-    ax.set_title("Risk on every test set", fontsize=FS_TITLE, color=INK, loc="left")
-    style(ax, FS_TICK)
+    ax.set_yticks(range(len(sets_)), [DNAME[d] for d in sets_])
+    ax.set_ylim(len(sets_) - 0.5, -1.15)  # band above the rows for the level labels
+    ax.set_xlabel("pairs lost vs. the full budget (%)")
+    ax.set_title("(c) Risk on every test set", loc="left")
+    style(ax)
     ax.grid(False, axis="y")
     ax.tick_params(axis="y", length=0)
+    return ax.get_legend_handles_labels()
 
 
 def _equal_time_live(variants):
@@ -701,12 +745,16 @@ def _equal_time_live(variants):
         return
     rows = json.loads(path.read_text())
     L = []
-    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.65), dpi=200, gridspec_kw={"width_ratios": [1, 1, 1.15]})
+    # layout in inches: (a), (b) share the recall axis; (c) leaves room for its row and descriptor labels;
+    # the band below the panels holds the two legends
+    W, H, BOT, HGT = 7.0, 2.94, 1.12, 1.58
+    fig = plt.figure(figsize=(W, H))
+    axes = [fig.add_axes((l / W, BOT / H, w / W, HGT / H)) for l, w in ((0.44, 1.93), (2.47, 1.93), (5.2, 1.76))]
     colors = {"rand": ORANGE, "fm1": VIOLET, "fm2": MAGENTA, "ratio": GRAY, "compat": BLUE_L, "cheap": INK2}
-    legend_name = {"rand": "uniform sampling", "fm1": "FastMAC-style, 1st-order graph",
-                   "fm2": "FastMAC-style, 2nd-order graph", "ratio": "fixed budget, ratio order",
+    legend_name = {"rand": "uniform sampling", "fm1": "FastMAC-style, 1st order",
+                   "fm2": "FastMAC-style, 2nd order", "ratio": "fixed budget, ratio order",
                    "compat": "fixed budget, our ordering", "cheap": "fewer seeds / cliques"}
-    for ax, (e, E) in zip(axes[:2], ESTS.items()):
+    for ax, (e, E), letter in zip(axes[:2], ESTS.items(), "ab"):
         rs = [r for r in rows if r["est"] == E]
         t = {k: 1e3 * np.mean([r[k] for r in rs]) for k in rs[0] if isinstance(rs[0][k], float)}
         val(f"eq.{e}.live.n", str(len(rs)))
@@ -754,51 +802,82 @@ def _equal_time_live(variants):
             L.append(" & ".join(cells) + " \\\\")
             xs, ys = [p[0] for p in curve], [p[1] for p in curve]
             if v == "cheap":
-                ax.plot([p[0] for p in pts], [p[1] for p in pts], "v", color=colors[v], ms=5.2, mec=colors[v], mew=0.4,
+                ax.plot([p[0] for p in pts], [p[1] for p in pts], "v", color=colors[v], ms=6.0, mec="white", mew=0.6,
                         label=legend_name[v], zorder=4)
             else:
-                ax.plot(xs, ys, "-o", color=colors[v], lw=1.4, ms=3.2, mec=colors[v], mew=0.4, label=legend_name[v],
+                ax.plot(xs, ys, "-o", color=colors[v], lw=1.5, ms=3.8, mec="white", mew=0.6, label=legend_name[v],
                         zorder=3)
-        # equal time: the guide marks CAB's time; every curve is read where it crosses the guide
-        ax.axvline(cab_t, color=BLUE, lw=0.8, ls=(0, (2, 2)), zorder=2)
-        ax.plot([t["full"]], [full_rr], "D", color=INK, ms=5.0, mec=INK, mew=0.4, label="full budget", zorder=5)
-        ax.plot([cab_t], [cab_rr], "*", color=BLUE, ms=14, mec=INK, mew=0.6, label="CAB (ours)", zorder=6)
-        ax.text(cab_t / 1.07, 83.55, f"CAB: {t['full'] / cab_t:.2f}$\\times$ faster", fontsize=FS_LEGEND, color=INK,
-                ha="right", va="center")
+        # equal time: the guide marks CAB's time; every curve is read where it crosses the guide. The arrow above
+        # the curves goes from the full budget's time to CAB's time at (nearly) the same recall.
+        y_ar = 83.3
+        ax.plot([cab_t, cab_t], [70, y_ar], color=BLUE, lw=0.9, ls=(0, (3, 2)), zorder=2)
+        ax.plot([t["full"], t["full"]], [full_rr + 0.5, y_ar], color=INK, lw=0.7, ls=(0, (1, 1.5)), zorder=2)
+        ax.annotate("", xy=(cab_t, y_ar), xytext=(t["full"], y_ar), zorder=6,
+                    arrowprops=dict(arrowstyle="-|>,head_length=0.45,head_width=0.22", fc=INK, ec=INK, lw=1.0,
+                                    shrinkA=0, shrinkB=0))
+        ax.text(np.sqrt(cab_t * t["full"]), y_ar + 0.3, f"{t['full'] / cab_t:.2f}× faster", ha="center", va="bottom",
+                fontsize=FS_LEGEND, color=INK, weight="bold")
+        ax.plot([t["full"]], [full_rr], "D", color=INK, ms=5.6, mec="white", mew=0.6, label="full budget", zorder=5)
+        ax.plot([cab_t], [cab_rr], "*", color=BLUE, ms=13, mec=INK, mew=0.6, label="CAB (ours)", zorder=7)
         ax.set_xscale("log")
         ax.set_xlim(100, 1300)
-        ax.set_ylim(70, 84.3)
+        ax.set_ylim(70, 85.2)
         ax.set_yticks([70, 74, 78, 82])
         ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([100, 200, 500, 1000]))
         ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["100", "200", "500", "1000"]))
         ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-        ax.set_xlabel("live time per pair (ms, log scale)", fontsize=FS_LABEL, color=INK2)
-        ax.set_ylabel("recall (%)", fontsize=FS_LABEL, color=INK2)
-        ax.set_title(f"{ENAME[e].replace('$^2$', '²')}, 3DMatch", fontsize=FS_TITLE, color=INK, loc="left")
-        style(ax, FS_TICK)
+        ax.set_xlabel("live time per pair (ms, log scale)")
+        if e == "sc":
+            ax.set_ylabel("recall (%)")
+        else:
+            ax.tick_params(labelleft=False)
+        ax.set_title(f"({letter}) {ENAME[e].replace('$^2$', '²')} on 3DMatch", loc="left")
+        style(ax)
         L.append("\\midrule" if e == "sc" else "\\bottomrule")
     handles = {}
     for ax in axes[:2]:
         for hh, ll in zip(*ax.get_legend_handles_labels()):
             handles.setdefault(ll, hh)
     order = ["CAB (ours)", "full budget", legend_name["compat"], legend_name["ratio"], legend_name["rand"],
-             legend_name["fm1"], legend_name["fm2"], legend_name["cheap"]]
+             legend_name["cheap"], legend_name["fm1"], legend_name["fm2"]]  # two columns of four
     order = [o for o in order if o in handles]
-    risk_ledger(axes[2])  # its legend sits inside the panel
-    fig.tight_layout(rect=(0, 0.2, 1, 1), w_pad=1.2)
-    # equal-time legend under the two equal-time panels
-    x0, x1 = axes[0].get_position().x0, axes[1].get_position().x1
-    fig.legend([handles[o] for o in order], order, loc="lower center", ncol=3, fontsize=FS_LEGEND, frameon=False,
-               labelcolor=INK2, bbox_to_anchor=((x0 + x1) / 2, 0.0), columnspacing=1.2, handlelength=1.8,
-               markerscale=0.75)
+    rh, rl = risk_ledger(axes[2])
+    # legends in the band below the panels: equal time under (a)-(b), risk under (c)
+    y_leg = 0.37 / H
+    fig.legend([handles[o] for o in order], order, loc="center", ncol=2, bbox_to_anchor=(2.42 / W, y_leg),
+               handlelength=1.9, columnspacing=2.0, labelspacing=0.25)
+    fig.legend(rh, rl, loc="center", ncol=1, bbox_to_anchor=(6.0 / W, y_leg), handlelength=1.0, labelspacing=0.25)
     fig.savefig(FIG / "teaser.pdf", facecolor="white")
     plt.close(fig)
     (TAB / "equal_time.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 # ============================================================================ qualitative figure
+def render_points(X, eye, target):
+    """Perspective projection of points X seen from `eye` towards `target` (camera frame: y down, z forward), with
+    a grey shade from a headlight on PCA normals and a little depth fog. Returns (uv, shade, depth, project)."""
+    from scipy.spatial import cKDTree
+    f = (target - eye) / np.linalg.norm(target - eye)
+    r = np.cross(f, (0.0, -1.0, 0.0))
+    r /= np.linalg.norm(r)
+    R = np.stack([r, np.cross(r, f), f])  # rows: image right, image up, viewing direction
+
+    def project(Y):
+        c = (Y - eye) @ R.T
+        return c[:, :2] / c[:, 2:], c[:, 2]
+
+    _, nn = cKDTree(X).query(X, k=16)
+    nb = X[nn] - X[nn].mean(1, keepdims=True)
+    normals = np.linalg.eigh(np.einsum("nki,nkj->nij", nb, nb))[1][:, :, 0]
+    light = R.T @ np.array([-0.3, 0.5, -1.0])
+    uv, depth = project(X)
+    fog = (depth - depth.min()) / np.ptp(depth)
+    shade = np.clip(0.60 + 0.34 * np.abs(normals @ (light / np.linalg.norm(light))) - 0.14 * fog, 0, 1)
+    return uv, shade, depth, project
+
+
 def qualitative():
-    from acpr.data import load_pairs
+    from acpr.data import load_fragment, load_pairs
     from acpr.estimators import compat_order, nn_correspondences
     from acpr.features import get_fpfh
 
@@ -816,27 +895,36 @@ def qualitative():
     P, Q = P[:4000], Q[:4000]
     perm, _ = compat_order(P, Q)
     gt = np.linalg.norm(P @ p.transform[:3, :3].T + p.transform[:3, 3] - Q, axis=1) < 0.1
-    # top view of the reference fragment (two largest-variance axes)
-    c = rp - rp.mean(0)
-    _, _, vt = np.linalg.svd(c[np.random.default_rng(0).choice(len(c), min(5000, len(c)), replace=False)], full_matrices=False)
-    proj = lambda X: (X - rp.mean(0)) @ vt[:2].T  # noqa: E731
-    bg = proj(rp)
-    fig, axes = plt.subplots(1, 2, figsize=(3.35, 2.0), dpi=220)
+    # the full-resolution reference fragment, seen from slightly above and right of its sensor
+    X = np.asarray(load_fragment(p.pcd0), float)
+    uv, shade, depth, project = render_points(X, np.array([0.35, -0.7, -0.3]), X.mean(0))
+    back = np.argsort(-depth)  # far to near
+    size = 3.2 * np.clip(np.median(depth) / depth[back], 0.7, 1.6) ** 2  # perspective splats fill the surfaces
+    lo, hi = np.percentile(uv, 0.5, 0), np.percentile(uv, 99.5, 0)
+    pad = 0.03 * (hi - lo)
+    pw = 1.62  # panel width (in); the height follows the rendering's aspect ratio
+    ph = pw * (hi - lo + 2 * pad)[1] / (hi - lo + 2 * pad)[0]
+    W, H = 3.35, ph + 0.62
+    fig = plt.figure(figsize=(W, H))
+    axes = [fig.add_axes((x0 / W, 0.24 / H, pw / W, ph / H)) for x0 in (0.03, W - 0.03 - pw)]
     for ax, (title, idx) in zip(axes, (("250 most distinctive", np.arange(250)), ("250 most consistent (ours)", perm[:250]))):
-        ax.scatter(bg[:, 0], bg[:, 1], s=0.2, c=LIGHT, lw=0, rasterized=True)
-        q = proj(Q[idx])
+        ax.scatter(uv[back, 0], uv[back, 1], s=size, c=np.repeat(shade[back, None], 3, 1), lw=0, rasterized=True)
+        q, _ = project(Q[idx])
         ok = gt[idx]
-        # outliers first, true correspondences on top; solid markers (an edge in the fill colour renders everywhere)
-        ax.scatter(q[~ok, 0], q[~ok, 1], s=4.5, c=ORANGE, edgecolors=ORANGE, linewidths=0.3, label="outlier")
-        ax.scatter(q[ok, 0], q[ok, 1], s=6.5, c=BLUE, edgecolors=BLUE, linewidths=0.3, label="true correspondence",
+        # outliers first, true correspondences on top, each with a white ring
+        ax.scatter(q[~ok, 0], q[~ok, 1], s=10, c=ORANGE, edgecolors="white", linewidths=0.4, label="outlier")
+        ax.scatter(q[ok, 0], q[ok, 1], s=13, c=BLUE, edgecolors="white", linewidths=0.4, label="true correspondence",
                    zorder=3)
-        ax.set_title(f"{title}\n{ok.sum()} true correspondences", fontsize=FS_LABEL, color=INK, linespacing=1.15)
+        ax.set_title(title, fontsize=FS_LABEL, weight="normal", pad=12)
+        ax.text(0.5, 1.0, f"{ok.sum()} true correspondences", transform=ax.transAxes, ha="center", va="bottom",
+                fontsize=FS_LABEL, weight="bold", color=INK)
+        ax.set_xlim(lo[0] - pad[0], hi[0] + pad[0])
+        ax.set_ylim(lo[1] - pad[1], hi[1] + pad[1])
         ax.set_aspect("equal")
         ax.axis("off")
     h, lab = axes[1].get_legend_handles_labels()
-    fig.legend(h[::-1], lab[::-1], loc="lower center", ncol=2, fontsize=FS_LEGEND, frameon=False, labelcolor=INK2,
-               markerscale=2.2, handletextpad=0.3, columnspacing=1.5)
-    fig.tight_layout(rect=(0, 0.08, 1, 1), pad=0.2, w_pad=0.3)
+    fig.legend(h[::-1], lab[::-1], loc="lower center", ncol=2, markerscale=1.3, columnspacing=1.5,
+               bbox_to_anchor=(0.5, 0.0), borderaxespad=0.1)
     fig.savefig(FIG / "qualitative.pdf", facecolor="white")
     plt.close(fig)
     val("qual.pair", p.pair_id.replace("_", "\\_"))
@@ -941,33 +1029,39 @@ def caps_extras():
         for s, S in SETS.items():
             rr = [x for x in st[S]["ransac_allocation"] if x["gt_inliers"] in ("[0,5)", "[5,10)")]
             val(f"A.waste.psh.{s}.share", 100 * sum(x["classical_cost_share"] for x in rr), "{:.0f}")
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.25), dpi=200)
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.75))
     for ax, (s, S) in zip(axes, SETS.items()):
         F, P = summ["full"]["sets"][S], summ["psh"]["sets"][S]
         h = A.upper_hull([(x["ce"] / 1e3, 100 * x["rr"]) for x in F["static"]])
-        ax.plot([p[0] for p in h], [p[1] for p in h], color=MUTED, lw=1.0, ls="--", label="static search configs (frontier)")
+        ax.plot([p[0] for p in h], [p[1] for p in h], color=MUTED, lw=1.2, ls=(0, (4, 2)),
+                label="static search configurations (frontier)")
         for st, col, lab, mk in ((F, BLUE, "CAPS-accurate, all thresholds", "o"), (P, AQUA, "CAPS-fast, all thresholds", "^")):
             fr = A.upper_hull(sorted({(x["ce"] / 1e3, 100 * x["rr"]) for x in st["families"]["mdp"]}))
-            ax.plot([p[0] for p in fr], [p[1] for p in fr], color=col, lw=1.3, marker=mk, ms=2.8, label=lab)
+            ax.plot([p[0] for p in fr], [p[1] for p in fr], color=col, lw=1.5, marker=mk, ms=4.0, mec="white", mew=0.5,
+                    label=lab)
             op = st["operating_points"]["mdp"]
-            ax.scatter([op["ce"] / 1e3], [100 * op["rr"]], s=55, marker="*", color=col, edgecolor=INK, linewidth=0.5, zorder=5)
+            ax.plot([op["ce"] / 1e3], [100 * op["rr"]], "*", ms=12, color=col, mec=INK, mew=0.6, zorder=6)
         fr = A.upper_hull(sorted({(x["ce"] / 1e3, 100 * x["rr"]) for x in F["families"]["ransac_fixed"]}))
-        ax.plot([p[0] for p in fr], [p[1] for p in fr], color=ORANGE, lw=1.3, marker="s", ms=2.6, label="RANSAC, fixed budgets")
+        ax.plot([p[0] for p in fr], [p[1] for p in fr], color=ORANGE, lw=1.5, marker="s", ms=3.6, mec="white", mew=0.5,
+                label="RANSAC, fixed budgets")
         cr = F["classical_ransac"]
-        ax.scatter([cr["ce"] / 1e3], [100 * cr["rr"]], s=24, facecolor="white", edgecolor=ORANGE, linewidth=1.3, zorder=4,
-                   label="RANSAC, classical stopping")
+        ax.plot([cr["ce"] / 1e3], [100 * cr["rr"]], "o", ms=6, mfc="white", mec=ORANGE, mew=1.5, zorder=5,
+                label="RANSAC, classical stopping")
         ex = F["exhaustive"]
-        ax.scatter([ex["ce"] / 1e3], [100 * ex["rr"]], s=20, marker="D", color=INK2, zorder=4, label="schedule run to completion")
-        ax.axhline(100 * F["sc2"]["rr"], color=MUTED, lw=0.8, ls=":")
-        ax.text(25, 100 * F["sc2"]["rr"] + 0.3, "SC² recall", color=INK2, fontsize=5.5)
+        ax.plot([ex["ce"] / 1e3], [100 * ex["rr"]], "D", ms=5.5, color=INK2, mec="white", mew=0.6, zorder=5,
+                label="schedule run to completion")
+        ax.axhline(100 * F["sc2"]["rr"], color=MUTED, lw=0.9, ls=":")
+        ax.text(0.02, 100 * F["sc2"]["rr"], "SC²-PCR recall", transform=ax.get_yaxis_transform(), ha="left",
+                va="bottom", color=INK2, fontsize=FS_LEGEND)
         ax.set_xscale("log")
-        ax.set_xlabel("mean cost per pair (thousand CE, log scale)", fontsize=6.5, color=INK2)
-        ax.set_ylabel("recall (%)", fontsize=6.5, color=INK2)
-        ax.set_title(S, fontsize=7, loc="left", color=INK)
+        ax.set_xlabel("mean cost per pair (thousand CE, log scale)")
+        ax.set_ylabel("recall (%)")
+        ax.set_title(S, loc="left")
         style(ax)
-    axes[0].scatter([], [], s=55, marker="*", color="white", edgecolor=INK, linewidth=0.6, label="certified operating point")
-    axes[0].legend(frameon=False, fontsize=5.5, loc="lower right", labelcolor=INK2)
-    fig.tight_layout(pad=0.4, w_pad=1.0)
+    axes[0].plot([], [], "*", ms=12, color="white", mec=INK, mew=0.6, label="certified operating point")
+    fig.tight_layout(rect=(0, 0.16, 1, 1), pad=0.4, w_pad=1.5)
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", ncol=4, bbox_to_anchor=(0.5, 0.0),
+               handlelength=1.9, columnspacing=1.2)
     fig.savefig(FIG / "caps_tradeoff.pdf", facecolor="white")
     plt.close(fig)
 
@@ -1046,7 +1140,7 @@ def kitti_meta():
 def latency():
     """Supp table: per-pair live latency percentiles (ms) of the full budget and CAB (compatibility order), and the
     share of pairs on which CAB is slower than the full budget (the first-stage overhead on hard pairs)."""
-    L = []
+    L, worst = [], []
     for fam, sets_ in (("3dmatch", [("m", "3DMatch"), ("lo", "3DLoMatch")]), ("kitti", [("ki", "kitti_test")]),
                        ("fcgf3dmatch", [("fm", "fcgf_3DMatch"), ("flo", "fcgf_3DLoMatch")])):
         path = RB / LIVE[fam]
@@ -1068,9 +1162,16 @@ def latency():
                     val(f"{k}.cab.p{p}", q(c, p), "{:,.0f}")
                 val(k + ".slower", slower, "{:.0f}")
                 val(k + ".overhead.p99", 100 * (q(c, 99) / q(f, 99) - 1), "{:+.0f}")
+                worst.append((100 * (q(c, 99) / q(f, 99) - 1), f"{ENAME[e]} on {dlabel(d)}"))
                 L.append(f"{ENAME[e]}, {dlabel(d)} & {len(rs)} & {q(f, 50):,.0f} / {q(c, 50):,.0f} & "
                          f"{q(f, 90):,.0f} / {q(c, 90):,.0f} & {q(f, 99):,.0f} / {q(c, 99):,.0f} & {slower:.0f} \\\\")
     (TAB / "supp_latency.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    if all(f"lat.{e}.lo.slower" in VALS for e in ESTS):  # 3DLoMatch: share of pairs slower than the full budget
+        a, b = sorted(int(VALS[f"lat.{e}.lo.slower"]) for e in ESTS)
+        val("lat.lo.slower", f"{a}" if a == b else f"{a}--{b}")
+    if worst:  # largest increase of the 99th-percentile latency over the full budget
+        val("lat.overhead.p99.max", max(worst)[0], "{:.0f}")
+        val("lat.overhead.p99.where", max(worst)[1])
 
 
 def evidence_extra():
@@ -1245,8 +1346,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     TAB.mkdir(parents=True, exist_ok=True)
     FIG.mkdir(parents=True, exist_ok=True)
-    plt.rcParams.update({"font.family": "serif", "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
-                         "pdf.fonttype": 42, "axes.edgecolor": "#c3c2b7", "axes.linewidth": 0.6})
+    setup_style()
     ds, logs, _ = cab_results()
     anchors_and_headroom(ds, logs)
     controller_calibration()

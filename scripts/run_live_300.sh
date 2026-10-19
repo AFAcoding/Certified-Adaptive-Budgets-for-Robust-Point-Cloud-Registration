@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Live timing on 300 test pairs per set (instead of 100), on an otherwise idle machine.
-# The 100-pair results are kept in results/budget/live_100pairs/.
+# The 100-pair results are kept in results/budget/live_100pairs/. Pairs whose timing was interrupted by a
+# system stall are timed again at the end (scripts/retime_stalls.py).
 # Usage: bash scripts/run_live_300.sh > logs/live_300.log 2>&1
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -19,4 +20,6 @@ echo "[$(date +%H:%M)] live FCGF (re-fitted)"
 $PY -I -u scripts/live_budget.py --per-set 300 --prefixes budget,budgetc --ladders extended --dataset fcgf3dmatch --refit
 echo "[$(date +%H:%M)] live equal-time"
 $PY -I -u scripts/live_equal_time.py --per-set 300
+echo "[$(date +%H:%M)] re-time stalled pairs"
+$PY -I -u scripts/retime_stalls.py
 echo "[$(date +%H:%M)] done"

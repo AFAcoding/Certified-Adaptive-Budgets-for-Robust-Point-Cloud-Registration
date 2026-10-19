@@ -55,7 +55,9 @@ python -I scripts/paper_assets.py                                        # -> pa
 
 `{a|b}` means "run once with each value". The outputs should match the files in `results/`.
 
-Live speed-ups are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*.json`, 300 test pairs per set). On other hardware, re-measure them with `bash scripts/run_live_300.sh` on an otherwise idle machine.
+Cost is reported in two ways:
+- **Operation counts** are hardware-independent and come from the logs: the dominant arithmetic of every estimator stage (compatibility tests, graph products, consensus and hypothesis scoring) plus the ordering. The fast path reproduces them exactly (`ops_ratio` in the selection reports, column "Ops" of the paper's Table 1).
+- **Live speed-ups** are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*.json`, 300 test pairs per set; the 100-pair runs are kept in `results/budget/live_100pairs/`). On other hardware, re-measure them with `bash scripts/run_live_300.sh` on an otherwise idle machine. Its last step, `scripts/retime_stalls.py`, times again any pair interrupted by a system stall (a run longer than ten times the median full-budget time); this happened to one pair in our runs.
 
 ## Full rerun from the data
 
