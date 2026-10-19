@@ -66,4 +66,14 @@ candidate only if running all its stages costs at most (1 + rho) times the full 
 - Cost: live wall-clock time and the analytic operation count.
 
 ## Deviations
-(none yet)
+
+1. **Outdoor split (2026-10-19, before any scan of these drives was downloaded or processed).** The 145 KITTI raw
+   drives outside odometry sequences 0-10 yield 1,332 pairs under FCGF's rule (49 drives move far enough), not the
+   2,400 the split above assumed. Denser pairings would create near-duplicate pairs, which a binomial certificate
+   must not see. Amended split:
+   - FPFH: calibration on the odometry validation pairs (180) and the held-out odometry training pairs (1,058),
+     which were never used for design (FPFH is not learned, so FCGF's training does not matter); blind test: all
+     1,332 raw-drive pairs.
+   - FCGF: the raw drives, permuted with `numpy.random.default_rng(20261019)`, go to FCGF calibration until it holds
+     at least 1,100 pairs (FCGF needs calibration data it was not trained on); the remaining drives form the FCGF
+     blind test. The odometry test pairs remain the development benchmark.
