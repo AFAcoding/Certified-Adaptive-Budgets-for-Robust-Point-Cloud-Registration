@@ -113,3 +113,13 @@ Everything else (ladders, families, eps, delta, G, dominance rule, both ordering
   all selections are written to disk. Live timing: 300 random v3 blind pairs, every configuration on the same pairs.
 - The paper reports method v3 as the main method only if it is non-inferior to the full budget and within the risk
   level on the v3 blind test; otherwise v2 remains the main method and v3 is reported as a negative result.
+
+## Deviations v3
+
+1. **Strictly unseen subset (2026-10-21, after the v3 split was generated and before any v3 test pair was logged or
+   processed).** A leakage check found that 377 of the 3,000 v3 blind pairs had appeared in earlier logs as
+   fitting or training pairs (never as test pairs): 237 v2 fitting pairs (also fitting data of the exploration), and
+   pairs of the first protocol's training sample and of the pose-search training logs. The v3 controllers are
+   re-fitted without them. The pre-registered analysis on all 3,000 pairs stays primary; in addition, every v3 blind
+   result is reported on the 2,623 pairs that appear in no earlier log (1,976 above and 647 below 30 % overlap),
+   and any difference in conclusions is stated.
