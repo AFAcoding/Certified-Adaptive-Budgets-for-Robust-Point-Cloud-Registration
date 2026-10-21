@@ -116,10 +116,12 @@ Everything else (ladders, families, eps, delta, G, dominance rule, both ordering
 
 ## Deviations v3
 
-1. **Strictly unseen subset (2026-10-21, after the v3 split was generated and before any v3 test pair was logged or
-   processed).** A leakage check found that 377 of the 3,000 v3 blind pairs had appeared in earlier logs as
-   fitting or training pairs (never as test pairs): 237 v2 fitting pairs (also fitting data of the exploration), and
-   pairs of the first protocol's training sample and of the pose-search training logs. The v3 controllers are
-   re-fitted without them. The pre-registered analysis on all 3,000 pairs stays primary; in addition, every v3 blind
-   result is reported on the 2,623 pairs that appear in no earlier log (1,976 above and 647 below 30 % overlap),
-   and any difference in conclusions is stated.
+1. **No leakage (2026-10-21, after the v3 split was generated and before any v3 test pair was logged or processed).**
+   A leakage check found that 377 of the 3,000 sampled v3 blind pairs had appeared in earlier logs as fitting or
+   training pairs (never as test pairs): 237 v2 fitting pairs (also fitting data of the exploration), and pairs of
+   the first protocol's training sample and of the pose-search training logs. They are removed from the blind test,
+   which therefore holds only pairs that nothing has ever processed: 2,623 pairs (1,976 above and 647 below 30 %
+   overlap; `scripts/make_splits_v3.py`, `results/protocol_v3/indoor_splits.json`). The blind scenes are disjoint
+   from every set that fits, calibrates, chooses or gates method v3; other pairs of these scenes were v2 fitting
+   pairs, which method v3 does not use. No 3DMatch training scene is free of earlier logs, so scene-level freshness
+   with respect to protocol v2 is not attainable within 3DMatch; this is stated in the paper.
