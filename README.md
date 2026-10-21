@@ -24,13 +24,13 @@ The official 3DMatch, 3DLoMatch and KITTI odometry test sets are reported as dev
 | Development: 3DMatch / 3DLoMatch / KITTI odometry, FPFH | 1.58× / 0.96× / 1.08× | 1.42× / 0.97× / 1.07× |
 | Development: 3DMatch / 3DLoMatch, FCGF | 1.04× / 1.08× | 1.01× / 1.03× |
 
-All results are statistically non-inferior in recall. Where nearly every pair needs the full budget, CAB declines to cut instead of losing pairs. Details are in the paper (`paper/main.pdf`, `paper/supp.pdf`).
+All results are statistically non-inferior in recall. Where nearly every pair needs the full budget, CAB declines to cut instead of losing pairs. Details are in the paper.
 
 ## Contents
 
 | Path | What it is |
 |---|---|
-| `paper/` | paper and supplementary material: LaTeX sources, PDFs, and the generated `numbers.tex`, `tables/` and `figures/` |
+
 | `PROTOCOL.md` | the pre-registered evaluation protocol v2 and its single deviation |
 | `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR and TurboReg re-implementations, compatibility ordering, FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
 | `scripts/` | every experiment, analysis and figure script (see the pipeline below) |

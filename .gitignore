@@ -19,3 +19,5 @@ __pycache__/
 *.pyc
 *.egg-info/
 .venv/
+# paper sources are kept private (removed from the repository by the author)
+paper/
