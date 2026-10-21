@@ -13,15 +13,15 @@ import zipfile
 from pathlib import Path
 
 URL = ("https://github.com/AFAcoding/Certified-Adaptive-Budgets-for-Robust-Point-Cloud-Registration/"
-       "releases/download/v1.0/logs-v1.0.zip")
-SHA256 = "25ed91dd102b3033c17a7640dffab7f3e040b37878440d01cead2337b945e184"
+       "releases/download/v2.0/logs-v2.0.zip")
+SHA256 = "a715fed0041f258251cb100f986421b285246f14a54cffd72e14fffb74832c27"
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
     logs = ROOT / "logs"
     logs.mkdir(exist_ok=True)
-    archive = logs / "logs-v1.0.zip"
+    archive = logs / "logs-v2.0.zip"
     if not archive.exists():
         print(f"downloading {URL}", flush=True)
         urllib.request.urlretrieve(URL, archive)

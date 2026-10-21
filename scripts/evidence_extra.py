@@ -26,10 +26,17 @@ import select_ladder as S  # noqa: E402
 from acpr import RESULTS_ROOT  # noqa: E402
 from acpr import analysis as A  # noqa: E402
 
-DATA = {"fpfh_indoor": ("train", "val", ["3DMatch", "3DLoMatch"], "ladder_selection_compat_ext.json"),
-        "fpfh_kitti": ("kitti_train", "kitti_val+kitti_calib", ["kitti_test"], "ladder_selection_compat_ext_kitti.json"),
-        "fcgf_indoor": ("fcgf_3DMatch_fit+fcgf_3DLoMatch_fit", "fcgf_3DMatch_cert+fcgf_3DLoMatch_cert",
-                        ["fcgf_3DMatch", "fcgf_3DLoMatch"], "ladder_selection_compat_ext_fcgf3dmatch_refit.json")}
+# protocol v2 (PROTOCOL.md): (fitting, calibration, test sets, selection file, development sets). The worst-case
+# mixture and per-scene checks concern the selected configuration itself and cover every test set; the re-fitted
+# controllers are other configurations, evaluated on the development benchmarks only.
+DATA = {"fpfh_indoor": ("v2_fit", "v2_cal", ["v2_blind_hi", "v2_blind_lo", "3DMatch", "3DLoMatch"],
+                        "ladder_selection_compat_ext_v2_indoor_fpfh.json", ["3DMatch", "3DLoMatch"]),
+        "fpfh_kitti": ("kitti_train", "kitti_val+kitti_calib", ["kitti_raw_blind", "kitti_test"],
+                       "ladder_selection_compat_ext_v2_kitti_fpfh.json", ["kitti_test"]),
+        "fcgf_indoor": ("fcgfown_v2_fit", "fcgfown_val", ["fcgfown_3DMatch", "fcgfown_3DLoMatch"],
+                        "ladder_selection_compat_ext_v2_indoor_fcgf.json", ["fcgfown_3DMatch", "fcgfown_3DLoMatch"]),
+        "fcgf_kitti": ("fcgfown_kitti_fit", "fcgfown_kitti_raw_cal", ["fcgfown_kitti_raw_blind", "fcgfown_kitti_test"],
+                       "ladder_selection_compat_ext_v2_kitti_fcgf.json", ["fcgfown_kitti_test"])}
 N_BOOT = 10
 
 
@@ -41,7 +48,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     out = {}
     lines = ["# Additional evidence (compatibility order)\n"]
-    for dname, (train, val, tests, selfile) in DATA.items():
+    for dname, (train, val, tests, selfile, dev) in DATA.items():
         sel = json.loads((RESULTS_ROOT / "budget" / selfile).read_text())
         logs = {"train": B.load(train, "budgetc"), "val": B.load(val, "budgetc"), **{t: B.load(t, "budgetc") for t in tests}}
         for est in ("sc2", "turbo"):
@@ -76,19 +83,17 @@ def main():
                              f"{max(v['speedup'] for v in res['scenes'].values()):.2f}x")
             # stability: controller re-fitted on bootstrap resamples of the training pairs
             rng = np.random.default_rng(0)
-            boots = {t: [] for t in tests}
+            boots = {t: [] for t in dev}
             for b in range(N_BOOT):
                 idx = rng.integers(0, len(logs["train"]), len(logs["train"]))
                 lb = dict(logs, train=[logs["train"][i] for i in idx])
-                tr, mdps = S.build(lb, est, B.LADDERS_EXT[g_sel["ladder"]])
-                ref = S.full_ok(lb["val"], est)
-                cert = S.certify(tr, mdps, ref, truncated=B.LADDERS_EXT[g_sel["ladder"]][-1] != 4)
-                param = cert["mondrian"]["param"]
-                for t in tests:
+                # same ladder, controller re-fitted, thresholds re-certified (edges from the resampled fitting pairs)
+                cfg, (tr, mdps) = S.certify_choice(lb, est, {"ladder": g_sel["chosen"]["ladder"], "policy": "mondrian"})
+                for t in dev:
                     full = A.fixed_stage([B.trajectory_ladder(r, est, (4,)) for r in lb[t]], 0)
-                    o = S.mondrian_policy(tr[t], np.array(param["edges"]), param["lambdas"])
+                    o = S.policy_outcome(tr[t], mdps, cfg["policy"], cfg["param"])
                     boots[t].append({"speedup": float(full.s.sum() / o.s.sum()), "risk": float(np.mean(full.ok & ~o.ok))})
-            for t in tests:
+            for t in dev:
                 sp = np.array([x["speedup"] for x in boots[t]])
                 rk = np.array([x["risk"] for x in boots[t]])
                 out[dname][est][t]["bootstrap"] = boots[t]

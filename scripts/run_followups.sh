@@ -3,7 +3,7 @@
 # Usage: bash scripts/run_followups.sh <main-chain output file to wait for>
 set -e
 cd "$(dirname "$0")/.."
-PY=${PYTHON:-python}  # set PYTHON to use another interpreter
+PY=./.venv/Scripts/python.exe
 if [ -n "$1" ]; then
   while ! grep -q ALL_DONE "$1" 2>/dev/null; do sleep 60; done
 fi

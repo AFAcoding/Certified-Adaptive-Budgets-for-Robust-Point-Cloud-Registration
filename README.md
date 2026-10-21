@@ -1,22 +1,41 @@
 # Certified Adaptive Budgets for Robust Point Cloud Registration
 
-Code to reproduce the experiments of *Not All Pairs Need All Correspondences: Certified Adaptive Budgets for Robust Point Cloud Registration*.
+Code, results and paper of *Not All Pairs Need All Correspondences: Certified Adaptive Budgets for Robust Point Cloud Registration*.
 
 **Certified adaptive budgets (CAB)** wrap an unchanged robust estimator (re-implemented SC²-PCR and TurboReg) in three steps:
 - They run it on growing budgets of correspondences, ordered by mutual consistency.
 - A learned controller stops as soon as it is confident.
-- The stopping rule is certified per difficulty group with Learn-then-Test. With high probability, at most 1 % of the pairs the full estimator registers are lost.
+- The stopping rule, chosen on the fitting pairs, is certified per difficulty group with Learn-then-Test on separate calibration pairs. With high probability, at most 1 % of the pairs the full estimator registers are lost.
 
-Experiments cover 3DMatch, 3DLoMatch and KITTI, with FPFH and FCGF correspondences. They include live timing, an equal-time comparison against cheaper variants of the estimators, and a certified adaptive pose search (CAPS) in the supplementary material.
+The paper's claims rest on a **pre-registered protocol** ([PROTOCOL.md](PROTOCOL.md)) with blind test sets that were evaluated once:
+- held-out 3DMatch training scenes (high and low overlap);
+- KITTI raw drives outside the odometry benchmark.
+
+The official 3DMatch, 3DLoMatch and KITTI odometry test sets are reported as development benchmarks. Correspondences come from FPFH and from FCGF, computed by a PyTorch re-implementation of the network that reproduces the released features.
+
+## Results (live speed-up over the full budget; realized risk ≤ 1 % everywhere)
+
+| Test set | SC²-PCR | TurboReg |
+|---|---|---|
+| Blind: held-out scenes, overlap > 30 % (2,092 pairs) | 1.56× | 1.49× |
+| Blind: held-out scenes, overlap 10–30 % (908) | 0.94× | 0.95× |
+| Blind: KITTI raw drives, FPFH (1,310) | 0.93× | 0.91× |
+| Blind: KITTI raw drives, FCGF (203) | full budget | full budget |
+| Development: 3DMatch / 3DLoMatch / KITTI odometry, FPFH | 1.58× / 0.96× / 1.08× | 1.42× / 0.97× / 1.07× |
+| Development: 3DMatch / 3DLoMatch, FCGF | 1.04× / 1.08× | 1.01× / 1.03× |
+
+All results are statistically non-inferior in recall. Where nearly every pair needs the full budget, CAB declines to cut instead of losing pairs. Details are in the paper (`paper/main.pdf`, `paper/supp.pdf`).
 
 ## Contents
 
 | Path | What it is |
 |---|---|
-| `src/acpr/` | the library: data loading, FPFH/FCGF correspondences, SC²-PCR and TurboReg re-implementations, compatibility ordering, FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
+| `paper/` | paper and supplementary material: LaTeX sources, PDFs, and the generated `numbers.tex`, `tables/` and `figures/` |
+| `PROTOCOL.md` | the pre-registered evaluation protocol v2 and its single deviation |
+| `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR and TurboReg re-implementations, compatibility ordering, FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
 | `scripts/` | every experiment, analysis and figure script (see the pipeline below) |
-| `results/` | the selection reports (`*.md`/`*.json`), live timings and summaries that the paper's numbers come from |
-| `scripts/download_logs.py` | downloads the per-pair logs of all experiments (88 MB zip from the v1.0 release) into `logs/` |
+| `results/` | the selection reports (`*.md`/`*.json`), live timings and summaries that the paper's numbers come from; `results/protocol_v2/` holds the splits, the KITTI raw pairs with their ICP ground truth, and the FCGF verification |
+| `scripts/download_logs.py` | downloads the per-pair logs of all experiments (122 MB zip from the v2.0 release) into `logs/` |
 
 Datasets are not redistributed; the scripts below download or prepare them from their official sources.
 
@@ -36,28 +55,24 @@ pip install -e .                   # the scripts run with python -I and import t
 The per-pair logs record every stage of every estimator on every pair. From them, all certified selections, test evaluations, tables and figures can be recomputed in minutes:
 
 ```bash
-python -I scripts/download_logs.py                                       # -> logs/*.jsonl (52 files)
-# certified selection on validation + single test evaluation (3DMatch/3DLoMatch, KITTI, FCGF)
-python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended
-python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset kitti
-python -I scripts/evaluate_transfer.py                                   # FPFH certificates applied to FCGF
-python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {fcgf3dmatch|fcgfkitti}
-python -I scripts/split_fcgf_cal.py
-python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset fcgf3dmatch_refit
-# further checks (all from the logs)
-python -I scripts/fcgf_scene_disjoint.py   # FCGF calibrated on other scenes only (cross-fitting over scenes)
+python -I scripts/download_logs.py                                       # -> logs/*.jsonl (79 files)
+# protocol v2: choice on the fitting pairs, certification on the calibration pairs, single test evaluation
+python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf}
+python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset ... --rho {0.10|0.25}   # worst-case variant
+# further checks on the development benchmarks (all from the logs)
 python -I scripts/calibration_size.py      # certification on random calibration subsets of growing size
 python -I scripts/sensitivity.py           # risk level epsilon and number of difficulty groups
 python -I scripts/evidence_extra.py        # group-wise and worst-case risk, per-scene results, re-fitted controllers
-# every number, table and figure of the paper
-python -I scripts/paper_assets.py                                        # -> paper/numbers.tex, paper/tables/, paper/figures/
+# every number, table and figure of the paper, then an independent re-computation of the headline numbers
+python -I scripts/paper_assets.py          # -> paper/numbers.tex, paper/tables/, paper/figures/
+python -I scripts/validate_numbers.py      # prints MISMATCH lines, or "no mismatches"
 ```
 
-`{a|b}` means "run once with each value". The outputs should match the files in `results/`.
+`{a|b}` means "run once with each value". The outputs should match the files in `results/`. `scripts/run_v2_analysis.sh` runs this whole stage, followed by the live timing.
 
 Cost is reported in two ways:
-- **Operation counts** are hardware-independent and come from the logs: the dominant arithmetic of every estimator stage (compatibility tests, graph products, consensus and hypothesis scoring) plus the ordering. The fast path reproduces them exactly (`ops_ratio` in the selection reports, column "Ops" of the paper's Table 1).
-- **Live speed-ups** are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*.json`, 300 test pairs per set; the 100-pair runs are kept in `results/budget/live_100pairs/`). On other hardware, re-measure them with `bash scripts/run_live_300.sh` on an otherwise idle machine. Its last step, `scripts/retime_stalls.py`, times again any pair interrupted by a system stall (a run longer than ten times the median full-budget time); this happened to one pair in our runs.
+- **Operation counts** are hardware-independent and come from the logs: the dominant arithmetic of every estimator stage (compatibility tests, graph products, consensus and hypothesis scoring) plus the ordering. The fast path reproduces them exactly (`ops_ratio` in the selection reports, column "Ops" of the paper's Tables 1 and 2).
+- **Live speed-ups** are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*_v2_*.json`, 300 random test pairs per set). On other hardware, re-measure them on an otherwise idle machine with the live steps of `scripts/run_v2_analysis.sh`. Its last step, `scripts/retime_stalls.py`, times again any pair interrupted by a system stall (a run longer than ten times the median full-budget time); no pair of the v2 runs needed it.
 
 ## Full rerun from the data
 
@@ -70,6 +85,7 @@ Expect several days on a laptop CPU. The log builders run 6 worker processes wit
   ```bash
   python -I scripts/prepare_3dmatch.py <data.zip> <GeoTransformer clone> data/3DMatch   # needs torch
   python -I scripts/precompute_val_info.py val
+  python -I scripts/make_splits_v2.py                                                    # protocol v2 indoor splits
   ```
 - **KITTI odometry:**
   - Copy GeoTransformer's `data/Kitti/metadata/{train,val,test}.pkl` to `data/KITTI/metadata_raw/`.
@@ -78,40 +94,33 @@ Expect several days on a laptop CPU. The log builders run 6 worker processes wit
   python -I -u scripts/kitti_fetch.py --all-train --threads 8
   python -I -u scripts/kitti_features.py --workers 4
   ```
-- **FCGF features:** use the test features released with [SC²-PCR](https://github.com/ZhiChen902/SC2-PCR) (Google Drive files `1kRwuTHlNPr9siENcEMddCO23Oaq0cz-X` for 3DMatch and `1mT4stteKF2IVjUe-YWht67WtgaB5lMTN` for KITTI).
-  - `scripts/fetch_ranged.sh <id> <file> <bytes>` downloads them resumably.
-  - Extract them so that the files are at `data/FCGF/3DMatch/<scene>/cloud_bin_<i>_fcgf.npz` and `data/FCGF/KITTI/pair_<i>.npz`.
+- **KITTI raw drives (protocol v2):** enumerate the raw drives outside odometry sequences 0–10, split them, fetch only the scans of the pairs (HTTP range requests on the official archives), then refine the GPS/IMU poses by ICP.
+  ```bash
+  python -I -u scripts/kitti_raw_v2.py enumerate
+  python -I -u scripts/kitti_raw_v2.py split
+  python -I -u scripts/kitti_raw_v2.py fetch --threads 8
+  python -I -u scripts/kitti_raw_v2.py fetch-odometry --threads 8   # odometry scans for the FCGF features
+  ```
+- **FCGF weights:** the official checkpoints linked in the [FCGF](https://github.com/chrischoy/FCGF) README, placed in `third_party/fcgf_weights/`: `2019-08-16_19-21-47.pth` (3DMatch, 5 cm) and `KITTI-v0.3-ResUNetBN2C-conv1-5-nout32.pth`. They are loaded with a restricted unpickler (`acpr.safe_torch_load`), so no code inside a checkpoint is run.
+- **FCGF verification (optional):** with the test features released with [SC²-PCR](https://github.com/ZhiChen902/SC2-PCR) (Google Drive files `1kRwuTHlNPr9siENcEMddCO23Oaq0cz-X` for 3DMatch and `1mT4stteKF2IVjUe-YWht67WtgaB5lMTN` for KITTI, extracted to `data/FCGF/3DMatch/<scene>/cloud_bin_<i>_fcgf.npz` and `data/FCGF/KITTI/pair_<i>.npz`), `scripts/verify_fcgf.py 8` and `scripts/verify_fcgf_kitti.py` check that the re-implementation reproduces them (`results/protocol_v2/fcgf_verification.txt`).
 
-**2. Logs and evaluation**
+**2. Logs, selections and timing (protocol v2)**
 ```bash
-# re-implementations vs published recall
-python -I -u scripts/validate_estimators.py 10 4000
-# budget logs, FPFH, 3DMatch/3DLoMatch (ratio order and compatibility order)
-python -I -u scripts/build_budget_logs.py --subset {val|3DMatch|3DLoMatch} --workers 6 [--order compat]
-python -I -u scripts/build_budget_logs.py --subset train --sample 1000 --workers 6 [--order compat]
-# ordering design studies (validation)
-python -I -u scripts/ordering_study.py 3 6
-python -I -u scripts/ordering_study_fast.py 3 6
-python -I -u scripts/ordering_study_anchors.py 3 6
-# KITTI: estimator thresholds on validation, then logs for every split
+python -I scripts/reuse_fit_logs_v2.py                        # fitting pairs already logged in the old training sample
+bash scripts/run_v2_indoor_fpfh.sh > logs/v2_indoor_fpfh.log 2>&1   # FPFH logs: fitting top-up, calibration, blind test
+bash scripts/run_v2_data.sh > logs/v2_data.log 2>&1           # ICP ground truth, FPFH raw-drive logs, FCGF logs, equal-time logs
+bash scripts/run_v2_analysis.sh > logs/v2_analysis.log 2>&1   # selections, studies, live timing (idle machine), re-timing
+python -I scripts/paper_assets.py && python -I scripts/validate_numbers.py
+```
+The development benchmarks also need the logs of the official test sets:
+```bash
+python -I -u scripts/validate_estimators.py 10 4000             # re-implementations vs published recall
+python -I -u scripts/build_budget_logs.py --subset {3DMatch|3DLoMatch} --workers 6 [--order compat]
 python -I -u scripts/build_budget_logs_kitti.py --select-thresholds --workers 6
 python -I -u scripts/build_budget_logs_kitti.py --split {train|val|calib|test} --workers 6
-# FCGF: test logs (even-indexed pairs), then the held-out pool and the three protocols
-python -I -u scripts/build_budget_logs_fcgf.py --set {3DMatch|3DLoMatch|kitti_test} --workers 6 --every 2
-bash scripts/run_fcgf_recal.sh
-# equal-time comparison (fewer seeds/cliques, uniform and FastMAC-style sampling)
-python -I -u scripts/build_equal_time_logs.py --subset {3DMatch|3DLoMatch} --workers 6 --every 2
-# certified selection and test evaluation (as in the fast path), then live timing and the paper assets
-bash scripts/run_budget_final.sh
-bash scripts/run_paper_final.sh
+python -I -u scripts/build_equal_time_logs.py --subset 3DLoMatch --workers 6 --every 2
 ```
-`run_paper_final.sh` runs:
-- the KITTI selection;
-- the FCGF transfer evaluation;
-- the live timing: `live_budget.py` for KITTI and FCGF, and `live_equal_time.py`;
-- `paper_assets.py`.
-
-Run the live timing on an otherwise idle machine.
+The ordering design studies (`scripts/ordering_study*.py`) run on the 3DMatch validation scenes.
 
 **3. Supplementary: certified adaptive pose search (CAPS)**
 ```bash
@@ -123,12 +132,17 @@ python -I scripts/combined_figure.py results/search_jump1024 results/psh_jump102
 python -I -u scripts/live_benchmark.py --summary results/psh_jump1024/summary.json --prefix psh --schedule jump1024 --per-set 200
 ```
 
+**4. Paper**
+```bash
+cd paper && latexmk -pdf supp.tex && latexmk -pdf main.tex
+```
+
 ## Protocol notes
 
-- **Single test evaluation.** Controllers are fitted on training pairs and certified on held-out validation/calibration pairs; each test set is evaluated once.
-  - KITTI certification uses the 180 validation pairs plus the 1,058 training pairs not used for fitting.
-  - FCGF uses the even-indexed test pairs for testing and the odd-indexed ones as a held-out pool.
-- **Statistics.** Speed-up intervals use a scene-stratified bootstrap; recall losses are tested for non-inferiority (1 pp margin, 2 pp on 3DLoMatch); paired comparisons use McNemar's exact test.
+- **Pre-registration.** PROTOCOL.md was committed before any of the new data was downloaded; its one amendment (the outdoor split) was committed before any raw-drive scan was downloaded. Each blind test set was evaluated once, after every selection had been written to disk.
+- **Choose, then certify.** The ladder, the policy family and the difficulty groups are chosen on the fitting pairs only (5-fold out-of-fold controller scores); only the chosen candidate is certified on the calibration pairs. Certifying several candidates on the same calibration pairs and keeping the cheapest would void the guarantee (an earlier version of this code did that; its results are kept in `results/budget/legacy_calibration_selection/`).
+- **Development history.** The first protocol (selections without the `v2_` suffix in `results/budget/`) used the 3DMatch validation scenes for both design and certification, and fitted FCGF on held-out test pairs. Its results are kept for transparency; the paper reports protocol v2.
+- **Statistics.** Speed-up intervals use a scene-stratified bootstrap; recall losses are tested for non-inferiority (1 pp margin, 2 pp at low overlap); paired comparisons use McNemar's exact test.
 - **Cost accounting.** Every distinct computation is charged once, including the ordering and the FastMAC sampling signal.
 
 ## License

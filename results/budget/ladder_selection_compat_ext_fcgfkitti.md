@@ -7,48 +7,61 @@ Compatibility-ordered budgets: a truncated budget takes the top-N correspondence
 
 ## SC²-PCR
 
-Validation, certified operating points (cheapest first):
+Step 1, fitting pairs (300, out-of-fold controller): operating point of every candidate at the loss share the certificate can accept for 276 calibration pairs (cheapest first):
 
-| ladder | policy | parameters | val RR % | val risk % | val mean time (ms) |
-|---|---|---|---|---|---|
-| 500-4000 | threshold | 0.98 | 93.1 | 0.00 | 610 |
-| 250-500-4000 | threshold | 0.99 | 92.8 | 0.00 | 901 |
-| full | threshold | 0.5 | 92.8 | 0.00 | 3906 |
-| full | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 3906 |
-| 250-4000 | threshold | 1.01 | 92.8 | 0.00 | 3992 |
-| 250-4000 | mdp | -1 | 92.8 | 0.00 | 3992 |
-| 250-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 3992 |
-| 500-4000 | mdp | -1 | 92.8 | 0.00 | 4062 |
-| 500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 4062 |
-| 250-500-4000 | mdp | -1 | 92.8 | 0.00 | 4106 |
-| 250-500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 4106 |
-| x4 | threshold | 1.01 | 92.8 | 0.00 | 4304 |
-| x4 | mdp | -1 | 92.8 | 0.00 | 4304 |
-| x4 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 4304 |
-| 250-1000-4000 | threshold | 1.01 | 92.8 | 0.00 | 4304 |
-| 250-1000-4000 | mdp | -1 | 92.8 | 0.00 | 4304 |
-| 250-1000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 4304 |
-| 250-2000-4000 | threshold | 1.01 | 92.8 | 0.00 | 5013 |
-| 250-2000-4000 | mdp | -1 | 92.8 | 0.00 | 5013 |
-| 250-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5013 |
-| 500-2000-4000 | threshold | 1.01 | 92.8 | 0.00 | 5083 |
-| 500-2000-4000 | mdp | -1 | 92.8 | 0.00 | 5083 |
-| 500-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5083 |
-| 250-1000-2000-4000 | threshold | 1.01 | 92.8 | 0.00 | 5325 |
-| 250-1000-2000-4000 | mdp | -1 | 92.8 | 0.00 | 5325 |
-| 250-1000-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5325 |
-| doubling | threshold | 1.01 | 92.8 | 0.00 | 5439 |
-| doubling | mdp | -1 | 92.8 | 0.00 | 5439 |
-| doubling | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5439 |
+| ladder | policy | parameters | fit risk % | fit mean time (ms) |
+|---|---|---|---|---|
+| x4 | giveup | 0.6, 0.02 | 0.00 | 3609 |
+| 250-1000-4000 | giveup | 0.6, 0.02 | 0.00 | 3609 |
+| 250-2000-4000 | giveup | 0.85, 0.02 | 0.00 | 3631 |
+| x4 | threshold | 0.6 | 0.00 | 3642 |
+| 250-1000-4000 | threshold | 0.6 | 0.00 | 3642 |
+| 250-500-4000 | mdp | 0 | 0.00 | 3650 |
+| 250-2000-4000 | threshold | 0.85 | 0.00 | 3709 |
+| 500-2000-4000 | threshold | 0.8 | 0.00 | 3751 |
+| 500-2000-4000 | giveup | 0.8, 0 | 0.00 | 3751 |
+| 250-500-4000 | threshold | 0.5 | 0.00 | 3792 |
+| 250-500-4000 | giveup | 0.5, 0 | 0.00 | 3792 |
+| 500-4000 | threshold | 0.5 | 0.00 | 3855 |
+| 500-4000 | giveup | 0.5, 0 | 0.00 | 3855 |
+| 250-1000-2000-4000 | giveup | 0.88, 0.02 | 0.00 | 3953 |
+| 250-4000 | giveup | 0.5, 0.02 | 0.00 | 3953 |
+| 250-4000 | threshold | 0.5 | 0.00 | 3968 |
+| 250-1000-2000-4000 | threshold | 0.88 | 0.00 | 4024 |
+| 500-4000 | mdp | 0 | 0.00 | 4119 |
+| 250-4000 | mdp | 0 | 0.00 | 4134 |
+| doubling | threshold | 0.88 | 0.00 | 4146 |
+| doubling | giveup | 0.88, 0 | 0.00 | 4146 |
+| full | threshold | 1.01 | 0.00 | 4219 |
+| full | mondrian | never stop early | 0.00 | 4219 |
+| 250-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 4314 |
+| 500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 4391 |
+| 250-500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 4441 |
+| x4 | mdp | -1 | 0.00 | 4670 |
+| x4 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 4670 |
+| 250-1000-4000 | mdp | -1 | 0.00 | 4670 |
+| 250-1000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 4670 |
+| 250-2000-4000 | mdp | -1 | 0.00 | 5454 |
+| 250-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5454 |
+| 500-2000-4000 | mdp | -1 | 0.00 | 5531 |
+| 500-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5531 |
+| 250-1000-2000-4000 | mdp | -1 | 0.00 | 5810 |
+| 250-1000-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5810 |
+| doubling | mdp | -1 | 0.00 | 5937 |
+| doubling | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5937 |
 
-Selected on validation: marginal = `500-4000` / threshold; group-conditional = `full` / mondrian.
+Step 2, calibration pairs: Learn-then-Test of the chosen candidates only:
 
+| certificate | chosen | certified | parameters | cal RR % | cal risk % | cal mean time (ms) |
+|---|---|---|---|---|---|---|
+| marginal | x4 / giveup | full / threshold (fallback) | 1.01 | 92.8 | 0.00 | 3906 |
+| mondrian | full / mondrian | full / mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 3906 |
 
 ### SC²-PCR, fcgf_kitti_test test (278 pairs)
 
 | configuration | RR % | mean time (ms) | ΔRR vs full, pp [95% UB] | non-inferior | speed-up vs full [95% CI] | McNemar p | risk % |
 |---|---|---|---|---|---|---|---|
-| marginal: 500-4000 / threshold | 93.88 | 645 | +1.08 [+2.16] | False | 6.25× [5.02, 8.02] | 0.25 | 1.08 |
+| marginal: full / threshold | 94.96 | 4035 | +0.00 [+0.00] | True | 1.00× [1.00, 1.00] | 1 | 0.00 |
 | mondrian: full / mondrian | 94.96 | 4035 | +0.00 [+0.00] | True | 1.00× [1.00, 1.00] | 1 | 0.00 |
 | fixed budget N=250 (single run) | 93.88 | 116 | | | | | |
 | fixed budget N=500 (single run) | 93.53 | 194 | | | | | |
@@ -58,42 +71,55 @@ Selected on validation: marginal = `500-4000` / threshold; group-conditional = `
 
 ## TurboReg
 
-Validation, certified operating points (cheapest first):
+Step 1, fitting pairs (300, out-of-fold controller): operating point of every candidate at the loss share the certificate can accept for 276 calibration pairs (cheapest first):
 
-| ladder | policy | parameters | val RR % | val risk % | val mean time (ms) |
-|---|---|---|---|---|---|
-| full | threshold | 0.5 | 92.8 | 0.00 | 5521 |
-| full | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5521 |
-| 250-4000 | threshold | 1.01 | 92.8 | 0.00 | 5724 |
-| 250-4000 | mdp | -1 | 92.8 | 0.00 | 5724 |
-| 250-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5724 |
-| 500-4000 | threshold | 1.01 | 92.8 | 0.00 | 5858 |
-| 500-4000 | mdp | -1 | 92.8 | 0.00 | 5858 |
-| 500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5858 |
-| 250-500-4000 | threshold | 1.01 | 92.8 | 0.00 | 6019 |
-| 250-500-4000 | mdp | -1 | 92.8 | 0.00 | 6019 |
-| 250-500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 6019 |
-| x4 | threshold | 1.01 | 92.8 | 0.00 | 6373 |
-| x4 | mdp | -1 | 92.8 | 0.00 | 6373 |
-| x4 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 6373 |
-| 250-1000-4000 | threshold | 1.01 | 92.8 | 0.00 | 6373 |
-| 250-1000-4000 | mdp | -1 | 92.8 | 0.00 | 6373 |
-| 250-1000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 6373 |
-| 500-2000-4000 | mdp | 0 | 92.8 | 0.00 | 7332 |
-| 250-2000-4000 | threshold | 1.01 | 92.8 | 0.00 | 7401 |
-| 250-2000-4000 | mdp | -1 | 92.8 | 0.00 | 7401 |
-| 250-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 7401 |
-| 500-2000-4000 | threshold | 1.01 | 92.8 | 0.00 | 7534 |
-| 500-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 7534 |
-| 250-1000-2000-4000 | threshold | 1.01 | 92.8 | 0.00 | 8050 |
-| 250-1000-2000-4000 | mdp | -1 | 92.8 | 0.00 | 8050 |
-| 250-1000-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 8050 |
-| doubling | threshold | 1.01 | 92.8 | 0.00 | 8344 |
-| doubling | mdp | -1 | 92.8 | 0.00 | 8344 |
-| doubling | mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 8344 |
+| ladder | policy | parameters | fit risk % | fit mean time (ms) |
+|---|---|---|---|---|
+| 250-2000-4000 | giveup | 0.8, 0.02 | 0.00 | 4590 |
+| 250-2000-4000 | threshold | 0.8 | 0.00 | 4663 |
+| 500-4000 | giveup | 0.5, 0.02 | 0.00 | 4731 |
+| 500-2000-4000 | giveup | 0.8, 0.02 | 0.00 | 4744 |
+| 500-4000 | threshold | 0.5 | 0.00 | 4747 |
+| 250-500-4000 | threshold | 0.6 | 0.00 | 4787 |
+| 250-500-4000 | giveup | 0.6, 0 | 0.00 | 4787 |
+| 500-2000-4000 | threshold | 0.8 | 0.00 | 4818 |
+| 250-4000 | giveup | 0.5, 0.02 | 0.00 | 4827 |
+| 250-4000 | threshold | 0.5 | 0.00 | 4860 |
+| x4 | threshold | 0.7 | 0.00 | 4941 |
+| x4 | giveup | 0.7, 0 | 0.00 | 4941 |
+| 250-1000-4000 | threshold | 0.7 | 0.00 | 4941 |
+| 250-1000-4000 | giveup | 0.7, 0 | 0.00 | 4941 |
+| 250-4000 | mdp | 0 | 0.00 | 5074 |
+| full | threshold | 1.01 | 0.00 | 5253 |
+| full | mondrian | never stop early | 0.00 | 5253 |
+| 250-1000-2000-4000 | threshold | 0.88 | 0.00 | 5357 |
+| 250-1000-2000-4000 | giveup | 0.88, 0 | 0.00 | 5357 |
+| 250-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5371 |
+| 500-4000 | mdp | -1 | 0.00 | 5504 |
+| 500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5504 |
+| doubling | threshold | 0.88 | 0.00 | 5520 |
+| doubling | giveup | 0.88, 0 | 0.00 | 5520 |
+| 250-500-4000 | mdp | -1 | 0.00 | 5578 |
+| 250-500-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5578 |
+| x4 | mdp | -1 | 0.00 | 5941 |
+| x4 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5941 |
+| 250-1000-4000 | mdp | -1 | 0.00 | 5941 |
+| 250-1000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 5941 |
+| 250-2000-4000 | mdp | -1 | 0.00 | 6977 |
+| 250-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 6977 |
+| 500-2000-4000 | mdp | -1 | 0.00 | 7110 |
+| 500-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 7110 |
+| 250-1000-2000-4000 | mdp | -1 | 0.00 | 7547 |
+| 250-1000-2000-4000 | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 7547 |
+| doubling | mdp | -1 | 0.00 | 7754 |
+| doubling | mondrian | λ per group = 1.01/1.01/1.01 | 0.00 | 7754 |
 
-Selected on validation: marginal = `full` / threshold; group-conditional = `full` / mondrian.
+Step 2, calibration pairs: Learn-then-Test of the chosen candidates only:
 
+| certificate | chosen | certified | parameters | cal RR % | cal risk % | cal mean time (ms) |
+|---|---|---|---|---|---|---|
+| marginal | 250-2000-4000 / giveup | full / threshold (fallback) | 1.01 | 92.8 | 0.00 | 5521 |
+| mondrian | full / mondrian | full / mondrian | λ per group = 1.01/1.01/1.01 | 92.8 | 0.00 | 5521 |
 
 ### TurboReg, fcgf_kitti_test test (278 pairs)
 

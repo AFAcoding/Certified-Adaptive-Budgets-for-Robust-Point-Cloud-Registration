@@ -1,0 +1,1506 @@
+{
+ "sc2": {
+  "candidates": [
+   {
+    "ladder": "doubling",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "doubling",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "doubling",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "x4",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "x4",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "x4",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.08540932200199071,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.146914239001732,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "fixed-1000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.3356120816686113,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "fixed-1000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.3356120816686113,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.415216184668534,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.186000112125488,
+      8.235360573481737
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.47718581300151225,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.5162119250022806,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.5506913120026001,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "fixed-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 1.0234946756691594,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "fixed-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 1.0234946756691594,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "fixed-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.18581461803742,
+      8.236685322712457
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.0234946756691594,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.3420412216689632,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.3765206086692827,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.186000112125488,
+      8.235360573481737
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.4020762800019777,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "x4",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.44303696200271,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.44303696200271,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.6718480843355064,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.186000112125488,
+      8.235360573481737
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.732347854001758,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.772843824669253,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "doubling",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184513675211702,
+      8.233768709217097
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.8073232116695725,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "threshold",
+    "fit_param": 1.01,
+    "fit_s": 3.721083838000389,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "mondrian",
+    "fit_param": null,
+    "fit_s": 3.721083838000389,
+    "fit_risk": 0.0
+   }
+  ],
+  "selected": {
+   "marginal": {
+    "ladder": "full",
+    "policy": "threshold",
+    "param": 1.01,
+    "val_s": 3.9261210298106737,
+    "val_rr": 0.8644986449864499,
+    "val_risk": 0.0,
+    "fit_s": 0.08540932200199071,
+    "chosen": {
+     "ladder": "doubling",
+     "policy": "threshold"
+    },
+    "fallback": true
+   },
+   "mondrian": {
+    "ladder": "full",
+    "policy": "mondrian",
+    "param": {
+     "edges": [
+      0.0,
+      0.0
+     ],
+     "lambdas": [
+      1.01,
+      1.01,
+      1.01
+     ]
+    },
+    "val_s": 3.9261210298106737,
+    "val_rr": 0.8644986449864499,
+    "val_risk": 0.0,
+    "fit_s": 0.415216184668534,
+    "chosen": {
+     "ladder": "250-2000",
+     "policy": "mondrian"
+    },
+    "fallback": true
+   }
+  },
+  "test": {
+   "fcgfown_kitti_raw_blind": {
+    "marginal": {
+     "rr": 0.9261083743842364,
+     "s": 3.9971102837443335,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      203
+     ]
+    },
+    "mondrian": {
+     "rr": 0.9261083743842364,
+     "s": 3.9971102837443335,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      203
+     ]
+    },
+    "full": {
+     "rr": 0.9261083743842364,
+     "s": 3.9971102837443335
+    }
+   },
+   "fcgfown_kitti_test": {
+    "marginal": {
+     "rr": 0.9351351351351351,
+     "s": 3.9300711594601707,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      555
+     ]
+    },
+    "mondrian": {
+     "rr": 0.9351351351351351,
+     "s": 3.9300711594601707,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      555
+     ]
+    },
+    "full": {
+     "rr": 0.9351351351351351,
+     "s": 3.9300711594601707
+    }
+   }
+  }
+ },
+ "turbo": {
+  "candidates": [
+   {
+    "ladder": "doubling",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "doubling",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "doubling",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "x4",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "x4",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "x4",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.20347120466690588,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "mdp",
+    "fit_param": 30.0,
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.3340145306678217,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "fixed-1000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 0.6813694716695076,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "fixed-1000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 0.6813694716695076,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.7448480903331074,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.186185683919772,
+      8.235360643753348
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.8741923566672873,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-1000-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 0.9577335150006305,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-500-1000-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.0548601436671257,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "fixed-2000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 1.6744723630007745,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "fixed-2000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.0
+    ],
+    "fit_s": 1.6744723630007745,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "fixed-2000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.18590740387695,
+      8.236685322712457
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 1.6744723630007745,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.0216005163336135,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.1187271450001086,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.186185683919772,
+      8.235360643753348
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.153996963001264,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "x4",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.2344859410011364,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-1000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.2344859410011364,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-2000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.562977401999815,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-2000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.186185683919772,
+      8.235360643753348
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.6941747890007295,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-1000-2000-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.775862826667338,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "doubling",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      8.184699557456506,
+      8.233857208708745
+     ],
+     "lambdas": [
+      1.01,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 2.8729894553338333,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "threshold",
+    "fit_param": 1.01,
+    "fit_s": 5.5779121463331585,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "mondrian",
+    "fit_param": null,
+    "fit_s": 5.5779121463331585,
+    "fit_risk": 0.0
+   }
+  ],
+  "selected": {
+   "marginal": {
+    "ladder": "full",
+    "policy": "threshold",
+    "param": 1.01,
+    "val_s": 5.4546903401986615,
+    "val_rr": 0.8563685636856369,
+    "val_risk": 0.0,
+    "fit_s": 0.20347120466690588,
+    "chosen": {
+     "ladder": "doubling",
+     "policy": "threshold"
+    },
+    "fallback": true
+   },
+   "mondrian": {
+    "ladder": "full",
+    "policy": "mondrian",
+    "param": {
+     "edges": [
+      0.0,
+      0.0
+     ],
+     "lambdas": [
+      1.01,
+      1.01,
+      1.01
+     ]
+    },
+    "val_s": 5.4546903401986615,
+    "val_rr": 0.8563685636856369,
+    "val_risk": 0.0,
+    "fit_s": 0.7448480903331074,
+    "chosen": {
+     "ladder": "250-2000",
+     "policy": "mondrian"
+    },
+    "fallback": true
+   }
+  },
+  "test": {
+   "fcgfown_kitti_raw_blind": {
+    "marginal": {
+     "rr": 0.9211822660098522,
+     "s": 5.495949805911035,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      203
+     ]
+    },
+    "mondrian": {
+     "rr": 0.9211822660098522,
+     "s": 5.495949805911035,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      203
+     ]
+    },
+    "full": {
+     "rr": 0.9211822660098522,
+     "s": 5.495949805911035
+    }
+   },
+   "fcgfown_kitti_test": {
+    "marginal": {
+     "rr": 0.9351351351351351,
+     "s": 5.870423516938054,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      555
+     ]
+    },
+    "mondrian": {
+     "rr": 0.9351351351351351,
+     "s": 5.870423516938054,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      555
+     ]
+    },
+    "full": {
+     "rr": 0.9351351351351351,
+     "s": 5.870423516938054
+    }
+   }
+  }
+ }
+}

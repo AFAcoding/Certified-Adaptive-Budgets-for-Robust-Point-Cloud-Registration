@@ -1,8 +1,8 @@
 """Scene-disjoint FCGF evaluation by cross-fitting over scenes.
 
 The main FCGF protocol fits and certifies on held-out pairs of the *same* scenes as the test pairs (only test features
-are released). Here every scene is held out in turn: for each fold, the controller is fitted and certified on pairs of
-the other scenes only (fitting: every third pair, certification: the rest) and evaluated on the held-out scenes, so
+are released). Here every scene is held out in turn: for each fold, the configuration is chosen and fitted on pairs
+of the other scenes and certified on others of them (fitting: every third pair, certification: the rest) and evaluated on the held-out scenes, so
 calibration and test never share a scene. Every pair is tested exactly once; outcomes are pooled over the folds.
 
 Pools (all FCGF pairs: the even-indexed test logs plus the odd-indexed held-out logs):
@@ -38,22 +38,10 @@ def load_pool(sets, prefix):
 
 
 def select(logs, est):
-    """Certified selection on logs['val'] as in select_ladder.py: cheapest certified point per family."""
-    rows, built = [], {}
-    for lname, ladder in B.LADDERS_EXT.items():
-        tr, mdps = S.build(logs, est, ladder)
-        built[lname] = (tr, mdps)
-        for pname, c in S.certify(tr, mdps, S.full_ok(logs["val"], est), truncated=ladder[-1] != 4).items():
-            rows.append({"ladder": lname, "policy": pname, **c})
-    rows.sort(key=lambda x: x["val_s"])
-    # the full budget is the reference itself (zero risk by definition): with too few calibration pairs to certify
-    # anything, not even the never-stop rule, it is the fallback
-    marg = next((x for x in rows if x["policy"] != "mondrian"),
-                {"ladder": "full", "policy": "threshold", "param": 1.01, "fallback": True})
-    mond = next((x for x in rows if x["policy"] == "mondrian"),
-                {"ladder": "full", "policy": "mondrian", "fallback": True,
-                 "param": {"edges": [0.0] * (S.N_GROUPS - 1), "lambdas": [1.01] * S.N_GROUPS}})
-    return {"marginal": marg, "mondrian": mond}, built
+    """As in select_ladder.py: chosen on logs['train'] (out-of-fold), only the choice certified on logs['val']; the full
+    budget when nothing cheaper is certifiable (e.g. per-fold pools too small for a group-conditional certificate)."""
+    sel, _, built = S.select_and_certify(logs, est)
+    return sel, built
 
 
 def concat(outs):
@@ -80,7 +68,7 @@ def main():
                     sel, built = select(logs, est)
                     full = A.fixed_stage([B.trajectory_ladder(r, est, (4,)) for r in test], 0)
                     for tag, x in sel.items():
-                        tr, mdps = built[x["ladder"]]
+                        tr, mdps = built[tag]
                         per[tag]["o"].append(S.policy_outcome(tr["test"], mdps, x["policy"], x["param"]))
                         per[tag]["full"].append(full)
                         per[tag]["recs"].append(test)

@@ -373,7 +373,20 @@ def final_labels(trajs) -> np.ndarray:
     return np.array([tr[-1]["ok"] for tr in trajs for _ in tr], dtype=int)
 
 
+class _Constant:
+    """Fitted on labels of a single class (e.g. every training stage correct): predicts that class."""
+
+    def __init__(self, p):
+        self.p = float(p)
+
+    def predict_proba(self, X):
+        n = len(X)
+        return np.column_stack([np.full(n, 1 - self.p), np.full(n, self.p)])
+
+
 def fit_classifier(X, y, C=1.0):
+    if len(np.unique(y)) < 2:
+        return _Constant(np.mean(y))
     clf = make_pipeline(StandardScaler(), LogisticRegression(C=C, max_iter=2000))
     clf.fit(X, y)
     return clf

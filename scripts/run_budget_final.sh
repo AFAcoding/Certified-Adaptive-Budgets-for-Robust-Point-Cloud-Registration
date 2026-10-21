@@ -11,7 +11,7 @@
 # Usage: bash scripts/run_budget_final.sh [--wait]   (--wait: block until the compat logs are complete)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PY=${PYTHON:-python}  # set PYTHON to use another interpreter
+PY=./.venv/Scripts/python.exe
 R=results/budget
 if [ "${1:-}" = "--wait" ]; then
   until [ -f logs/budgetc_3DLoMatch.jsonl ] && [ "$(wc -l < logs/budgetc_3DLoMatch.jsonl)" -ge 1781 ]; do sleep 30; done

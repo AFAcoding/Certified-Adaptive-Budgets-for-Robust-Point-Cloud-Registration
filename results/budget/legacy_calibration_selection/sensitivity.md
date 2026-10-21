@@ -1,0 +1,52 @@
+# Sensitivity to the risk level epsilon and the number of difficulty groups G (compatibility order)
+
+| data | estimator | epsilon % | G | ladder | test | offline speed-up | risk % | loss [UB] pp |
+|---|---|---|---|---|---|---|---|---|
+| 3dmatch | sc2 | 0.5 | 3 | full | 3DMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | sc2 | 0.5 | 3 | full | 3DLoMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | sc2 | 1 | 3 | 250-4000 | 3DMatch | 1.96× | 0.31 | 0.25 [0.49] |
+| 3dmatch | sc2 | 1 | 3 | 250-4000 | 3DLoMatch | 1.04× | 0.00 | 0.00 [0.00] |
+| 3dmatch | sc2 | 2 | 3 | 250-4000 | 3DMatch | 2.04× | 0.43 | 0.37 [0.68] |
+| 3dmatch | sc2 | 2 | 3 | 250-4000 | 3DLoMatch | 1.05× | 0.06 | 0.06 [0.17] |
+| 3dmatch | sc2 | 5 | 3 | 500-4000 | 3DMatch | 2.41× | 1.36 | 0.92 [1.48] |
+| 3dmatch | sc2 | 5 | 3 | 500-4000 | 3DLoMatch | 1.11× | 0.17 | 0.06 [0.28] |
+| 3dmatch | sc2 | 1 | 1 | 250-4000 | 3DMatch | 2.23× | 0.80 | 0.62 [1.05] |
+| 3dmatch | sc2 | 1 | 1 | 250-4000 | 3DLoMatch | 1.09× | 0.11 | 0.00 [0.17] |
+| 3dmatch | sc2 | 1 | 2 | 250-4000 | 3DMatch | 2.04× | 0.43 | 0.37 [0.68] |
+| 3dmatch | sc2 | 1 | 2 | 250-4000 | 3DLoMatch | 1.06× | 0.06 | 0.06 [0.17] |
+| 3dmatch | sc2 | 1 | 4 | full | 3DMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | sc2 | 1 | 4 | full | 3DLoMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | sc2 | 1 | 5 | full | 3DMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | sc2 | 1 | 5 | full | 3DLoMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 0.5 | 3 | full | 3DMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 0.5 | 3 | full | 3DLoMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 1 | 3 | 250-4000 | 3DMatch | 1.84× | 0.37 | 0.37 [0.62] |
+| 3dmatch | turbo | 1 | 3 | 250-4000 | 3DLoMatch | 1.03× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 2 | 3 | 250-4000 | 3DMatch | 1.97× | 0.55 | 0.55 [0.86] |
+| 3dmatch | turbo | 2 | 3 | 250-4000 | 3DLoMatch | 1.05× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 5 | 3 | 250-4000 | 3DMatch | 2.28× | 1.17 | 1.11 [1.54] |
+| 3dmatch | turbo | 5 | 3 | 250-4000 | 3DLoMatch | 1.11× | 0.22 | 0.17 [0.39] |
+| 3dmatch | turbo | 1 | 1 | 250-4000 | 3DMatch | 2.16× | 0.80 | 0.74 [1.11] |
+| 3dmatch | turbo | 1 | 1 | 250-4000 | 3DLoMatch | 1.09× | 0.06 | 0.00 [0.11] |
+| 3dmatch | turbo | 1 | 2 | 250-4000 | 3DMatch | 1.92× | 0.55 | 0.55 [0.86] |
+| 3dmatch | turbo | 1 | 2 | 250-4000 | 3DLoMatch | 1.04× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 1 | 4 | full | 3DMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 1 | 4 | full | 3DLoMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 1 | 5 | full | 3DMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| 3dmatch | turbo | 1 | 5 | full | 3DLoMatch | 1.00× | 0.00 | 0.00 [0.00] |
+| kitti | sc2 | 0.5 | 3 | full | kitti_test | 1.00× | 0.00 | 0.00 [0.00] |
+| kitti | sc2 | 1 | 3 | 250-2000-4000 | kitti_test | 1.30× | 0.18 | 0.00 [0.36] |
+| kitti | sc2 | 2 | 3 | 500-2000-4000 | kitti_test | 1.41× | 0.90 | 0.90 [1.62] |
+| kitti | sc2 | 5 | 3 | 250-2000-4000 | kitti_test | 1.48× | 1.08 | 0.72 [1.62] |
+| kitti | sc2 | 1 | 1 | 500-2000-4000 | kitti_test | 1.41× | 0.90 | 0.90 [1.62] |
+| kitti | sc2 | 1 | 2 | 250-2000-4000 | kitti_test | 1.36× | 0.36 | 0.18 [0.72] |
+| kitti | sc2 | 1 | 4 | full | kitti_test | 1.00× | 0.00 | 0.00 [0.00] |
+| kitti | sc2 | 1 | 5 | full | kitti_test | 1.00× | 0.00 | 0.00 [0.00] |
+| kitti | turbo | 0.5 | 3 | full | kitti_test | 1.00× | 0.00 | 0.00 [0.00] |
+| kitti | turbo | 1 | 3 | 250-2000-4000 | kitti_test | 1.36× | 0.72 | 0.54 [1.26] |
+| kitti | turbo | 2 | 3 | 250-2000-4000 | kitti_test | 1.39× | 1.08 | 0.90 [1.62] |
+| kitti | turbo | 5 | 3 | 250-2000-4000 | kitti_test | 1.52× | 2.88 | 2.70 [3.96] |
+| kitti | turbo | 1 | 1 | 250-2000-4000 | kitti_test | 1.41× | 1.62 | 1.44 [2.34] |
+| kitti | turbo | 1 | 2 | 250-2000-4000 | kitti_test | 1.32× | 0.54 | 0.54 [1.08] |
+| kitti | turbo | 1 | 4 | full | kitti_test | 1.00× | 0.00 | 0.00 [0.00] |
+| kitti | turbo | 1 | 5 | full | kitti_test | 1.00× | 0.00 | 0.00 [0.00] |

@@ -24,15 +24,15 @@ import select_ladder as S  # noqa: E402
 from acpr import RESULTS_ROOT  # noqa: E402
 from acpr import analysis as A  # noqa: E402
 
-DATA = {"3dmatch": ("train", "val", ["3DMatch", "3DLoMatch"], "ladder_selection_compat_ext.json"),
-        "kitti": ("kitti_train", "kitti_val+kitti_calib", ["kitti_test"], "ladder_selection_compat_ext_kitti.json")}
-SIZES = [100, 200, 300, 450, 600, 900, 1200]
+# protocol v2 (PROTOCOL.md); evaluated on the development benchmarks only, never on the blind tests
+DATA = {"3dmatch": ("v2_fit", "v2_cal", ["3DMatch", "3DLoMatch"], "ladder_selection_compat_ext_v2_indoor_fpfh.json"),
+        "kitti": ("kitti_train", "kitti_val+kitti_calib", ["kitti_test"], "ladder_selection_compat_ext_v2_kitti_fpfh.json")}
+SIZES = [100, 200, 300, 450, 600, 900, 1200, 1800, 2400]
 REPS = 20
 
 
-def certify_mondrian(trv, ref_ok):
-    edges = S.group_edges(trv)
-    gv = S.groups_of(trv, edges)
+def certify_mondrian(trv, ref_ok, edges):
+    gv = S.groups_of(trv, edges)  # edges from the fitting pairs, fixed for every subset
     lams = []
     for gi in range(S.N_GROUPS):
         sub = [t for t, g in zip(trv, gv) if g == gi]
@@ -63,6 +63,7 @@ def main():
             logs = {"train": B.load(train, "budgetc"), "val": B.load(val, "budgetc"), **{t: B.load(t, "budgetc") for t in tests}}
             tr, mdps = S.build(logs, est, B.LADDERS_EXT[ladder])
             ref = S.full_ok(logs["val"], est)
+            edges = S.group_edges(tr["train"])
             full = {t: A.fixed_stage([B.trajectory_ladder(r, est, (4,)) for r in logs[t]], 0) for t in tests}
             rng = np.random.default_rng(0)
             pool = len(tr["val"])
@@ -71,11 +72,13 @@ def main():
                 for rep in range(reps):
                     idx = np.sort(rng.choice(pool, n, replace=False))
                     trv = [tr["val"][i] for i in idx]
-                    certs = {"mondrian": certify_mondrian(trv, ref[idx]), "marginal": certify_marginal(trv, ref[idx])}
+                    certs = {"mondrian": certify_mondrian(trv, ref[idx], edges), "marginal": certify_marginal(trv, ref[idx])}
                     for tag, param in certs.items():
                         certified = (min(param["lambdas"]) < 1.01) if tag == "mondrian" else (param < 1.01)
                         for t in tests:
-                            o = (S.mondrian_policy(tr[t], np.array(param["edges"]), param["lambdas"]) if tag == "mondrian"
+                            # nothing certified: the full budget (as in select_ladder.certify_choice)
+                            o = (full[t] if not certified else
+                                 S.mondrian_policy(tr[t], np.array(param["edges"]), param["lambdas"]) if tag == "mondrian"
                                  else A.threshold_policy(tr[t], "p_now", param))
                             f = full[t]
                             rec = {"certified": bool(certified), "speedup": float(f.s.sum() / o.s.sum()),

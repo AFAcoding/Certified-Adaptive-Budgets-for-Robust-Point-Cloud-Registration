@@ -1,0 +1,14 @@
+{
+ "all": {
+  "pairs": 1310,
+  "dropped_icp": 22
+ },
+ "fcgf_blind": {
+  "pairs": 203,
+  "dropped_icp": 4
+ },
+ "fcgf_cal": {
+  "pairs": 1107,
+  "dropped_icp": 18
+ }
+}

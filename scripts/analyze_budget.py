@@ -29,7 +29,10 @@ LAMBDAS_P = [1.01, 0.995, 0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.9, 0
 LAMBDAS_MDP = [-1.0, 0.0] + list(np.geomspace(1e-3, 30, 40))  # cost unit: seconds
 EPS, DELTA = 0.01, 0.10
 MARGIN = {"3DMatch": 0.01, "3DLoMatch": 0.02, "val": 0.01, "kitti_test": 0.01, "kitti_val": 0.01,
-          "fcgf_3DMatch": 0.01, "fcgf_3DLoMatch": 0.02, "fcgf_kitti_test": 0.01}
+          "fcgf_3DMatch": 0.01, "fcgf_3DLoMatch": 0.02, "fcgf_kitti_test": 0.01,
+          # protocol v2: 2 pp at low overlap (10-30 %), 1 pp elsewhere, as above
+          "v2_blind_hi": 0.01, "v2_blind_lo": 0.02, "kitti_raw_blind": 0.01, "fcgfown_3DMatch": 0.01,
+          "fcgfown_3DLoMatch": 0.02, "fcgfown_kitti_raw_blind": 0.01, "fcgfown_kitti_test": 0.01}
 
 
 def load(subset, prefix="budget"):

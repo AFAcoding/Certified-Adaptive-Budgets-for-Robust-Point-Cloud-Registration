@@ -196,7 +196,70 @@ class Controller:
         return next((st["stage"] for st in tro if st["p_now"] >= self.lams[g]), len(tro) - 1)
 
 
+class V2(ThreeDMatch):
+    """Protocol v2 datasets (select_ladder.DATASETS["v2_*"]): blind tests and development benchmarks with the same
+    pairs, features and correspondence search as their logs (FPFH indoors: k-d tree; otherwise exact brute force)."""
+
+    def __init__(self, name):
+        D = S.DATASETS[name]
+        self.name, self.tests, self.train, self.val = name, D["tests"], D["train"], D["val"]
+        self.suffix = self.outtag = f"_{name}"
+        self.outdoor = "kitti" in name
+        self.fpfh_indoor = name == "v2_indoor_fpfh"
+        if self.outdoor:
+            thr = json.loads((RESULTS_ROOT / "kitti" / "thresholds.json").read_text())
+            self.inlier, self.compat_thr = 0.6, thr["sc2_d_thre"]
+            self.kw = {"sc2": {"d_thre": thr["sc2_d_thre"], "inlier_thr": 0.6, "nms_radius": 0.6},
+                       "turbo": {"tau": thr["turbo_tau"], "inlier_thr": 0.6}}
+        else:
+            self.inlier, self.compat_thr, self.kw = 0.10, 0.10, {"sc2": {}, "turbo": {}}
+
+    def _v2(self, subset):
+        from acpr import v2data
+        return v2data.config(subset) if subset.startswith(("fcgfown_", "kitti_raw")) else None
+
+    def pairs(self, subset):
+        self._current = subset  # features_pair dispatches on the subset being timed
+        c = self._v2(subset)
+        if c is not None:
+            return c["pairs"]()
+        return K.load_kitti_pairs("test") if subset == "kitti_test" else load_pairs(subset)
+
+    def features_pair(self, pair):
+        c = self._v2(self._subset_of(pair))
+        if c is not None:
+            rp, rf = c["features"](pair.pcd0)
+            sp, sf = c["features"](pair.pcd1)
+            return rp, rf, sp, sf
+        if self.outdoor:  # odometry test pairs with FPFH
+            rp, rf, _ = K.get_fpfh_kitti(pair.pcd0)
+            sp, sf, _ = K.get_fpfh_kitti(pair.pcd1)
+            return rp, rf, sp, sf
+        return ThreeDMatch.features_pair(self, pair)
+
+    def _subset_of(self, pair):
+        return self._current
+
+    def kwargs(self, est):
+        return self.kw[est]
+
+    def info(self, pair):
+        return None
+
+    def ok(self, pair, T, info):
+        if self.outdoor:
+            return K.success(pair.transform, T)[0]
+        from acpr.metrics import rre_rte
+        rre, rte = rre_rte(pair.transform, T)
+        return bool(rre <= 15 and rte <= 0.3)
+
+    def corr(self, sp, sf, rp, rf):
+        return nn_correspondences(sp, sf, rp, rf) if self.fpfh_indoor else nn_correspondences_bf(sp, sf, rp, rf)
+
+
 def make_dataset(name, recal=False, refit=False):
+    if name.startswith("v2_"):
+        return V2(name)
     ds = {"3dmatch": ThreeDMatch, "kitti": Kitti, "fcgf3dmatch": FcgfThreeDMatch, "fcgfkitti": FcgfKitti}[name]()
     if recal:  # FCGF: configuration re-certified on the held-out FCGF pairs instead of transferred from FPFH
         assert ds.name.startswith("fcgf"), "--recal applies to the FCGF datasets"
@@ -257,7 +320,8 @@ def main():
     ap.add_argument("--per-set", type=int, default=100)
     ap.add_argument("--prefixes", default="budget")
     ap.add_argument("--ladders", default="base", choices=["base", "extended"])
-    ap.add_argument("--dataset", default="3dmatch", choices=["3dmatch", "kitti", "fcgf3dmatch", "fcgfkitti"])
+    ap.add_argument("--dataset", default="3dmatch",
+                    choices=["3dmatch", "kitti", "fcgf3dmatch", "fcgfkitti"] + [k for k in S.DATASETS if k.startswith("v2_")])
     ap.add_argument("--recal", action="store_true", help="FCGF: use the selection re-certified on FCGF")
     ap.add_argument("--refit", action="store_true", help="FCGF: controller re-fitted and re-certified on FCGF")
     args = ap.parse_args()

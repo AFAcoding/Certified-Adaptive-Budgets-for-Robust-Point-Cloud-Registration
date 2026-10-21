@@ -1,0 +1,87 @@
+%% paper.sty -- neutral two-column layout for this paper (no venue header, footer, line numbers or paper ID).
+%% US letter, 10-point Times, 6.875 x 8.875 in text block in two columns, numbered references.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{paper}[2026/10/18 Neutral two-column paper layout]
+
+\RequirePackage{times}
+\RequirePackage{xspace}
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{booktabs}
+\RequirePackage[numbers,sort&compress]{natbib}
+\RequirePackage{etoolbox}
+\RequirePackage[format=plain,labelformat=simple,labelsep=period,font=small,compatibility=false]{caption}
+\RequirePackage[font=footnotesize,skip=3pt,subrefformat=parens]{subcaption}
+\RequirePackage[hyphens]{url}
+
+%% page layout
+\setlength{\textheight}{8.875in}
+\setlength{\textwidth}{6.875in}
+\setlength{\columnsep}{0.3125in}
+\setlength{\topmargin}{0in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\parindent}{1pc}
+\setlength{\oddsidemargin}{-0.1875in}
+\setlength{\evensidemargin}{-0.1875in}
+
+%% heading fonts
+\font\elvbf = ptmb scaled 1100
+\font\tenbf = ptmb scaled 1000
+
+%% title block
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip .375in
+  \begin{center}
+    {\Large \bf \@title \par}
+    \vspace*{24pt}
+    {\large
+      \lineskip .5em
+      \begin{tabular}[t]{c}\@author\end{tabular}\par}
+    \vskip .5em
+    \vspace*{12pt}
+  \end{center}}
+
+%% abstract
+\renewenvironment{abstract}%
+  {\centerline{\large\bf Abstract}\vspace*{12pt}\noindent\it\ignorespaces}%
+  {\vspace*{12pt}}
+
+%% section headings: "1. Introduction"
+\def\papersection{\@startsection{section}{1}{\z@}{-10pt plus -2pt minus -2pt}{7pt}{\large\bf}}
+\def\paperssect#1{\papersection*{#1}}
+\def\papersect#1{\papersection{\texorpdfstring{\hskip -1em.~}{}#1}}
+\def\section{\@ifstar\paperssect\papersect}
+\def\papersubsection{\@startsection{subsection}{2}{\z@}{-8pt plus -2pt minus -2pt}{5pt}{\elvbf}}
+\def\paperssubsect#1{\papersubsection*{#1}}
+\def\papersubsect#1{\papersubsection{\texorpdfstring{\hskip -1em.~}{}#1}}
+\def\subsection{\@ifstar\paperssubsect\papersubsect}
+\def\papersubsubsection{\@startsection{subsubsection}{3}{\z@}{-6pt plus -2pt minus -2pt}{3pt}{\tenbf}}
+\def\paperssubsubsect#1{\papersubsubsection*{#1}}
+\def\papersubsubsect#1{\papersubsubsection{\texorpdfstring{\hskip -1em.~}{}#1}}
+\def\subsubsection{\@ifstar\paperssubsubsect\papersubsubsect}
+
+%% abbreviations with a trailing period unless one follows
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+\def\eg{\emph{e.g}\onedot} \def\ie{\emph{i.e}\onedot}
+\def\etal{\emph{et al}\onedot}
+
+%% cross-references (after hyperref)
+\AtEndPreamble{%
+  \usepackage[capitalize]{cleveref}
+  \crefname{section}{Sec.}{Secs.}
+  \Crefname{section}{Section}{Sections}
+  \Crefname{table}{Table}{Tables}
+  \crefname{table}{Tab.}{Tabs.}}
+
+%% compact lists
+\RequirePackage[shortlabels,inline]{enumitem}
+\setlist[itemize]{noitemsep,leftmargin=*,topsep=0em}
+\setlist[enumerate]{noitemsep,leftmargin=*,topsep=0em}
+
+\endinput

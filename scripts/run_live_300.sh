@@ -5,7 +5,7 @@
 # Usage: bash scripts/run_live_300.sh > logs/live_300.log 2>&1
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PY=${PYTHON:-python}  # set PYTHON to use another interpreter
+PY=${PYTHON:-./.venv/Scripts/python.exe}
 R=results/budget
 mkdir -p $R/live_100pairs
 for f in live_budget_compare_ext.json live_budget_compare_ext_kitti.json live_budget_compare_ext_fcgf3dmatch_refit.json \

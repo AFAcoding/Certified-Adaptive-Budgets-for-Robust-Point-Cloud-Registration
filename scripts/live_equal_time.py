@@ -88,9 +88,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-set", type=int, default=100)
     ap.add_argument("--subset", default="3DMatch")
+    ap.add_argument("--dataset", default="3dmatch", help="whose certified CAB to time (e.g. v2_indoor_fpfh)")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
-    ds = L.ThreeDMatch()
+    ds = L.make_dataset(args.dataset)
     rows = []
     for est in ["sc2", "turbo"]:
         ctrl = L.Controller("budgetc", est, "extended", ds)

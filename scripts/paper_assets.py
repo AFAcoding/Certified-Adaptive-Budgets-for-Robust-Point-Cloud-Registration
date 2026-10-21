@@ -27,35 +27,29 @@ PAPER = PROJECT_ROOT / "paper"
 TAB, FIG = PAPER / "tables", PAPER / "figures"
 RB = RESULTS_ROOT / "budget"
 SETS = {"m": "3DMatch", "lo": "3DLoMatch"}                       # Part A (pose search)
-DS = {"m": ("3DMatch", "3dmatch"), "lo": ("3DLoMatch", "3dmatch"), "ki": ("kitti_test", "kitti"),
-      # FCGF: configurations certified on FPFH validation, applied unchanged (transfer); see evaluate_transfer.py
-      "fm": ("fcgf_3DMatch", "fcgf3dmatch"), "flo": ("fcgf_3DLoMatch", "fcgf3dmatch"), "fki": ("fcgf_kitti_test", "fcgfkitti")}
-DNAME = {"m": "3DMatch", "lo": "3DLoMatch", "ki": "KITTI", "fm": "3DMatch", "flo": "3DLoMatch", "fki": "KITTI"}
-FCGF = {"fm", "flo", "fki"}
-DATASETS_CAL = {"fm": ["fcgf_3DMatch_cal", "fcgf_3DLoMatch_cal"], "flo": ["fcgf_3DMatch_cal", "fcgf_3DLoMatch_cal"],
-                "fki": ["fcgf_kitti_test_cal"]}
-DATASETS_FIT = {"fm": ["fcgf_3DMatch_fit", "fcgf_3DLoMatch_fit"], "flo": ["fcgf_3DMatch_fit", "fcgf_3DLoMatch_fit"]}
+# protocol v2 (PROTOCOL.md): test set -> (log name, dataset of select_ladder.DATASETS). Blind tests: bh, bl (held-out
+# 3DMatch training scenes, overlap > 30 % / 10-30 %), kr (KITTI raw drives, FPFH), fkr (KITTI raw drives, FCGF).
+# Development benchmarks (seen during development): m, lo, ki (FPFH), fm, flo, fki (FCGF, own features).
+DS = {"bh": ("v2_blind_hi", "v2_indoor_fpfh"), "bl": ("v2_blind_lo", "v2_indoor_fpfh"),
+      "kr": ("kitti_raw_blind", "v2_kitti_fpfh"), "fkr": ("fcgfown_kitti_raw_blind", "v2_kitti_fcgf"),
+      "m": ("3DMatch", "v2_indoor_fpfh"), "lo": ("3DLoMatch", "v2_indoor_fpfh"), "ki": ("kitti_test", "v2_kitti_fpfh"),
+      "fm": ("fcgfown_3DMatch", "v2_indoor_fcgf"), "flo": ("fcgfown_3DLoMatch", "v2_indoor_fcgf"),
+      "fki": ("fcgfown_kitti_test", "v2_kitti_fcgf")}
+BLIND = ("bh", "bl", "kr", "fkr")
+DNAME = {"bh": "Held-out scenes", "bl": "Held-out scenes, low overlap", "kr": "KITTI raw", "fkr": "KITTI raw",
+         "m": "3DMatch", "lo": "3DLoMatch", "ki": "KITTI", "fm": "3DMatch", "flo": "3DLoMatch", "fki": "KITTI"}
+FCGF = {"fkr", "fm", "flo", "fki"}
 
 
 def dlabel(d):
     return DNAME[d] + (" (FCGF)" if d in FCGF else "")
-SEL = {("3dmatch", "ratio"): "ladder_selection_ext.json", ("3dmatch", "compat"): "ladder_selection_compat_ext.json",
-       ("kitti", "ratio"): "ladder_selection_ext_kitti.json", ("kitti", "compat"): "ladder_selection_compat_ext_kitti.json",
-       # FCGF 3DMatch/3DLoMatch: controller re-fitted on a quarter of the held-out (odd-indexed) FCGF pairs and
-       # certified on the rest; FCGF KITTI: thresholds re-certified on its 276 held-out pairs (too few to split)
-       ("fcgf3dmatch", "ratio"): "ladder_selection_ext_fcgf3dmatch_refit.json",
-       ("fcgf3dmatch", "compat"): "ladder_selection_compat_ext_fcgf3dmatch_refit.json",
-       ("fcgfkitti", "ratio"): "ladder_selection_ext_fcgfkitti.json",
-       ("fcgfkitti", "compat"): "ladder_selection_compat_ext_fcgfkitti.json"}
-# FCGF 3DMatch/3DLoMatch with the FPFH controller and only its thresholds re-certified on FCGF (finds nothing
-# cheaper than the full budget: the FPFH controller's confidence saturates on FCGF)
-SEL_RCERT = {("fcgf3dmatch", "ratio"): "ladder_selection_ext_fcgf3dmatch.json",
-             ("fcgf3dmatch", "compat"): "ladder_selection_compat_ext_fcgf3dmatch.json"}
-LIVE = {"3dmatch": "live_budget_compare_ext.json", "kitti": "live_budget_compare_ext_kitti.json",
-        "fcgf3dmatch": "live_budget_compare_ext_fcgf3dmatch_refit.json",
-        "fcgfkitti": "live_budget_compare_ext_fcgfkitti_recal.json"}
-# FCGF with the FPFH-certified configurations applied unchanged (the transfer test, which fails)
-LIVE_XFER = {"fcgf3dmatch": "live_budget_compare_ext_fcgf3dmatch.json", "fcgfkitti": "live_budget_compare_ext_fcgfkitti.json"}
+
+
+FAMS = ("v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf")
+SEL = {(f, o): f"ladder_selection{'_compat' if o == 'compat' else ''}_ext_{f}.json" for f in FAMS for o in ("ratio", "compat")}
+SEL_RCERT = {}
+LIVE = {f: f"live_budget_compare_ext_{f}.json" for f in FAMS}
+LIVE_XFER = {}
 PREFIX = {"ratio": "budget", "compat": "budgetc"}
 ESTS = {"sc": "sc2", "tr": "turbo"}
 ENAME = {"sc": "SC$^2$-PCR", "tr": "TurboReg"}
@@ -140,15 +134,13 @@ def hull_value(points, t):
     return float(np.interp(t, xs, ys))
 
 
-TRANSFER = RB / "transfer_fcgf.json"
+TRANSFER = RB / "transfer_fcgf_v2.json"  # not used in protocol v2
 
 
 def available(d):
     log, fam = DS[d]
     if not (LOG_ROOT / f"budgetc_{log}.jsonl").exists():
         return False
-    if d in FCGF:
-        return TRANSFER.exists() and log in json.loads(TRANSFER.read_text())
     return all((RB / SEL[(fam, o)]).exists() for o in ("ratio", "compat"))
 
 
@@ -169,14 +161,13 @@ def cab_results():
         return s_["test"][log][tag], s_["test"][log]["full"], s_["selected"][tag]["ladder"]
 
     marg_risks, xfer_risks = {}, {}
-    for d in [d for d in ds if d in FCGF]:  # FCGF split sizes: even-indexed test pairs, odd-indexed calibration pool
+    import select_ladder as S  # split sizes of every dataset (fitting, calibration, test)
+    for fam in FAMS:
+        D = S.DATASETS[fam]
+        val(f"{fam}.n.fit", f"{len(B.load(D['train'], 'budgetc')):,}")
+        val(f"{fam}.n.cal", f"{len(B.load(D['val'], 'budgetc')):,}")
+    for d in ds:
         val(f"{d}.n.test", f"{len(logs[(d, 'compat')]):,}")
-        n_cal = sum(len(B.load(c, "budgetc")) for c in DATASETS_CAL[d])
-        val(f"{d}.n.cal", f"{n_cal:,}")
-        if d in DATASETS_FIT:
-            n_fit = sum(len(B.load(c, "budgetc")) for c in DATASETS_FIT[d])
-            val(f"{d}.n.fit", f"{n_fit:,}")
-            val(f"{d}.n.cert", f"{n_cal - n_fit:,}")
     for d in ds:
         log, fam = DS[d]
         for o in PREFIX:
@@ -261,7 +252,7 @@ def cab_results():
                 val(f"{e}.{d}.{lk}.compatvsratiohi", hi)
     if agrees:
         val("live.agree.min", 100 * min(agrees), "{:.0f}")
-    eq_path = RB / "live_equal_time_3DMatch.json"
+    eq_path = RB / "live_equal_time_v2_blind_hi.json"
     if eq_path.exists():
         stalls += [max(r["stalled"].values()) for r in json.loads(eq_path.read_text()) if "stalled" in r]
     val("live.retimed", str(len(stalls)))
@@ -271,6 +262,7 @@ def cab_results():
                  if f"{e}.{d}.compat.live.speed" in VALS), default=None)
     if worst is not None:
         val("cab.live.min", worst[0])
+        val("cab.live.min.pct", 100 * (1 / worst[0] - 1), "{:.0f}")  # extra time where CAB is slowest
         val("cab.live.min.where", f"{ENAME[worst[1]]} on {'FCGF ' if worst[2] in FCGF else ''}{DNAME[worst[2]]}")
 
     for (fam, o), fname in SEL_RCERT.items():  # FCGF, thresholds-only re-certification (supp)
@@ -285,60 +277,44 @@ def cab_results():
                 val(k + ".risk", 100 * t["risk"], "{:.2f}")
                 val(k + ".ladder", rc[E]["selected"]["mondrian"]["ladder"])
 
-    # supp: FCGF under three protocols (compat order, group-conditional): FPFH controller and thresholds applied
-    # unchanged (transfer); FPFH controller with thresholds re-certified on FCGF; controller re-fitted on FCGF and
-    # certified on a disjoint part of the pool (3DMatch/3DLoMatch only; the KITTI pool is too small to split)
-    L = []
-    for d in [d for d in ("fm", "flo", "fki") if d in ds]:
-        for e in ESTS:
-            k, kx = f"{e}.{d}.compat.group", f"{e}.{d}.compat.group.xfer"
-            if kx + ".risk" not in VALS:
+    # ---- main tables: blind tests (FPFH; FCGF on the raw drives runs the full budget) and development benchmarks
+    def table(blocks, ncols, path):
+        L = []
+        for title, cols in blocks:
+            if not any(d in ds for d in cols):
                 continue
-            refit = d in DATASETS_FIT
-            thr = (f"{VALS[k + '.rcert.speed']}\\X" if refit and k + ".rcert.speed" in VALS
-                   else (f"{VALS[k + '.speed']}\\X" if not refit else "--"))
-            cells = [f"{ENAME[e]}, {DNAME[d]}", VALS[kx + ".risk"], VALS[kx + ".speed"] + "\\X", thr]
-            cells += ([VALS[k + ".risk"], f"{VALS[k + '.loss']} [{VALS[k + '.ub']}]", VALS[k + ".speed"] + "\\X"]
-                      if refit else ["--", "--", "--"])
-            L.append(" & ".join(cells) + " \\\\")
-    (TAB / "supp_fcgf.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+            L.append(f"\\multicolumn{{{ncols}}}{{@{{}}l}}{{\\textbf{{{title}}}}} \\\\")
+            for e in ESTS:
+                L.append(f"\\multicolumn{{{ncols}}}{{@{{}}l}}{{\\textit{{{ENAME[e]}}}}} \\\\")
+                for lab, o in (("Full budget (standard)", None), ("\\method, ratio order", "ratio"),
+                               ("\\textbf{\\method (ours)}", "compat")):
+                    cells = [lab]
+                    for d in cols:
+                        if d not in ds:
+                            cells += ["--"] * 5
+                            continue
+                        if o is None:
+                            cells += [VALS[f"{e}.{d}.ratio.group.full"], "--", "1.00\\X", "1.00\\X", "--"]
+                            continue
+                        k = f"{e}.{d}.{o}.group"
+                        ni = "\\cmark" if VALS[k + ".ni"] == "yes" else "\\xmark"
+                        if VALS[k + ".ladder"] == "full":  # nothing cheaper certifiable: CAB is the full budget itself
+                            lv = "1.00$\\times^\\dagger$"
+                        elif f"{e}.{d}.{o}.live.speed" in VALS:
+                            lv = f"{VALS[f'{e}.{d}.{o}.live.speed']}\\X"
+                        else:
+                            lv = f"{VALS[k + '.speed']}$\\times^*$"
+                        bold = (lambda x: f"\\textbf{{{x}}}") if o == "compat" else (lambda x: x)
+                        cells += [bold(VALS[k + ".rr"]), f"{VALS[k + '.loss']} [{VALS[k + '.ub']}] {ni}", bold(lv),
+                                  bold(f"{VALS[k + '.ops']}\\X"), VALS[k + ".risk"]]
+                    L.append(" & ".join(cells) + " \\\\")
+            L.append("\\midrule")
+        L[-1] = "\\bottomrule"
+        (TAB / path).write_text("\n".join(L) + "\n", encoding="utf-8")
 
-    # ---- Table 1: main results (group-conditional certificates)
-    L = []
-    blocks = [("FPFH correspondences", ["m", "lo", "ki"]),
-              ("FCGF correspondences (controller fitted and certified on held-out FCGF pairs)", ["fm", "flo", "fki"])]
-    for title, cols in blocks:
-      if not any(d in ds for d in cols):
-        continue
-      L.append(f"\\multicolumn{{16}}{{@{{}}l}}{{\\textbf{{{title}}}}} \\\\")
-      for e in ESTS:
-        L.append(f"\\multicolumn{{16}}{{@{{}}l}}{{\\textit{{{ENAME[e]}}}}} \\\\")
-        for lab, o in (("Full budget (standard)", None), ("\\method, ratio order", "ratio"), ("\\textbf{\\method (ours)}", "compat")):
-            cells = [lab]
-            for d in cols:
-                if d not in ds:
-                    cells += ["--"] * 5
-                    continue
-                if o is None:
-                    cells += [VALS[f"{e}.{d}.ratio.group.full"], "--", "1.00\\X", "1.00\\X", "--"]
-                    continue
-                k = f"{e}.{d}.{o}.group"
-                ni = "\\cmark" if VALS[k + ".ni"] == "yes" else "\\xmark"
-                if VALS[k + ".ladder"] == "full":  # nothing cheaper certifiable: CAB is the full budget itself
-                    lv = "1.00$\\times^\\dagger$"
-                elif f"{e}.{d}.{o}.live.speed" in VALS:
-                    lv = f"{VALS[f'{e}.{d}.{o}.live.speed']}\\X"
-                else:
-                    lv = f"{VALS[k + '.speed']}$\\times^*$"
-                rr =f"\\textbf{{{VALS[k + '.rr']}}}" if o == "compat" else VALS[k + ".rr"]
-                lvb = f"\\textbf{{{lv}}}" if o == "compat" else lv
-                ops = f"{VALS[k + '.ops']}\\X"
-                cells += [rr, f"{VALS[k + '.loss']} [{VALS[k + '.ub']}] {ni}", lvb,
-                          f"\\textbf{{{ops}}}" if o == "compat" else ops, VALS[k + ".risk"]]
-            L.append(" & ".join(cells) + " \\\\")
-      L.append("\\midrule")
-    L[-1] = "\\bottomrule"
-    (TAB / "main_results.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    table([("FPFH correspondences", ["bh", "bl", "kr"])], 16, "blind_results.tex")
+    table([("FPFH correspondences", ["m", "lo", "ki"]), ("FCGF correspondences", ["fm", "flo", "fki"])], 16,
+          "main_results.tex")
 
     # ---- supplementary: all certified configurations
     L = []
@@ -528,7 +504,9 @@ def anchors_and_headroom(ds, logs):
     # when does CAB pay off: per test set, success of the cheapest budget, unsolvable pairs, speed-up and risk
     # (each cell: SC2-PCR / TurboReg; CAB = compat order, group-conditional; live speed-up where measured)
     P = []
-    for d in [d for d in ("m", "lo", "ki", "fm", "flo", "fki") if d in ds]:
+    for d in [d for d in BLIND + ("m", "lo", "ki", "fm", "flo", "fki") if d in ds]:
+        if d == "m" and P:  # blind test sets first, then the development benchmarks
+            P.append("\\midrule")
         def both(fmt):
             return " / ".join(fmt(e) for e in ESTS)
 
@@ -549,12 +527,12 @@ def anchors_and_headroom(ds, logs):
 
 # ============================================================================ equal-time comparison
 def equal_time(logs):
-    """Cheaper variants of the estimators vs CAB at equal time (3DMatch: live time; 3DLoMatch: offline, supp)."""
+    """Cheaper variants of the estimators vs CAB at equal time (blind held-out scenes: live time; 3DLoMatch: offline, supp)."""
     variants = [("rand", "Uniform sampling"), ("fm1", "FastMAC-style, 1st-order graph"),
                 ("fm2", "FastMAC-style, 2nd-order graph"), ("ratio", "Fixed budget, ratio order"),
                 ("compat", "Fixed budget, compat.\\ order")]
     lo_rows = {}
-    for subset, d in (("3DMatch", "m"), ("3DLoMatch", "lo")):
+    for subset, d in (("v2_blind_hi", "bh"), ("3DLoMatch", "lo")):
         path = LOG_ROOT / f"eqtime_{subset}.jsonl"
         if not path.exists() or (d, "compat") not in logs:
             continue
@@ -570,9 +548,9 @@ def equal_time(logs):
         for e, E in ESTS.items():
             # CAB outcome per pair (compat order, group-conditional, selected on validation)
             import select_ladder as S
-            sel = json.loads((RB / SEL[("3dmatch", "compat")]).read_text())[E]["selected"]["mondrian"]
+            sel = json.loads((RB / SEL[("v2_indoor_fpfh", "compat")]).read_text())[E]["selected"]["mondrian"]
             ladder = B.LADDERS_EXT[sel["ladder"]]
-            tr, mdps = S.build({"train": B.load("train", "budgetc"), "val": B.load("val", "budgetc"),
+            tr, mdps = S.build({"train": B.load("v2_fit", "budgetc"), "val": B.load("v2_cal", "budgetc"),
                                 subset: logs[(d, "compat")]}, E, ladder)
             o = S.policy_outcome(tr[subset], mdps, "mondrian", sel["param"])
             cab_ok = {r["pair_id"]: bool(ok) for r, ok in zip(logs[(d, "compat")], o.ok)}
@@ -685,29 +663,33 @@ def controller_calibration():
 def risk_ledger(ax):
     """Realized test risk (pairs the full budget registers but the configuration loses) on every test set, for
     CAB with group-conditional certificates against the alternatives that carry no valid guarantee there."""
-    sets_ = [d for d in ("m", "lo", "ki", "fm", "flo", "fki") if f"sc.{d}.compat.group.risk" in VALS]
-    series = [  # (label, key pattern, color, marker, filled)
-        ("CAB, group-cond. (ours)", "{e}.{d}.compat.group.risk", BLUE, "o", True),
-        ("CAB, marginal cert.", "{e}.{d}.compat.marg.risk", BLUE, "o", False),
+    sets_ = [d for d in BLIND + ("m", "lo", "ki", "fm", "flo", "fki") if f"sc.{d}.compat.group.risk" in VALS]
+    short = {"bh": "Held-out", "bl": "Held-out low", "kr": "KITTI raw", "fkr": "KITTI raw F", "m": "3DMatch",
+             "lo": "3DLoMatch", "ki": "KITTI", "fm": "3DMatch F", "flo": "3DLoMatch F", "fki": "KITTI F"}
+    series = [  # (label, key pattern over estimator e and ordering o, color, marker, filled)
+        ("CAB, group-cond. (ours)", "{e}.{d}.{o}.group.risk", BLUE, "o", True),
+        ("CAB, marginal cert.", "{e}.{d}.{o}.marg.risk", BLUE, "o", False),
         ("uniform sampling", "eq.{e}.{d}.rand2000.risk", ORANGE, "^", True),
-        ("FPFH cert. on FCGF", "{e}.{d}.compat.group.xfer.risk", RED, "X", True),
+        ("FPFH cert. on FCGF", "{e}.{d}.{o}.group.xfer.risk", RED, "X", True),
     ]
-    cab = [num(f"{e}.{d}.compat.group.risk") for d in sets_ for e in ESTS]
+    cab = [num(f"{e}.{d}.{o}.group.risk") for d in sets_ for e in ESTS for o in PREFIX]
     val("cab.risk.max", max(cab), "{:.2f}")
     val("cab.risk.n", str(len(cab)))
-    # horizontal dot plot: one row per test set (upper dot SC2-PCR, lower TurboReg), risk on a symlog axis
-    off = {"sc": -0.18, "tr": 0.18}
+    marg = [(num(f"{e}.{d}.{o}.marg.risk"), e, d, o) for d in sets_ for e in ESTS for o in PREFIX]
+    val("marg.risk.max", max(marg)[0], "{:.2f}")
+    val("marg.risk.over", str(sum(m[0] > 1.0 for m in marg)))
+    val("marg.compat.risk.max", max(m[0] for m in marg if m[3] == "compat"), "{:.2f}")
+    # horizontal dot plot: one row per test set; every method at its worst over the two estimators and orderings
     XMAX = 14
     ax.axvspan(1.0, XMAX, color=RED, alpha=0.08, lw=0, zorder=0)
     ax.axvline(1.0, color=INK, lw=0.9, ls=(0, (3, 2)), zorder=2)
     for si, (label, pat, col, mk, filled) in enumerate(series):
         xs, ys = [], []
         for i, d in enumerate(sets_):
-            for e in ESTS:
-                k = pat.format(e=e, d=d)
-                if k in VALS:
-                    xs.append(num(k))
-                    ys.append(i + off[e])
+            vals = [num(k) for k in {pat.format(e=e, d=d, o=o) for e in ESTS for o in PREFIX} if k in VALS]
+            if vals:
+                xs.append(max(vals))
+                ys.append(i + (-0.14, 0.14, 0.0, 0.0)[si])  # CAB above, its marginal variant below
         if xs:
             ax.plot(xs, ys, mk, ls="none", ms={"^": 6.2, "X": 6.0}.get(mk, 6.6 if filled else 5.8), color=col,
                     mfc=col if filled else "white", mec=col if mk == "X" or not filled else "white",
@@ -715,13 +697,13 @@ def risk_ledger(ax):
                     zorder=6 if si == 0 else 4, clip_on=False)
     for i in range(len(sets_) - 1):
         ax.axhline(i + 0.5, color=GRID, lw=0.6, zorder=1)
-    for name, rows_ in (("FPFH", [i for i, d in enumerate(sets_) if d not in FCGF]),
-                        ("FCGF", [i for i, d in enumerate(sets_) if d in FCGF])):
+    for name, rows_ in (("Blind", [i for i, d in enumerate(sets_) if d in BLIND]),
+                        ("Development", [i for i, d in enumerate(sets_) if d not in BLIND])):
         if rows_:  # descriptor of each block of rows, left of the row labels
-            ax.annotate(name, xy=(0, np.mean(rows_)), xycoords=("axes fraction", "data"), xytext=(-49, 0),
+            ax.annotate(name, xy=(0, np.mean(rows_)), xycoords=("axes fraction", "data"), xytext=(-58, 0),
                         textcoords="offset points", rotation=90, ha="center", va="center", fontsize=FS_LABEL,
                         weight="bold", color=INK)
-            if name == "FCGF":
+            if name == "Development":
                 ax.axhline(min(rows_) - 0.5, color=AXIS, lw=0.8, zorder=1)
     ax.text(0.93, -0.8, "level ε = 1 %", fontsize=FS_LEGEND, color=INK, ha="right", va="center")
     ax.text(1.12, -0.8, "exceeds ε", fontsize=FS_LEGEND, color=INK, ha="left", va="center", style="italic")
@@ -729,7 +711,7 @@ def risk_ledger(ax):
     ax.set_xlim(-0.05, XMAX)
     ax.set_xticks([0, 0.5, 1, 2, 5, 10])
     ax.set_xticklabels(["0", "0.5", "1", "2", "5", "10"])
-    ax.set_yticks(range(len(sets_)), [DNAME[d] for d in sets_])
+    ax.set_yticks(range(len(sets_)), [short[d] for d in sets_])
     ax.set_ylim(len(sets_) - 0.5, -1.15)  # band above the rows for the level labels
     ax.set_xlabel("pairs lost vs. the full budget (%)")
     ax.set_title("(c) Risk on every test set", loc="left")
@@ -740,7 +722,7 @@ def risk_ledger(ax):
 
 
 def _equal_time_live(variants):
-    path = RB / "live_equal_time_3DMatch.json"
+    path = RB / "live_equal_time_v2_blind_hi.json"
     if not path.exists():
         return
     rows = json.loads(path.read_text())
@@ -749,7 +731,7 @@ def _equal_time_live(variants):
     # the band below the panels holds the two legends
     W, H, BOT, HGT = 7.0, 2.94, 1.12, 1.58
     fig = plt.figure(figsize=(W, H))
-    axes = [fig.add_axes((l / W, BOT / H, w / W, HGT / H)) for l, w in ((0.44, 1.93), (2.47, 1.93), (5.2, 1.76))]
+    axes = [fig.add_axes((l / W, BOT / H, w / W, HGT / H)) for l, w in ((0.44, 1.88), (2.40, 1.88), (5.42, 1.54))]
     colors = {"rand": ORANGE, "fm1": VIOLET, "fm2": MAGENTA, "ratio": GRAY, "compat": BLUE_L, "cheap": INK2}
     legend_name = {"rand": "uniform sampling", "fm1": "FastMAC-style, 1st order",
                    "fm2": "FastMAC-style, 2nd order", "ratio": "fixed budget, ratio order",
@@ -764,20 +746,20 @@ def _equal_time_live(variants):
         val(f"eq.{e}.fm2.signal.ms", t["fm2_signal"], "{:,.0f}")
         val(f"eq.{e}.fm1.signal.ms", t["fm1_signal"], "{:,.0f}")
         val(f"eq.{e}.rand2000.ms", t["rand@2000"], "{:,.0f}")
-        cab_t, cab_rr, full_rr = t["cab"], num(f"eq.{e}.m.cab.rr"), num(f"eq.{e}.m.full.rr")
+        cab_t, cab_rr, full_rr = t["cab"], num(f"eq.{e}.bh.cab.rr"), num(f"eq.{e}.bh.full.rr")
         L.append(f"\\multicolumn{{5}}{{@{{}}l}}{{\\textit{{{ENAME[e]}: full budget {t['full']:,.0f}\\,ms, {full_rr:.1f}\\,\\%; "
                  f"\\method {cab_t:,.0f}\\,ms, {cab_rr:.1f}\\,\\%}}}} \\\\")
         key, params = ("seeds", ("0.025", "0.01")) if e == "sc" else ("k1", ("500", "250"))
         cheap_name = "Fewer seeds (ratio 0.025, 0.01)" if e == "sc" else "Fewer cliques ($K_1{=}500, 250$)"
         for v, name in [("cheap", cheap_name)] + variants:
             if v == "cheap":
-                pts = [(t[f"{key}@{prm}"], num(f"eq.{e}.m.cheap.{prm}.rr")) for prm in params]
-                ref_full = num(f"eq.{e}.m.cheap.{params[0]}.fullrr")
-                cab_same = num(f"eq.{e}.m.cheap.{params[0]}.cab")
+                pts = [(t[f"{key}@{prm}"], num(f"eq.{e}.bh.cheap.{prm}.rr")) for prm in params]
+                ref_full = num(f"eq.{e}.bh.cheap.{params[0]}.fullrr")
+                cab_same = num(f"eq.{e}.bh.cheap.{params[0]}.cab")
             else:
-                pts = [(t[f"{v}@{b}"], num(f"eq.{e}.m.{v}.{b}.rr")) for b in BUDGETS[:4]]
-                ref_full = num(f"eq.{e}.m.{v}.250.fullrr")
-                cab_same = num(f"eq.{e}.m.{v}.250.cab")  # CAB on the same pairs as this variant
+                pts = [(t[f"{v}@{b}"], num(f"eq.{e}.bh.{v}.{b}.rr")) for b in BUDGETS[:4]]
+                ref_full = num(f"eq.{e}.bh.{v}.250.fullrr")
+                cab_same = num(f"eq.{e}.bh.{v}.250.cab")  # CAB on the same pairs as this variant
             curve = sorted(pts + [(t["full"], ref_full)])  # the full budget closes every curve (same pairs)
             hull = A.upper_hull(curve)
             hx, hy = [p[0] for p in hull], [p[1] for p in hull]
@@ -809,7 +791,8 @@ def _equal_time_live(variants):
                         zorder=3)
         # equal time: the guide marks CAB's time; every curve is read where it crosses the guide. The arrow above
         # the curves goes from the full budget's time to CAB's time at (nearly) the same recall.
-        y_ar = 83.3
+        y_top = max([full_rr, cab_rr] + [ln.get_ydata().max() for ln in ax.get_lines()]) + 2.6  # arrow above all
+        y_ar = y_top - 1.6
         ax.plot([cab_t, cab_t], [70, y_ar], color=BLUE, lw=0.9, ls=(0, (3, 2)), zorder=2)
         ax.plot([t["full"], t["full"]], [full_rr + 0.5, y_ar], color=INK, lw=0.7, ls=(0, (1, 1.5)), zorder=2)
         ax.annotate("", xy=(cab_t, y_ar), xytext=(t["full"], y_ar), zorder=6,
@@ -821,8 +804,8 @@ def _equal_time_live(variants):
         ax.plot([cab_t], [cab_rr], "*", color=BLUE, ms=13, mec=INK, mew=0.6, label="CAB (ours)", zorder=7)
         ax.set_xscale("log")
         ax.set_xlim(100, 1300)
-        ax.set_ylim(70, 85.2)
-        ax.set_yticks([70, 74, 78, 82])
+        ax.set_ylim(70, y_top)
+        ax.set_yticks([70, 75, 80, 85])
         ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([100, 200, 500, 1000]))
         ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["100", "200", "500", "1000"]))
         ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
@@ -831,7 +814,7 @@ def _equal_time_live(variants):
             ax.set_ylabel("recall (%)")
         else:
             ax.tick_params(labelleft=False)
-        ax.set_title(f"({letter}) {ENAME[e].replace('$^2$', '²')} on 3DMatch", loc="left")
+        ax.set_title(f"({letter}) {ENAME[e].replace('$^2$', '²')} on held-out scenes", loc="left")
         style(ax)
         L.append("\\midrule" if e == "sc" else "\\bottomrule")
     handles = {}
@@ -1141,8 +1124,10 @@ def latency():
     """Supp table: per-pair live latency percentiles (ms) of the full budget and CAB (compatibility order), and the
     share of pairs on which CAB is slower than the full budget (the first-stage overhead on hard pairs)."""
     L, worst = [], []
-    for fam, sets_ in (("3dmatch", [("m", "3DMatch"), ("lo", "3DLoMatch")]), ("kitti", [("ki", "kitti_test")]),
-                       ("fcgf3dmatch", [("fm", "fcgf_3DMatch"), ("flo", "fcgf_3DLoMatch")])):
+    for fam, sets_ in (("v2_indoor_fpfh", [("bh", "v2_blind_hi"), ("bl", "v2_blind_lo"), ("m", "3DMatch"),
+                                           ("lo", "3DLoMatch")]),
+                       ("v2_kitti_fpfh", [("kr", "kitti_raw_blind"), ("ki", "kitti_test")]),
+                       ("v2_indoor_fcgf", [("fm", "fcgfown_3DMatch"), ("flo", "fcgfown_3DLoMatch")])):
         path = RB / LIVE[fam]
         if not path.exists():
             continue
@@ -1181,26 +1166,41 @@ def evidence_extra():
     if not path.exists():
         return
     data = json.loads(path.read_text())
-    names = {"3DMatch": "3DMatch", "3DLoMatch": "3DLoMatch", "kitti_test": "KITTI", "fcgf_3DMatch": "3DMatch (FCGF)",
-             "fcgf_3DLoMatch": "3DLoMatch (FCGF)"}
+    names = {"v2_blind_hi": "Held-out scenes", "v2_blind_lo": "Held-out, low overlap", "3DMatch": "3DMatch",
+             "3DLoMatch": "3DLoMatch", "kitti_raw_blind": "KITTI raw", "kitti_test": "KITTI",
+             "fcgfown_3DMatch": "3DMatch (FCGF)", "fcgfown_3DLoMatch": "3DLoMatch (FCGF)",
+             "fcgfown_kitti_raw_blind": "KITTI raw (FCGF)", "fcgfown_kitti_test": "KITTI (FCGF)"}
     L, wg, wm, groups, over = [], [], [], 0, []
-    for dname in ("fpfh_indoor", "fpfh_kitti", "fcgf_indoor"):
+    wg_f, wm_f, refit = [], [], []
+    for dname in ("fpfh_indoor", "fpfh_kitti", "fcgf_indoor", "fcgf_kitti"):
         for e, E in ESTS.items():
             for t, r in data[dname][E].items():
-                sp = np.array([b["speedup"] for b in r["bootstrap"]])
-                rk = np.array([b["risk"] for b in r["bootstrap"]])
+                boot = r.get("bootstrap", [])  # re-fitted controllers: development benchmarks only
+                sp = np.array([b["speedup"] for b in boot])
+                rk = np.array([b["risk"] for b in boot])
                 scene_risk = max(v["risk"] for v in r["scenes"].values())
                 wg.append(100 * r["worst_group"])
                 wm.append(100 * r["worst_marginal"])
+                if dname.startswith("fpfh"):
+                    wg_f.append(100 * r["worst_group"])
+                    wm_f.append(100 * r["worst_marginal"])
+                refit += list(100 * rk)
                 for g in r["groups"]:
                     groups += 1
                     if g["risk_group"] > 0.01:
                         over.append((g["risk_group"], g["n"]))
+                refit_cells = (f"{sp.mean():.2f}\\X\\,[{sp.min():.2f}, {sp.max():.2f}] & {100 * rk.max():.2f}" if len(sp)
+                               else "-- & --")
                 L.append(f"{ENAME[e]}, {names[t]} & {100 * r['worst_group']:.2f} & {100 * r['worst_marginal']:.2f} & "
-                         f"{100 * scene_risk:.2f} & {sp.mean():.2f}\\X\\,[{sp.min():.2f}, {sp.max():.2f}] & {100 * rk.max():.2f} \\\\")
+                         f"{100 * scene_risk:.2f} & {refit_cells} \\\\")
     val("ev.worst.group.max", max(wg), "{:.2f}")
     val("ev.worst.marg.max", max(wm), "{:.2f}")
     val("ev.worst.marg.min", min(wm), "{:.2f}")
+    val("ev.worst.group.fpfh.max", max(wg_f), "{:.2f}")
+    val("ev.worst.marg.fpfh.max", max(wm_f), "{:.2f}")
+    val("ev.refit.risk.max", max(refit), "{:.2f}")
+    val("ev.refit.n", str(len(refit)))
+    val("ev.refit.over", str(sum(x > 1.0 for x in refit)))
     val("ev.groups.n", str(groups))
     val("ev.groups.over", str(len(over)))
     if over:
@@ -1208,6 +1208,7 @@ def evidence_extra():
         val("ev.groups.over.risk", 100 * r, "{:.2f}")
         val("ev.groups.over.lost", str(int(round(r * n))))
         val("ev.groups.over.n", str(n))
+        val("ev.groups.over.step", 100 / n, "{:.1f}")
     (TAB / "supp_evidence.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
@@ -1237,7 +1238,38 @@ def sensitivity():
         if (eps, g) == ("0.05", "3"):
             L.append("\\midrule")
     val("sens.violations", str(viol))
+    few = [100 * data[d][E][t][f"0.01_{g}"]["risk"] for d, t in cols for E in ESTS.values() for g in ("1", "2")]
+    val("sens.g12.risk.max", max(few), "{:.2f}")  # one or two groups at epsilon = 1 %
     (TAB / "supp_sensitivity.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+
+def worst_case():
+    """Supp table of the pre-registered worst-case variant (PROTOCOL.md): ladders allowed only if running all their
+    stages costs at most (1 + rho) times the full budget on 95 % of the fitting pairs. Compatibility order,
+    group-conditional certificate; FPFH test sets; offline speed-up (risk)."""
+    cols = [("v2_indoor_fpfh", "v2_blind_hi"), ("v2_indoor_fpfh", "v2_blind_lo"), ("v2_kitti_fpfh", "kitti_raw_blind"),
+            ("v2_indoor_fpfh", "3DMatch"), ("v2_indoor_fpfh", "3DLoMatch"), ("v2_kitti_fpfh", "kitti_test")]
+    L = []
+    for e, E in ESTS.items():
+        for rho, sfx, name in ((None, "", "none"), (0.25, "_rho025", "0.25"), (0.10, "_rho010", "0.10")):
+            cells = [ENAME[e] if rho is None else "", name]
+            ladders = []
+            for ds, test in cols:
+                path = RB / f"ladder_selection_compat_ext_{ds}{sfx}.json"
+                if not path.exists():
+                    return
+                d = json.loads(path.read_text())[E]
+                if test == cols[0][1] or (ds, test) == ("v2_kitti_fpfh", "kitti_raw_blind"):
+                    ladders.append(d["selected"]["mondrian"]["ladder"])
+                r = d["test"][test]["mondrian"]
+                cells.append(f"{r['speedup']:.2f}\\X\\,({100 * r['risk']:.2f})")
+                val(f"wc.{e}.{name}.{test}.speed", r["speedup"])
+                val(f"wc.{e}.{name}.{test}.risk", 100 * r["risk"], "{:.2f}")
+            cells.insert(2, " / ".join(ladders))
+            L.append(" & ".join(cells) + " \\\\")
+        if e == "sc":
+            L.append("\\midrule")
+    (TAB / "supp_worst_case.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 def fcgf_scene_disjoint():
@@ -1291,6 +1323,8 @@ def calibration_size():
                     over = 100 * np.mean([r["risk"] > 0.01 for r in cert]) if cert else float("nan")
                     worst = 100 * max(r["risk"] for r in cert) if cert else float("nan")
                     k = f"cal.{e}.{test}.{tag}"
+                    pool = by_n[max(by_n)]  # the whole calibration pool (a single certificate)
+                    val(k + ".pool", 100 * pool[0]["risk"], "{:.2f}")
                     if nmin is not None:
                         val(k + ".nmin", f"{nmin:,}")
                     val(k + ".over", over, "{:.0f}")
@@ -1349,7 +1383,6 @@ def main():
     setup_style()
     ds, logs, _ = cab_results()
     anchors_and_headroom(ds, logs)
-    controller_calibration()
     equal_time(logs)
     qualitative()
     part_a()
@@ -1359,8 +1392,8 @@ def main():
     kitti_meta()
     calibration_size()
     fidelity()
-    fcgf_scene_disjoint()
     sensitivity()
+    worst_case()
     evidence_extra()
     latency()
     lines = ["% generated by scripts/paper_assets.py -- do not edit"]

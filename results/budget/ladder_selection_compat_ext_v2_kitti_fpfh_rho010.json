@@ -1,0 +1,554 @@
+{
+ "sc2": {
+  "candidates": [
+   {
+    "ladder": "250-500-4000",
+    "policy": "mdp",
+    "fit_param": 0.0,
+    "fit_s": 3.6495955766768504,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.2
+    ],
+    "fit_s": 3.6625679543366036,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.05
+    ],
+    "fit_s": 3.6705226126747825,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 3.792385700341935,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      3.4339872044851463,
+      4.335090700808782
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 3.792385700341935,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.1
+    ],
+    "fit_s": 3.8336036980113324,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 3.8554565153379614,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      3.7376696182833684,
+      4.503492949059126
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 3.8554565153379614,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 3.9676942110115974,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      3.4339872044851463,
+      4.335090700808782
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 3.9676942110115974,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mdp",
+    "fit_param": 0.0,
+    "fit_s": 4.118739255339218,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mdp",
+    "fit_param": 0.0,
+    "fit_s": 4.133810689011589,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "threshold",
+    "fit_param": 1.01,
+    "fit_s": 4.219170050330771,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "mondrian",
+    "fit_param": null,
+    "fit_s": 4.219170050330771,
+    "fit_risk": 0.0
+   }
+  ],
+  "selected": {
+   "marginal": {
+    "ladder": "full",
+    "policy": "threshold",
+    "param": 1.01,
+    "val_s": 4.450055302104759,
+    "val_rr": 0.7924071082390953,
+    "val_risk": 0.0,
+    "fit_s": 3.6495955766768504,
+    "chosen": {
+     "ladder": "250-500-4000",
+     "policy": "mdp"
+    },
+    "fallback": true
+   },
+   "mondrian": {
+    "ladder": "250-500-4000",
+    "policy": "mondrian",
+    "param": {
+     "edges": [
+      3.4339872044851463,
+      4.335090700808782
+     ],
+     "lambdas": [
+      0.8,
+      0.5,
+      1.01
+     ]
+    },
+    "val_s": 4.474252542577494,
+    "val_rr": 0.7924071082390953,
+    "val_risk": 0.0,
+    "fit_s": 3.792385700341935,
+    "chosen": {
+     "ladder": "250-500-4000",
+     "policy": "mondrian"
+    },
+    "fallback": false
+   }
+  },
+  "test": {
+   "kitti_raw_blind": {
+    "marginal": {
+     "rr": 0.6175572519083969,
+     "s": 4.410988185877707,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      1310
+     ]
+    },
+    "mondrian": {
+     "rr": 0.6152671755725191,
+     "s": 4.4444454732817995,
+     "risk": 0.0022900763358778627,
+     "delta_rr": 0.0022900763358778553,
+     "ub95": 0.004580152671755711,
+     "non_inferior": true,
+     "mcnemar_p": 0.25,
+     "speedup": 0.9924721120766978,
+     "speedup_ci": [
+      0.982312455933989,
+      1.0032625797588088
+     ],
+     "ops_ratio": 1.0413177584191398,
+     "ops_ratio_ci": [
+      1.0306397806968457,
+      1.053907552663927
+     ],
+     "gains": 0,
+     "losses": 3,
+     "stop_hist": [
+      0,
+      60,
+      1250
+     ]
+    },
+    "full": {
+     "rr": 0.6175572519083969,
+     "s": 4.410988185877707
+    }
+   },
+   "kitti_test": {
+    "marginal": {
+     "rr": 0.9225225225225225,
+     "s": 4.293987935675761,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0,
+     "speedup_ci": [
+      1.0,
+      1.0
+     ],
+     "ops_ratio": 1.0,
+     "ops_ratio_ci": [
+      1.0,
+      1.0
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      555
+     ]
+    },
+    "mondrian": {
+     "rr": 0.918918918918919,
+     "s": 4.3064347291889655,
+     "risk": 0.0036036036036036037,
+     "delta_rr": 0.003603603603603567,
+     "ub95": 0.009009009009008917,
+     "non_inferior": true,
+     "mcnemar_p": 0.5,
+     "speedup": 0.9971097220099866,
+     "speedup_ci": [
+      0.9807211399959447,
+      1.0159113192719387
+     ],
+     "ops_ratio": 1.0461702841686085,
+     "ops_ratio_ci": [
+      1.027208980411643,
+      1.0666951914358958
+     ],
+     "gains": 0,
+     "losses": 2,
+     "stop_hist": [
+      0,
+      28,
+      527
+     ]
+    },
+    "full": {
+     "rr": 0.9225225225225225,
+     "s": 4.293987935675761
+    }
+   }
+  }
+ },
+ "turbo": {
+  "candidates": [
+   {
+    "ladder": "500-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.15
+    ],
+    "fit_s": 4.537321388366011,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "giveup",
+    "fit_param": [
+     0.5,
+     0.1
+    ],
+    "fit_s": 4.721352337351224,
+    "fit_risk": 0.0033333333333333335
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 4.747473301699696,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      3.7765264611766947,
+      4.51085950651685
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 4.747473301699696,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "threshold",
+    "fit_param": 0.5,
+    "fit_s": 4.86041616268456,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mondrian",
+    "fit_param": {
+     "edges": [
+      3.4965075614664802,
+      4.382026634673881
+     ],
+     "lambdas": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    },
+    "fit_s": 4.86041616268456,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "250-4000",
+    "policy": "mdp",
+    "fit_param": 0.0,
+    "fit_s": 5.074145188685507,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "threshold",
+    "fit_param": 1.01,
+    "fit_s": 5.252548999341671,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "full",
+    "policy": "mondrian",
+    "fit_param": null,
+    "fit_s": 5.252548999341671,
+    "fit_risk": 0.0
+   },
+   {
+    "ladder": "500-4000",
+    "policy": "mdp",
+    "fit_param": -1.0,
+    "fit_s": 5.504419601698562,
+    "fit_risk": 0.0
+   }
+  ],
+  "selected": {
+   "marginal": {
+    "ladder": "500-4000",
+    "policy": "giveup",
+    "param": [
+     0.5,
+     0.15
+    ],
+    "val_s": 4.896929108485074,
+    "val_rr": 0.7883683360258481,
+    "val_risk": 0.004038772213247173,
+    "fit_s": 4.537321388366011,
+    "chosen": {
+     "ladder": "500-4000",
+     "policy": "giveup"
+    },
+    "fallback": false
+   },
+   "mondrian": {
+    "ladder": "500-4000",
+    "policy": "mondrian",
+    "param": {
+     "edges": [
+      3.7765264611766947,
+      4.51085950651685
+     ],
+     "lambdas": [
+      0.5,
+      0.75,
+      0.5
+     ]
+    },
+    "val_s": 5.103339991441993,
+    "val_rr": 0.7915993537964459,
+    "val_risk": 0.0,
+    "fit_s": 4.747473301699696,
+    "chosen": {
+     "ladder": "500-4000",
+     "policy": "mondrian"
+    },
+    "fallback": false
+   }
+  },
+  "test": {
+   "kitti_raw_blind": {
+    "marginal": {
+     "rr": 0.6221374045801527,
+     "s": 4.891033714504105,
+     "risk": 0.0061068702290076335,
+     "delta_rr": 0.003816793893129833,
+     "ub95": 0.007633587786259555,
+     "non_inferior": true,
+     "mcnemar_p": 0.2265625,
+     "speedup": 1.1069482324013251,
+     "speedup_ci": [
+      1.087695261893637,
+      1.127786757174378
+     ],
+     "ops_ratio": 1.158854203990908,
+     "ops_ratio_ci": [
+      1.1367308005278174,
+      1.1829210944333053
+     ],
+     "gains": 3,
+     "losses": 8,
+     "stop_hist": [
+      183,
+      1127
+     ]
+    },
+    "mondrian": {
+     "rr": 0.6267175572519084,
+     "s": 5.178566557481105,
+     "risk": 0.0,
+     "delta_rr": -0.0007633587786258778,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0454864420085928,
+     "speedup_ci": [
+      1.0320015517161842,
+      1.059937434082941
+     ],
+     "ops_ratio": 1.0885609522374493,
+     "ops_ratio_ci": [
+      1.0733976449782772,
+      1.105090782508945
+     ],
+     "gains": 1,
+     "losses": 0,
+     "stop_hist": [
+      110,
+      1200
+     ]
+    },
+    "full": {
+     "rr": 0.6259541984732825,
+     "s": 5.4141211248856065
+    }
+   },
+   "kitti_test": {
+    "marginal": {
+     "rr": 0.918918918918919,
+     "s": 5.177372533871649,
+     "risk": 0.0036036036036036037,
+     "delta_rr": 0.003603603603603567,
+     "ub95": 0.009009009009008917,
+     "non_inferior": true,
+     "mcnemar_p": 0.5,
+     "speedup": 1.1003976874309214,
+     "speedup_ci": [
+      1.0668108760341006,
+      1.1384386509592117
+     ],
+     "ops_ratio": 1.152755376583415,
+     "ops_ratio_ci": [
+      1.1179242446677151,
+      1.1923803838846756
+     ],
+     "gains": 0,
+     "losses": 2,
+     "stop_hist": [
+      75,
+      480
+     ]
+    },
+    "mondrian": {
+     "rr": 0.9225225225225225,
+     "s": 5.318479600176635,
+     "risk": 0.0,
+     "delta_rr": 0.0,
+     "ub95": 0.0,
+     "non_inferior": true,
+     "mcnemar_p": 1.0,
+     "speedup": 1.0712025224373374,
+     "speedup_ci": [
+      1.0422540572698598,
+      1.1040315560628757
+     ],
+     "ops_ratio": 1.1179316419631922,
+     "ops_ratio_ci": [
+      1.0872702856958267,
+      1.1503717370194841
+     ],
+     "gains": 0,
+     "losses": 0,
+     "stop_hist": [
+      60,
+      495
+     ]
+    },
+    "full": {
+     "rr": 0.9225225225225225,
+     "s": 5.697168763240732
+    }
+   }
+  }
+ }
+}

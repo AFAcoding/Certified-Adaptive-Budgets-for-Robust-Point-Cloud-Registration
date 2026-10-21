@@ -27,7 +27,13 @@ STALL = 10.0
 FILES = {"live_budget_compare_ext.json": ("3dmatch", False, False),
          "live_budget_compare_ext_kitti.json": ("kitti", False, False),
          "live_budget_compare_ext_fcgf3dmatch_refit.json": ("fcgf3dmatch", False, True),
-         "live_budget_compare_ext_fcgfkitti_recal.json": ("fcgfkitti", True, False)}
+         "live_budget_compare_ext_fcgfkitti_recal.json": ("fcgfkitti", True, False),
+         # protocol v2
+         "live_budget_compare_ext_v2_indoor_fpfh.json": ("v2_indoor_fpfh", False, False),
+         "live_budget_compare_ext_v2_kitti_fpfh.json": ("v2_kitti_fpfh", False, False),
+         "live_budget_compare_ext_v2_indoor_fcgf.json": ("v2_indoor_fcgf", False, False),
+         "live_budget_compare_ext_v2_kitti_fcgf.json": ("v2_kitti_fcgf", False, False)}
+EQUAL_TIME = (("3DMatch", "3dmatch"), ("v2_blind_hi", "v2_indoor_fpfh"))  # (test set, whose certificate is timed)
 
 
 def stalled(rows):
@@ -69,10 +75,11 @@ def main():
         with open(path, "w") as f:
             json.dump(rows, f, indent=1)
         L.summary(rows, ds, prefixes)
-    retime_equal_time(args.dry_run)
+    for subset, dataset in EQUAL_TIME:
+        retime_equal_time(args.dry_run, subset, dataset)
 
 
-def retime_equal_time(dry_run, subset="3DMatch"):
+def retime_equal_time(dry_run, subset="3DMatch", dataset="3dmatch"):
     """The same rule for the equal-time file (live_equal_time.py), whose rows hold one time per variant."""
     path = RESULTS_ROOT / "budget" / f"live_equal_time_{subset}.json"
     if not path.exists():
@@ -84,7 +91,7 @@ def retime_equal_time(dry_run, subset="3DMatch"):
     print(f"{path.name}: {len(bad)} stalled pair(s)", flush=True)
     if not bad or dry_run:
         return
-    ds = L.ThreeDMatch()
+    ds = L.make_dataset(dataset)
     for est in sorted({rows[i]["est"] for i in bad}):
         ctrl = L.Controller("budgetc", est, "extended", ds)
         pairs = {p.pair_id: p for p in ds.pairs(subset)}

@@ -1,0 +1,36 @@
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=True: \3DMatch\7-scenes-redkitchen\cloud_bin_0_fcgf.npz: 1.000 of keypoints found, 5182 voxels vs 5182 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=True: \3DMatch\sun3d-home_at-home_at_scan1_2013_jan_1\cloud_bin_43_fcgf.npz: 1.000 of keypoints found, 3472 voxels vs 3472 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=True: \3DMatch\sun3d-hotel_uc-scan3\cloud_bin_22_fcgf.npz: 1.000 of keypoints found, 5921 voxels vs 5921 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=True: \3DMatch\sun3d-hotel_umd-maryland_hotel1\cloud_bin_9_fcgf.npz: 1.000 of keypoints found, 5028 voxels vs 5028 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=True: \3DMatch\sun3d-mit_76_studyroom-76-1studyroom2\cloud_bin_63_fcgf.npz: 1.000 of keypoints found, 5644 voxels vs 5644 keypoints
+2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=True: cosine mean 1.00000, min 1.00000, >0.999: 1.0000
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=False: \3DMatch\7-scenes-redkitchen\cloud_bin_0_fcgf.npz: 1.000 of keypoints found, 5182 voxels vs 5182 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=False: \3DMatch\sun3d-home_at-home_at_scan1_2013_jan_1\cloud_bin_43_fcgf.npz: 1.000 of keypoints found, 3472 voxels vs 3472 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=False: \3DMatch\sun3d-hotel_uc-scan3\cloud_bin_22_fcgf.npz: 1.000 of keypoints found, 5921 voxels vs 5921 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=False: \3DMatch\sun3d-hotel_umd-maryland_hotel1\cloud_bin_9_fcgf.npz: 1.000 of keypoints found, 5028 voxels vs 5028 keypoints
+  2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=False: \3DMatch\sun3d-mit_76_studyroom-76-1studyroom2\cloud_bin_63_fcgf.npz: 1.000 of keypoints found, 5644 voxels vs 5644 keypoints
+2019-08-16_19-21-47.pth voxel 0.05 first-axis-fastest=False: cosine mean 0.92126, min 0.74432, >0.999: 0.0000
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=True: \3DMatch\7-scenes-redkitchen\cloud_bin_0_fcgf.npz: 1.000 of keypoints found, 18977 voxels vs 5182 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=True: \3DMatch\sun3d-home_at-home_at_scan1_2013_jan_1\cloud_bin_43_fcgf.npz: 1.000 of keypoints found, 13769 voxels vs 3472 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=True: \3DMatch\sun3d-hotel_uc-scan3\cloud_bin_22_fcgf.npz: 1.000 of keypoints found, 23631 voxels vs 5921 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=True: \3DMatch\sun3d-hotel_umd-maryland_hotel1\cloud_bin_9_fcgf.npz: 1.000 of keypoints found, 20492 voxels vs 5028 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=True: \3DMatch\sun3d-mit_76_studyroom-76-1studyroom2\cloud_bin_63_fcgf.npz: 1.000 of keypoints found, 22698 voxels vs 5644 keypoints
+2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=True: cosine mean 0.05274, min -0.56899, >0.999: 0.0000
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=False: \3DMatch\7-scenes-redkitchen\cloud_bin_0_fcgf.npz: 1.000 of keypoints found, 18977 voxels vs 5182 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=False: \3DMatch\sun3d-home_at-home_at_scan1_2013_jan_1\cloud_bin_43_fcgf.npz: 1.000 of keypoints found, 13769 voxels vs 3472 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=False: \3DMatch\sun3d-hotel_uc-scan3\cloud_bin_22_fcgf.npz: 1.000 of keypoints found, 23631 voxels vs 5921 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=False: \3DMatch\sun3d-hotel_umd-maryland_hotel1\cloud_bin_9_fcgf.npz: 1.000 of keypoints found, 20492 voxels vs 5028 keypoints
+  2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=False: \3DMatch\sun3d-mit_76_studyroom-76-1studyroom2\cloud_bin_63_fcgf.npz: 1.000 of keypoints found, 22698 voxels vs 5644 keypoints
+2019-08-19_06-17-41.pth voxel 0.025 first-axis-fastest=False: cosine mean 0.04743, min -0.58000, >0.999: 0.0000
+pair 29 (08 329) xyz0: 27909 voxels vs 27909 keypoints, 1.0000 found; released feature norm 1.000
+   KITTI-v0.3-ResUNetBN2C-conv1-5-nout32.pth: cosine mean 1.000000, min 1.00000; max abs diff 1.19e-06
+   2019-07-31_19-37-00.pth: cosine mean 0.036403, min -0.62159; max abs diff 1.90e+00
+pair 29 (08 337) xyz1: 25744 voxels vs 25744 keypoints, 1.0000 found; released feature norm 1.000
+   KITTI-v0.3-ResUNetBN2C-conv1-5-nout32.pth: cosine mean 1.000000, min 1.00000; max abs diff 1.04e-06
+   2019-07-31_19-37-00.pth: cosine mean 0.030964, min -0.67509; max abs diff 1.85e+00
+pair 31 (08 347) xyz0: 26114 voxels vs 26114 keypoints, 1.0000 found; released feature norm 1.000
+   KITTI-v0.3-ResUNetBN2C-conv1-5-nout32.pth: cosine mean 1.000000, min 1.00000; max abs diff 1.19e-06
+   2019-07-31_19-37-00.pth: cosine mean 0.026549, min -0.54621; max abs diff 1.82e+00
+pair 31 (08 354) xyz1: 25554 voxels vs 25554 keypoints, 1.0000 found; released feature norm 1.000
+   KITTI-v0.3-ResUNetBN2C-conv1-5-nout32.pth: cosine mean 1.000000, min 1.00000; max abs diff 1.17e-06
+   2019-07-31_19-37-00.pth: cosine mean 0.028556, min -0.64455; max abs diff 1.76e+00

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Final evaluation for the paper, after all logs exist:
+# Final evaluation for the CVPR paper, after all logs exist:
 #   1. KITTI: certified selection on validation (ratio and compatibility order), single test evaluation
 #   2. FCGF: transfer of the FPFH-certified configurations (evaluate_transfer.py)
 #   3. live single-process benchmarks, one at a time on a quiet machine:
@@ -8,7 +8,7 @@
 # Usage: bash scripts/run_paper_final.sh [--skip-kitti-selection]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PY=${PYTHON:-python}  # set PYTHON to use another interpreter
+PY=./.venv/Scripts/python.exe
 R=results/budget
 if [ "${1:-}" != "--skip-kitti-selection" ]; then
   echo "[$(date +%H:%M)] KITTI selection"
