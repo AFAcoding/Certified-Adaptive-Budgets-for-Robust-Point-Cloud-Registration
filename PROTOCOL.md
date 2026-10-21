@@ -77,3 +77,39 @@ candidate only if running all its stages costs at most (1 + rho) times the full 
    - FCGF: the raw drives, permuted with `numpy.random.default_rng(20261019)`, go to FCGF calibration until it holds
      at least 1,100 pairs (FCGF needs calibration data it was not trained on); the remaining drives form the FCGF
      blind test. The odometry test pairs remain the development benchmark.
+
+# Evaluation protocol v3 (pre-registered 2026-10-21)
+
+Frozen before any v3 split was generated and before any v3 test pair was processed. Reason: after the v2 blind
+evaluation, exploration on development data only (`results/explore/SUMMARY.md`) found two improvements. Because they
+were found after the v2 blind sets had been seen, their claim needs a fresh blind test.
+
+## Method v3 (frozen, `scripts/select_ladder.py --controller auto --gate`)
+CAB exactly as in v2, plus two choices made without test data:
+1. **Controller classifier.** For each dataset, estimator and ordering, the stopping controller (p_now, p_fin) uses
+   one of: logistic regression C=1 (v2), logistic regression C=0.1, quadratic logistic regression (degree-2
+   features, C=0.1), gradient-boosted trees (`acpr.analysis.fit_classifier` kinds `logit`, `logit_c01`, `poly2`,
+   `hgb`). The kind is the one whose chosen candidate (step 1 of choose-then-certify, out-of-fold) has the lowest
+   mean cost on the fitting pairs. Only the chosen candidate is certified, as in v2.
+2. **Hardness gate** (`acpr.gate`). Pre-estimation signals of the correspondences predict whether CAB would cost
+   more than the full budget; predicted-hard pairs run the full budget directly. Classifier (logistic or boosted
+   trees) and threshold minimise the 5-fold out-of-fold total cost on the fitting and calibration pairs. The gate
+   can only remove losses, so the certificate is unchanged.
+Everything else (ladders, families, eps, delta, G, dominance rule, both orderings, marginal certificate) as in v2.
+
+## Data v3 (indoor, FPFH)
+- The 53 v2 fitting scenes are permuted with `numpy.random.default_rng(20261021)` and assigned to the v3 blind test
+  until it holds at least 3,500 pairs with overlap > 0.1. Blind test: a random sample of 3,000 of them (seed 1),
+  reported above and below 30 % overlap.
+- v3 fitting pairs: the v2 fitting pairs outside the v3 blind scenes, topped up to 1,000 with random pairs (seed 3)
+  of the remaining fitting scenes. Calibration: the v2 calibration pairs, unchanged.
+- No pair of the v3 blind scenes has ever been evaluated as a test pair; pairs of these scenes that served as v2
+  fitting pairs (and in the exploration as fitting data) are removed from fitting.
+- Outdoor and FCGF: no fresh data exist. Method v3 is also evaluated on every v2 test set; those results are
+  reported as non-blind for v3.
+
+## Evaluation v3
+- The v3 blind test is evaluated once, for method v2 and method v3 (both re-fitted on the v3 fitting pairs), after
+  all selections are written to disk. Live timing: 300 random v3 blind pairs, every configuration on the same pairs.
+- The paper reports method v3 as the main method only if it is non-inferior to the full budget and within the risk
+  level on the v3 blind test; otherwise v2 remains the main method and v3 is reported as a negative result.
