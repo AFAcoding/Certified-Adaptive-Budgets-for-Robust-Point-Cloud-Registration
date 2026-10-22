@@ -195,3 +195,38 @@ Purpose: test whether the final method (v3), frozen, carries over to another gra
 - Order: MAC logs of the fitting and calibration pairs and every MAC selection are written to disk before MAC runs on
   any blind pair; then the blind pairs are logged and evaluated once, and timed live (300 pairs per overlap part,
   full budget and both configurations on the same pairs). All results are reported, favourable or not.
+
+# Protocol v3, addendum B: MAC on every family, with the authors' graph reduction (pre-registered 2026-10-22, 22:30, before any MAC run on a test pair)
+
+Amends addendum A before MAC ran on any test pair: only 520 fitting pairs (v3_fit) had been logged, with addendum A's
+implementation; those logs are archived (logs/mac_python_impl/) and not used.
+- Scope: MAC is evaluated on every family of test sets of SC2-PCR and TurboReg, with the same fitting, calibration and
+  test splits and the same methods as in addendum A (CAB without the gate with the logistic controller; the final
+  method, with the classifier kind chosen on the fitting pairs and the hardness gate), both orderings, the v3 choice and
+  certification rules: indoor FPFH (addendum A: families v3_indoor_fpfh and v2_indoor_fpfh), KITTI with FPFH
+  (v2_kitti_fpfh: fitting kitti_train, calibration kitti_val + kitti_calib, tests kitti_raw_blind and kitti_test),
+  indoor FCGF (v2_indoor_fcgf: fcgfown_v2_fit, fcgfown_val; tests fcgfown_3DMatch, fcgfown_3DLoMatch) and KITTI with
+  FCGF (v2_kitti_fcgf: fcgfown_kitti_fit, fcgfown_kitti_raw_cal; tests fcgfown_kitti_raw_blind, fcgfown_kitti_test).
+- Implementation (`src/acpr/mac.py`): addendum A's MAC plus two parts of the authors' C++ implementation, which
+  produced their published results. (1) Graph reduction before the clique search, on every graph: weighted clustering
+  coefficient of every node on the second-order graph, threshold min(Otsu, mean, total coefficient); if it exceeds 3
+  and there are more than 50 correspondences, only the edges among the most clustered nodes (at least about 50) are
+  kept. (2) The C++ KITTI setting outdoors: tau = 0.6 m, edge cut-off 0.9 with FPFH and 0.999 with FCGF, cliques of at
+  least 4 nodes. Indoors, for both descriptors, the compatibility graph stays that of the Python implementation
+  (tau = 0.10 m, cut-off 0.99, cliques of at least 3; the C++ indoor graph depends on the resolution of the authors'
+  point-cloud files). Success is judged after the refinement, as for the other estimators.
+  Reason: without the reduction, the clique search on dense graphs (pairs with many inliers: easy indoor pairs, most
+  FCGF pairs) explodes (16.5 million maximal cliques and ~6 min per run on an indoor FPFH fitting pair; with the
+  reduction 2,768 cliques, 2 s, still registered), so addendum A's MAC was far slower than the authors' published MAC
+  on exactly the easy pairs, which would inflate the savings of any adaptive wrapper, and the FCGF families could not be
+  run. Checks (fitting pairs and synthetic graphs only): the reduction reproduces a literal transcription of the C++
+  loops on random and planted-cluster graphs; graphs it does not reduce give results identical to addendum A's
+  implementation (3 fitting pairs); full-budget runs on 6 fitting pairs of each family take 1-35 s and agree with
+  SC2-PCR's success on every one.
+- Fidelity is reported against MAC's published recall (FPFH: 3DMatch 84.10 %, 3DLoMatch 40.88 %, KITTI 99.46 %;
+  FCGF: 3DMatch 93.72 %, 3DLoMatch 59.85 %, KITTI 97.84 %).
+- Order, family by family (indoor FPFH, KITTI FPFH, indoor FCGF, KITTI FCGF): MAC logs of the fitting and calibration
+  pairs and every MAC selection are written to disk before MAC runs on any test pair of that family; then its test
+  logs, a single evaluation (which must reproduce the selections), and live timing on an otherwise idle machine
+  (300 random pairs per test set, full budget and both configurations on the same pairs, compatibility order; a family
+  whose configurations are all certified as the full budget is not timed). All results are reported, favourable or not.
