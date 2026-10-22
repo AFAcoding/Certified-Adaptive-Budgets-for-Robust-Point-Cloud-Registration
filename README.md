@@ -1,41 +1,40 @@
 # Certified Adaptive Budgets for Robust Point Cloud Registration
 
-Code, results and paper of *Not All Pairs Need All Correspondences: Certified Adaptive Budgets for Robust Point Cloud Registration*.
+Code, results and paper of *Not All Pairs Need All Correspondences: Certified Adaptive Budgets for Robust Point Cloud Registration* (`paper/main.pdf`, 8 pages + references; `paper/supp.pdf`, supplementary material).
 
-**Certified adaptive budgets (CAB)** wrap an unchanged robust estimator (re-implemented SC²-PCR and TurboReg) in three steps:
+**Certified adaptive budgets (CAB)** wrap an unchanged robust estimator (re-implemented SC²-PCR and TurboReg):
 - They run it on growing budgets of correspondences, ordered by mutual consistency.
-- A learned controller stops as soon as it is confident.
+- A learned controller stops as soon as it is confident; its classifier is chosen on the fitting pairs.
+- A cheap **hardness gate** sends pairs that would only pay for extra stages straight to the full budget; it can only remove losses.
 - The stopping rule, chosen on the fitting pairs, is certified per difficulty group with Learn-then-Test on separate calibration pairs. With high probability, at most 1 % of the pairs the full estimator registers are lost.
 
-The paper's claims rest on a **pre-registered protocol** ([PROTOCOL.md](PROTOCOL.md)) with blind test sets that were evaluated once:
-- held-out 3DMatch training scenes (high and low overlap);
-- KITTI raw drives outside the odometry benchmark.
+The paper's claims rest on **pre-registered protocols** ([PROTOCOL.md](PROTOCOL.md)):
+- **Protocol v2**: CAB without the gate, evaluated once on blind held-out 3DMatch training scenes and KITTI raw drives outside the odometry benchmark.
+- **Protocol v3**: the final method (gate and classifier choice, found afterwards on development data only), evaluated once on a **fresh blind test** of 2,623 indoor pairs that no earlier experiment had processed under any role (377 previously seen pairs were removed before processing).
 
-The official 3DMatch, 3DLoMatch and KITTI odometry test sets are reported as development benchmarks. Correspondences come from FPFH and from FCGF, computed by a PyTorch re-implementation of the network that reproduces the released features.
+The protocol-v2 blind sets and the official 3DMatch, 3DLoMatch and KITTI odometry test sets are reported for the final method as earlier test sets, not as blind tests. Correspondences come from FPFH and from FCGF, computed by a PyTorch re-implementation of the network that reproduces the released features.
 
-## Results (live speed-up over the full budget; realized risk ≤ 1 % everywhere)
+## Results (live speed-up over the full budget)
+
+Fresh blind test (protocol v3), compatibility order, group-conditional certificates:
 
 | Test set | SC²-PCR | TurboReg |
 |---|---|---|
-| Blind: held-out scenes, overlap > 30 % (2,092 pairs) | 1.56× | 1.49× |
-| Blind: held-out scenes, overlap 10–30 % (908) | 0.94× | 0.95× |
-| Blind: KITTI raw drives, FPFH (1,310) | 0.93× | 0.91× |
-| Blind: KITTI raw drives, FCGF (203) | full budget | full budget |
-| Development: 3DMatch / 3DLoMatch / KITTI odometry, FPFH | 1.58× / 0.96× / 1.08× | 1.42× / 0.97× / 1.07× |
-| Development: 3DMatch / 3DLoMatch, FCGF | 1.04× / 1.08× | 1.01× / 1.03× |
+| Fresh scenes, overlap > 30 % (1,976 pairs) | 1.68× | 2.10× |
+| Fresh scenes, overlap 10–30 % (647) | 1.01× | 1.05× |
 
-All results are statistically non-inferior in recall. Where nearly every pair needs the full budget, CAB declines to cut instead of losing pairs. Details are in the paper.
+Every configuration is statistically non-inferior in recall, and the realized risk is ≤ 1 % on all 48 test conditions (at most 0.55 %). Against CAB without the gate on the same pairs, the final method is 1.28× faster for TurboReg above 30 % overlap, but 0.95× for SC²-PCR there: the gate costs 40–48 ms per pair live in this implementation (3 ms when timed alone). Earlier test sets, ablations and every configuration are in the paper and `results/`.
 
 ## Contents
 
 | Path | What it is |
 |---|---|
-
-| `PROTOCOL.md` | the pre-registered evaluation protocol v2 and its single deviation |
-| `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR and TurboReg re-implementations, compatibility ordering, FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
-| `scripts/` | every experiment, analysis and figure script (see the pipeline below) |
-| `results/` | the selection reports (`*.md`/`*.json`), live timings and summaries that the paper's numbers come from; `results/protocol_v2/` holds the splits, the KITTI raw pairs with their ICP ground truth, and the FCGF verification |
-| `scripts/download_logs.py` | downloads the per-pair logs of all experiments (122 MB zip from the v2.0 release) into `logs/` |
+| `paper/` | the paper: LaTeX sources, the generated `numbers.tex`, `tables/` and `figures/`, and the PDFs |
+| `PROTOCOL.md` | the pre-registered evaluation protocols v2 and v3 and their deviations |
+| `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR and TurboReg re-implementations, compatibility ordering, the hardness gate (`gate.py`), FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
+| `scripts/` | every experiment, analysis and figure script (see the pipeline below); `scripts/explore/` holds the exploration on development data |
+| `results/` | the selection reports (`*.md`/`*.json`), live timings and summaries that the paper's numbers come from; `results/protocol_v2/` and `results/protocol_v3/` hold the splits, the KITTI raw pairs with their ICP ground truth, the FCGF verification, the gate's cost and the protocol-v3 notes; `results/gate/` the gate's signals; `results/explore/` the exploration results |
+| `scripts/download_logs.py` | downloads the per-pair logs of all experiments (130 MB zip from the v3.0 release) into `logs/` |
 
 Datasets are not redistributed; the scripts below download or prepare them from their official sources.
 
@@ -52,12 +51,14 @@ pip install -e .                   # the scripts run with python -I and import t
 
 ## Fast path: regenerate the numbers from the logs
 
-The per-pair logs record every stage of every estimator on every pair. From them, all certified selections, test evaluations, tables and figures can be recomputed in minutes:
+The per-pair logs record every stage of every estimator on every pair. From them, all certified selections, test evaluations, tables and figures can be recomputed:
 
 ```bash
-python -I scripts/download_logs.py                                       # -> logs/*.jsonl (79 files)
-# protocol v2: choice on the fitting pairs, certification on the calibration pairs, single test evaluation
-python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf}
+python -I scripts/download_logs.py                                       # -> logs/*.jsonl (85 files)
+# protocol v2 (CAB without the gate): choice on the fitting pairs, certification on the calibration pairs, single test evaluation
+python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf|v3_indoor_fpfh}
+# the final method (protocol v3): classifier chosen on the fitting pairs + hardness gate
+python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v3_indoor_fpfh|v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf} --controller auto --gate
 python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset ... --rho {0.10|0.25}   # worst-case variant
 # further checks on the development benchmarks (all from the logs)
 python -I scripts/calibration_size.py      # certification on random calibration subsets of growing size
@@ -66,13 +67,14 @@ python -I scripts/evidence_extra.py        # group-wise and worst-case risk, per
 # every number, table and figure of the paper, then an independent re-computation of the headline numbers
 python -I scripts/paper_assets.py          # -> paper/numbers.tex, paper/tables/, paper/figures/
 python -I scripts/validate_numbers.py      # prints MISMATCH lines, or "no mismatches"
+cd paper && latexmk -pdf supp.tex && latexmk -pdf main.tex
 ```
 
-`{a|b}` means "run once with each value". The outputs should match the files in `results/`. `scripts/run_v2_analysis.sh` runs this whole stage, followed by the live timing.
+`{a|b}` means "run once with each value". The outputs should match the files in `results/`. The gate needs its signals (`results/gate/`, or `scripts/gate_features.py`, which needs the data). `scripts/run_v2_analysis.sh` and `scripts/run_v3.sh` run the selection and live-timing stages of each protocol.
 
 Cost is reported in two ways:
-- **Operation counts** are hardware-independent and come from the logs: the dominant arithmetic of every estimator stage (compatibility tests, graph products, consensus and hypothesis scoring) plus the ordering. The fast path reproduces them exactly (`ops_ratio` in the selection reports, column "Ops" of the paper's Tables 1 and 2).
-- **Live speed-ups** are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*_v2_*.json`, 300 random test pairs per set). On other hardware, re-measure them on an otherwise idle machine with the live steps of `scripts/run_v2_analysis.sh`. Its last step, `scripts/retime_stalls.py`, times again any pair interrupted by a system stall (a run longer than ten times the median full-budget time); no pair of the v2 runs needed it.
+- **Operation counts** are hardware-independent and come from the logs: the dominant arithmetic of every estimator stage (compatibility tests, graph products, consensus and hypothesis scoring) plus the ordering and the gate's signals. The fast path reproduces them exactly (`ops_ratio` in the selection reports, column "Ops" of the paper's tables).
+- **Live speed-ups** are wall-clock measurements on our machine (AMD Ryzen 7 5700U, 8 cores; `results/budget/live_*.json`, 300 random test pairs per set). On other hardware, re-measure them on an otherwise idle machine with the live steps of `scripts/run_v2_analysis.sh` and `scripts/run_v3.sh`. Their last step, `scripts/retime_stalls.py`, times again any pair interrupted by a system stall (a run longer than ten times the median full-budget time); no pair of the v2 or v3 runs needed it.
 
 ## Full rerun from the data
 
@@ -122,7 +124,21 @@ python -I -u scripts/build_equal_time_logs.py --subset 3DLoMatch --workers 6 --e
 ```
 The ordering design studies (`scripts/ordering_study*.py`) run on the 3DMatch validation scenes.
 
-**3. Supplementary: certified adaptive pose search (CAPS)**
+**3. Protocol v3: fresh blind test of the final method**
+```bash
+python -I scripts/make_splits_v3.py          # fresh blind scenes from the v2 fitting scenes; removes pairs seen in any earlier log
+bash scripts/run_gate_features_v2.sh > logs/gate_features_v2.log 2>&1   # gate signals of every protocol-v2 split
+bash scripts/run_v3.sh > logs/v3.log 2>&1    # v3 logs, gate signals, selections (v2 and final method), live timing, re-timing
+python -I scripts/gate_cost.py 100           # the gate's cost (signals, ordering, prediction), on development pairs
+python -I -u scripts/live_equal_time.py --per-set 300 --subset v2_blind_hi --dataset v2_indoor_fpfh --method v3
+python -I scripts/paper_assets.py && python -I scripts/validate_numbers.py
+```
+`results/protocol_v3/NOTES.md` records the evaluation as it happened, including a re-run of the final method's selections with a consistent accounting of the gate's cost (`scripts/run_v3_reeval.sh`; identical choices and per-pair outcomes).
+
+**4. Exploration (development data only, after protocol v3)**
+`scripts/explore/` holds the studies summarised in `research/improving_v3_memo.md` and in `results/explore/`: budget prediction, certified give-up and start-rung routing, and a factorial study of extra controller signals (geometric verification, correspondence-geometry uncertainty) with a selection rule fixed in advance; none improved the final method on development data.
+
+**5. Supplementary: certified adaptive pose search (CAPS)**
 ```bash
 python -I -u scripts/build_search_logs.py --subset {val|3DMatch|3DLoMatch} --workers 6 [--variant psh]
 python -I -u scripts/build_search_logs.py --subset train --sample 2000 --workers 6 [--variant psh]
@@ -132,7 +148,7 @@ python -I scripts/combined_figure.py results/search_jump1024 results/psh_jump102
 python -I -u scripts/live_benchmark.py --summary results/psh_jump1024/summary.json --prefix psh --schedule jump1024 --per-set 200
 ```
 
-**4. Paper**
+**6. Paper**
 ```bash
 cd paper && latexmk -pdf supp.tex && latexmk -pdf main.tex
 ```
@@ -140,10 +156,11 @@ cd paper && latexmk -pdf supp.tex && latexmk -pdf main.tex
 ## Protocol notes
 
 - **Pre-registration.** PROTOCOL.md was committed before any of the new data was downloaded; its one amendment (the outdoor split) was committed before any raw-drive scan was downloaded. Each blind test set was evaluated once, after every selection had been written to disk.
+- **Protocol v3.** The gate and the classifier choice were found after the protocol-v2 blind evaluation, on development data only, so the final method was pre-registered again and tested once on fresh pairs. A leakage check before any of them was processed removed 377 pairs that had appeared in earlier logs as fitting or training pairs; the blind scenes are disjoint from every set that fits, calibrates, chooses or gates the final method.
 - **Choose, then certify.** The ladder, the policy family and the difficulty groups are chosen on the fitting pairs only (5-fold out-of-fold controller scores); only the chosen candidate is certified on the calibration pairs. Certifying several candidates on the same calibration pairs and keeping the cheapest would void the guarantee (an earlier version of this code did that; its results are kept in `results/budget/legacy_calibration_selection/`).
 - **Development history.** The first protocol (selections without the `v2_` suffix in `results/budget/`) used the 3DMatch validation scenes for both design and certification, and fitted FCGF on held-out test pairs. Its results are kept for transparency; the paper reports protocol v2.
 - **Statistics.** Speed-up intervals use a scene-stratified bootstrap; recall losses are tested for non-inferiority (1 pp margin, 2 pp at low overlap); paired comparisons use McNemar's exact test.
-- **Cost accounting.** Every distinct computation is charged once, including the ordering and the FastMAC sampling signal.
+- **Cost accounting.** Every distinct computation is charged once, including the ordering, the gate's signals and prediction, and the FastMAC sampling signal. Live timing is the primary measure: the gate's live overhead (40–48 ms per pair) is far above its isolated cost (3 ms), which no offline accounting captures.
 
 ## License
 

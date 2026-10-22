@@ -1,0 +1,44 @@
+{
+ "sc2": {
+  "ladder": "500-4000",
+  "policy": "mondrian",
+  "fallback": false,
+  "fit_s": 1.2289689595000237,
+  "chosen": "500-4000",
+  "test": {
+   "fcgfown_3DMatch": {
+    "speedup": 1.0557879215490646,
+    "risk": 0.004313000616142945,
+    "ub95": 0.0067775723967959944,
+    "non_inferior": true
+   },
+   "fcgfown_3DLoMatch": {
+    "speedup": 1.1289485613662786,
+    "risk": 0.004491858506457047,
+    "ub95": 0.005614823133071378,
+    "non_inferior": true
+   }
+  }
+ },
+ "turbo": {
+  "ladder": "500-4000",
+  "policy": "mondrian",
+  "fallback": false,
+  "fit_s": 2.191552964499104,
+  "chosen": "500-4000",
+  "test": {
+   "fcgfown_3DMatch": {
+    "speedup": 1.0456815384824925,
+    "risk": 0.005545286506469501,
+    "ub95": 0.008626001232285851,
+    "non_inferior": true
+   },
+   "fcgfown_3DLoMatch": {
+    "speedup": 1.104854256260584,
+    "risk": 0.0039303761931499155,
+    "ub95": 0.005053340819764163,
+    "non_inferior": true
+   }
+  }
+ }
+}

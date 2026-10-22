@@ -1,0 +1,32 @@
+{
+ "sc2": {
+  "ladder": "250-2000-4000",
+  "policy": "mondrian",
+  "fallback": false,
+  "fit_s": 3.074327044017458,
+  "chosen": "250-2000-4000",
+  "test": {
+   "kitti_test": {
+    "speedup": 1.1539236626728495,
+    "risk": 0.0018018018018018018,
+    "ub95": 0.00540540540540535,
+    "non_inferior": true
+   }
+  }
+ },
+ "turbo": {
+  "ladder": "250-2000-4000",
+  "policy": "mondrian",
+  "fallback": false,
+  "fit_s": 3.9637507013441065,
+  "chosen": "250-2000-4000",
+  "test": {
+   "kitti_test": {
+    "speedup": 1.1401348093012549,
+    "risk": 0.0036036036036036037,
+    "ub95": 0.007207207207207245,
+    "non_inferior": true
+   }
+  }
+ }
+}

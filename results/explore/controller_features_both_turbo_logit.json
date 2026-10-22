@@ -1,0 +1,113 @@
+{
+ "features": [
+  "log_inl",
+  "inl_frac",
+  "inl_all_frac",
+  "top250_frac",
+  "log_dpose_deg",
+  "log_dpose_m",
+  "agree",
+  "stage",
+  "log_N_all",
+  "ratio_med",
+  "inl_gain",
+  "log_inl_all",
+  "vfit",
+  "vfit2",
+  "vrmse",
+  "dvfit",
+  "g_lmin",
+  "g_lratio",
+  "g_hess_logdet",
+  "g_hess_lmin",
+  "g_inl_spread"
+ ],
+ "classifier": "logit",
+ "ladder": "x4",
+ "param": {
+  "edges": [
+   4.290459441148391,
+   5.480638923341991
+  ],
+  "lambdas": [
+   0.8,
+   0.93,
+   0.99
+  ]
+ },
+ "fit_s": 2.0591092875004104,
+ "fit_s_se": 0.07944982705307937,
+ "test": {
+  "3DMatch": {
+   "speedup": 1.5560772763405888,
+   "speedup_ci": [
+    1.4921193868357994,
+    1.6231000463929823
+   ],
+   "ops": 1.8321265920265626,
+   "risk": 0.0018484288354898336,
+   "ub95": 0.003696857670979714,
+   "non_inferior": true,
+   "stop_hist": [
+    726,
+    93,
+    804
+   ]
+  },
+  "3DLoMatch": {
+   "speedup": 0.917013352634323,
+   "speedup_ci": [
+    0.9052325813709032,
+    0.9297604278629856
+   ],
+   "ops": 1.0659772364133073,
+   "risk": 0.0011229646266142617,
+   "ub95": 0.002245929253228529,
+   "non_inferior": true,
+   "stop_hist": [
+    120,
+    53,
+    1608
+   ]
+  }
+ },
+ "test_gate": {
+  "3DMatch": {
+   "speedup": 1.576244561724806,
+   "speedup_ci": [
+    1.5159575305031987,
+    1.6387708494057829
+   ],
+   "ops": 1.7470616607195812,
+   "risk": 0.0012322858903265558,
+   "ub95": 0.0030807147258163914,
+   "non_inferior": true,
+   "stop_hist": [
+    1109,
+    58,
+    456
+   ]
+  },
+  "3DLoMatch": {
+   "speedup": 0.98819123780202,
+   "speedup_ci": [
+    0.976786104588429,
+    1.0004511712997837
+   ],
+   "ops": 1.0544718109670341,
+   "risk": 0.0005614823133071309,
+   "ub95": 0.0011229646266142645,
+   "non_inferior": true,
+   "stop_hist": [
+    1134,
+    24,
+    623
+   ]
+  }
+ },
+ "gate": {
+  "kind": "hgb",
+  "threshold": 0.8,
+  "fitcal_saving": 0.011722200309226105
+ }
+}

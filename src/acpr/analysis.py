@@ -384,10 +384,28 @@ class _Constant:
         return np.column_stack([np.full(n, 1 - self.p), np.full(n, self.p)])
 
 
-def fit_classifier(X, y, C=1.0):
+CLASSIFIERS = ("logit", "logit_c01", "poly2", "hgb")  # controller kinds (protocol v3); "logit" is protocol v2's
+CLASSIFIER = "logit"  # kind used by fit_classifier when none is given (set by select_ladder --controller)
+
+
+def fit_classifier(X, y, C=1.0, kind=None):
     if len(np.unique(y)) < 2:
         return _Constant(np.mean(y))
-    clf = make_pipeline(StandardScaler(), LogisticRegression(C=C, max_iter=2000))
+    kind = kind or CLASSIFIER
+    if kind == "logit":
+        clf = make_pipeline(StandardScaler(), LogisticRegression(C=C, max_iter=2000))
+    elif kind == "logit_c01":
+        clf = make_pipeline(StandardScaler(), LogisticRegression(C=0.1, max_iter=2000))
+    elif kind == "poly2":
+        from sklearn.preprocessing import PolynomialFeatures
+        clf = make_pipeline(StandardScaler(), PolynomialFeatures(2, include_bias=False), StandardScaler(),
+                            LogisticRegression(C=0.1, max_iter=5000))
+    elif kind == "hgb":
+        from sklearn.ensemble import HistGradientBoostingClassifier
+        clf = HistGradientBoostingClassifier(max_depth=3, learning_rate=0.05, max_iter=300, l2_regularization=1.0,
+                                             random_state=0)
+    else:
+        raise ValueError(f"unknown classifier {kind}")
     clf.fit(X, y)
     return clf
 

@@ -144,25 +144,44 @@ def stage_record(fn, kw, P, Q, Po, Qo, ratio_o, n, prev_T, info, pair, ds):
 
 
 class Controller:
-    def __init__(self, prefix, est, ladders, ds):
-        suffix = S.SUFFIX[prefix] + ("" if ladders == "base" else "_ext") + ds.suffix
+    def __init__(self, job, est, ladders, ds):
+        # job: "budget" / "budgetc" (method v2), or "budget+v3" / "budgetc+v3" (protocol v3: classifier chosen on the
+        # fitting pairs and the hardness gate; selection files with suffix _ctlauto_gate)
+        prefix, _, variant = job.partition("+")
+        suffix = S.SUFFIX[prefix] + ("" if ladders == "base" else "_ext") + ds.suffix + \
+            ("_ctlauto_gate" if variant == "v3" else "")
         sel = json.loads((RESULTS_ROOT / "budget" / f"ladder_selection{suffix}.json").read_text())
         cfg = sel[est]["selected"]["mondrian"]
         self.prefix, self.est, self.ds, self.ladder_name = prefix, est, ds, cfg["ladder"]
         self.ladder = B.LADDERS_EXT[cfg["ladder"]]
         self.edges, self.lams = np.array(cfg["param"]["edges"]), cfg["param"]["lambdas"]
+        A.CLASSIFIER = cfg.get("classifier", "logit")  # the kind chosen on the fitting pairs (v2: logistic)
         logs = {"train": B.load(ds.train, prefix), "val": B.load(ds.val, prefix)}
-        tr, _ = S.build(logs, est, self.ladder)
+        tr, mdps = S.build(logs, est, self.ladder)
         X, y = A.rows(tr["train"], B.FEATURES, "ok")
         self.clf_now = A.fit_classifier(X, y)
         self.clf_fin = A.fit_classifier(X, A.final_labels(tr["train"]))
+        self.gate, self.gate_X = None, {}
+        if variant == "v3":  # the same gate as in the selection run (deterministic given the logs)
+            self.gate = S.fit_gate_for(logs, {"train": ds.train, "val": ds.val}, est, cfg, (tr, mdps), prefix)
+            t0, t1 = self.gate.threshold, float(cfg["gate"]["threshold"])
+            assert self.gate.kind == cfg["gate"]["kind"] and (t0 == t1 or abs(t0 - t1) < 1e-9)  # inf: no gate
+        A.CLASSIFIER = "logit"
 
     def run(self, fn, P, Q, ratio, info, pair):
-        """Adaptive run (timed by the caller). Returns (T, stop stage)."""
+        """Adaptive run (timed by the caller). Returns (T, stop stage); stop -1: gated to the full budget."""
         kw = self.ds.kwargs(self.est)
         N_all = P.shape[0]
+        perm = None
+        if self.gate is not None and self.gate.clf is not None:
+            from acpr.gate import FEATURES, signals
+            sig, perm = signals(P, Q, ratio, self.ds.compat_thr, return_order=True)
+            if self.gate.predict([[sig[f] for f in FEATURES]])[0]:
+                T, _ = fn(P, Q, **kw)
+                return T, -1
         if self.prefix == "budgetc" and BUDGETS[self.ladder[0]] < N_all:
-            perm, _ = compat_order(P, Q, thr=self.ds.compat_thr)
+            if perm is None:
+                perm, _ = compat_order(P, Q, thr=self.ds.compat_thr)
             Po, Qo, ratio_o = P[perm], Q[perm], ratio[perm]
         else:
             Po, Qo, ratio_o = P, Q, ratio
@@ -189,7 +208,14 @@ class Controller:
                 return prev_T, k
         return prev_T, len(self.ladder) - 1
 
-    def offline_stop(self, rec):
+    def offline_stop(self, rec, subset=None):
+        if self.gate is not None and self.gate.clf is not None:
+            if subset not in self.gate_X:
+                recs = B.load(subset, self.prefix)
+                Xs, _ = S.load_gate_features(subset, recs)
+                self.gate_X[subset] = dict(zip((r["pair_id"] for r in recs), Xs))
+            if self.gate.predict([self.gate_X[subset][rec["pair_id"]]])[0]:
+                return -1
         tro = B.trajectory_ladder(rec, self.est, self.ladder)
         A.attach_scores([tro], B.FEATURES, self.clf_now, self.clf_fin)
         g = int(np.searchsorted(self.edges, tro[0]["log_inl_all"], side="right"))
@@ -205,7 +231,7 @@ class V2(ThreeDMatch):
         self.name, self.tests, self.train, self.val = name, D["tests"], D["train"], D["val"]
         self.suffix = self.outtag = f"_{name}"
         self.outdoor = "kitti" in name
-        self.fpfh_indoor = name == "v2_indoor_fpfh"
+        self.fpfh_indoor = name in ("v2_indoor_fpfh", "v3_indoor_fpfh")
         if self.outdoor:
             thr = json.loads((RESULTS_ROOT / "kitti" / "thresholds.json").read_text())
             self.inlier, self.compat_thr = 0.6, thr["sc2_d_thre"]
@@ -258,7 +284,7 @@ class V2(ThreeDMatch):
 
 
 def make_dataset(name, recal=False, refit=False):
-    if name.startswith("v2_"):
+    if name.startswith(("v2_", "v3_")):
         return V2(name)
     ds = {"3dmatch": ThreeDMatch, "kitti": Kitti, "fcgf3dmatch": FcgfThreeDMatch, "fcgfkitti": FcgfKitti}[name]()
     if recal:  # FCGF: configuration re-certified on the held-out FCGF pairs instead of transferred from FPFH
@@ -272,7 +298,7 @@ def make_dataset(name, recal=False, refit=False):
     return ds
 
 
-def time_pair(ds, est, ctrls, p, jobs, offline):
+def time_pair(ds, est, ctrls, p, jobs, offline, subset=None):
     """Time, on pair p and in the order `jobs`, the standard estimator ("full") and the adaptive configurations."""
     fn, kw = FNS[est], ds.kwargs(est)
     info = ds.info(p)
@@ -291,7 +317,7 @@ def time_pair(ds, est, ctrls, p, jobs, offline):
         secs = time.perf_counter() - t0
         out[job] = {"s": secs, "ok": ds.ok(p, T, info), "stop": stop}
         if job != "full":
-            out[job]["offline_stop"] = ctrls[job].offline_stop(offline[job][p.pair_id])
+            out[job]["offline_stop"] = ctrls[job].offline_stop(offline[job][p.pair_id], subset)
     return out
 
 
@@ -300,6 +326,8 @@ def summary(rows, ds, prefixes):
     for est in ["sc2", "turbo"]:
         for subset in ds.tests:
             rs = [r for r in rows if r["est"] == est and r["subset"] == subset]
+            if not rs:  # subset not timed in this run
+                continue
             sc = np.array([r["scene"] for r in rs])
             b = np.array([r["full"]["ok"] for r in rs])
             tb = np.array([r["full"]["s"] for r in rs])
@@ -321,9 +349,10 @@ def main():
     ap.add_argument("--prefixes", default="budget")
     ap.add_argument("--ladders", default="base", choices=["base", "extended"])
     ap.add_argument("--dataset", default="3dmatch",
-                    choices=["3dmatch", "kitti", "fcgf3dmatch", "fcgfkitti"] + [k for k in S.DATASETS if k.startswith("v2_")])
+                    choices=["3dmatch", "kitti", "fcgf3dmatch", "fcgfkitti"] + [k for k in S.DATASETS if k.startswith(("v2_", "v3_"))])
     ap.add_argument("--recal", action="store_true", help="FCGF: use the selection re-certified on FCGF")
     ap.add_argument("--refit", action="store_true", help="FCGF: controller re-fitted and re-certified on FCGF")
+    ap.add_argument("--subsets", default=None, help="comma-separated test subsets to time (default: all tests)")
     args = ap.parse_args()
     prefixes = args.prefixes.split(",")
     ds = make_dataset(args.dataset, args.recal, args.refit)
@@ -331,8 +360,8 @@ def main():
     rows = []
     for est in ["sc2", "turbo"]:
         ctrls = {pf: Controller(pf, est, args.ladders, ds) for pf in prefixes}
-        for subset in ds.tests:
-            offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf)} for pf in prefixes}
+        for subset in (args.subsets.split(",") if args.subsets else ds.tests):
+            offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf.split("+")[0])} for pf in prefixes}
             ids = set.intersection(*[set(v) for v in offline.values()])
             pairs = [p for p in ds.pairs(subset) if p.pair_id in ids]
             rng = np.random.default_rng(0)
@@ -341,13 +370,14 @@ def main():
                 jobs = ["full"] + prefixes
                 jobs = jobs[j % len(jobs):] + jobs[: j % len(jobs)]
                 row = {"est": est, "subset": subset, "pair_id": p.pair_id, "scene": p.scene, "run_order": jobs}
-                row.update(time_pair(ds, est, ctrls, p, jobs, offline))
+                row.update(time_pair(ds, est, ctrls, p, jobs, offline, subset))
                 rows.append(row)
             print(f"  {est} {subset}: done", flush=True)
     if prefixes == ["budget"] and args.ladders == "base" and ds.name == "3dmatch":
         name = "live_budget.json"
     else:
-        name = f"live_budget_compare{'' if args.ladders == 'base' else '_ext'}{ds.outtag}.json"
+        name = f"live_budget_compare{'' if args.ladders == 'base' else '_ext'}{ds.outtag}" + \
+            ("_v3" if any("+v3" in pf for pf in prefixes) else "") + ".json"
     with open(RESULTS_ROOT / "budget" / name, "w") as f:
         json.dump(rows, f, indent=1)
     summary(rows, ds, prefixes)

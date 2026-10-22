@@ -1,0 +1,286 @@
+{
+ "sc2": {
+  "ladder": "500-4000",
+  "classifier": "hgb",
+  "A.3DMatch": {
+   "speed_v3": 1.7099737229229284,
+   "speed_oracle": 4.989207339034204,
+   "cats": {
+    "gated": {
+     "pairs%": 24.0,
+     "time%": 44.1,
+     "excess_over_oracle%": 26.4
+    },
+    "unsolvable(not gated)": {
+     "pairs%": 8.1,
+     "time%": 14.3,
+     "excess_over_oracle%": 13.5
+    },
+    "stop0(solvable)": {
+     "pairs%": 49.1,
+     "time%": 4.3,
+     "excess_over_oracle%": -0.5
+    },
+    "stop1(solvable)": {
+     "pairs%": 18.8,
+     "time%": 37.3,
+     "excess_over_oracle%": 26.4
+    }
+   }
+  },
+  "A.3DLoMatch": {
+   "speed_v3": 1.025294432340214,
+   "speed_oracle": 4.93142292950015,
+   "cats": {
+    "gated": {
+     "pairs%": 54.7,
+     "time%": 62.8,
+     "excess_over_oracle%": 49.5
+    },
+    "unsolvable(not gated)": {
+     "pairs%": 23.5,
+     "time%": 22.5,
+     "excess_over_oracle%": 21.0
+    },
+    "stop0(solvable)": {
+     "pairs%": 7.4,
+     "time%": 0.4,
+     "excess_over_oracle%": -0.0
+    },
+    "stop1(solvable)": {
+     "pairs%": 14.4,
+     "time%": 14.2,
+     "excess_over_oracle%": 8.7
+    }
+   }
+  },
+  "B.params": {
+   "lams_eps0.5": [
+    0.8,
+    0.97,
+    0.98
+   ],
+   "gammas": [
+    0.1,
+    0.2,
+    0.4
+   ]
+  },
+  "B.3DMatch": {
+   "speed": 1.442222115668226,
+   "risk%": 0.18484288354898337,
+   "gave_up%": 0.0,
+   "gave_up_of_unsolvable%": 0.0
+  },
+  "B.3DLoMatch": {
+   "speed": 0.9958197753941651,
+   "risk%": 0.0,
+   "gave_up%": 0.22459292532285235,
+   "gave_up_of_unsolvable%": 0.354295837023915
+  },
+  "C": {
+   "0.5": {
+    "lams": [
+     0.6,
+     0.96,
+     1.01,
+     1.01,
+     0.94,
+     0.98
+    ],
+    "3DMatch": {
+     "routed_low%": 61.67590881084411,
+     "speed": 1.6428584088816789,
+     "risk%": 0.3080714725816389
+    },
+    "3DLoMatch": {
+     "routed_low%": 20.10106681639528,
+     "speed": 1.0289216766398435,
+     "risk%": 0.05614823133071309
+    }
+   },
+   "0.7": {
+    "lams": [
+     0.6,
+     0.96,
+     1.01,
+     1.01,
+     0.96,
+     0.98
+    ],
+    "3DMatch": {
+     "routed_low%": 53.85089340727048,
+     "speed": 1.5367032364840723,
+     "risk%": 0.3080714725816389
+    },
+    "3DLoMatch": {
+     "routed_low%": 11.398090960134756,
+     "speed": 1.0123087367543886,
+     "risk%": 0.05614823133071309
+    }
+   },
+   "0.85": {
+    "lams": [
+     0.6,
+     0.96,
+     1.01,
+     1.01,
+     1.01,
+     0.98
+    ],
+    "3DMatch": {
+     "routed_low%": 48.12076401725201,
+     "speed": 1.4423295782946468,
+     "risk%": 0.18484288354898337
+    },
+    "3DLoMatch": {
+     "routed_low%": 7.186973610331275,
+     "speed": 1.0011215698640532,
+     "risk%": 0.11229646266142618
+    }
+   }
+  }
+ },
+ "turbo": {
+  "ladder": "500-4000",
+  "classifier": "hgb",
+  "A.3DMatch": {
+   "speed_v3": 1.7675658035895978,
+   "speed_oracle": 4.629828939057169,
+   "cats": {
+    "gated": {
+     "pairs%": 16.9,
+     "time%": 32.6,
+     "excess_over_oracle%": 19.0
+    },
+    "unsolvable(not gated)": {
+     "pairs%": 11.0,
+     "time%": 19.7,
+     "excess_over_oracle%": 18.3
+    },
+    "stop0(solvable)": {
+     "pairs%": 51.4,
+     "time%": 6.7,
+     "excess_over_oracle%": -1.0
+    },
+    "stop1(solvable)": {
+     "pairs%": 20.6,
+     "time%": 40.9,
+     "excess_over_oracle%": 25.5
+    }
+   }
+  },
+  "A.3DLoMatch": {
+   "speed_v3": 1.0362931591041757,
+   "speed_oracle": 4.707531014871941,
+   "cats": {
+    "gated": {
+     "pairs%": 43.0,
+     "time%": 51.0,
+     "excess_over_oracle%": 40.0
+    },
+    "unsolvable(not gated)": {
+     "pairs%": 30.7,
+     "time%": 30.9,
+     "excess_over_oracle%": 28.5
+    },
+    "stop0(solvable)": {
+     "pairs%": 8.5,
+     "time%": 0.7,
+     "excess_over_oracle%": -0.2
+    },
+    "stop1(solvable)": {
+     "pairs%": 17.7,
+     "time%": 17.4,
+     "excess_over_oracle%": 9.6
+    }
+   }
+  },
+  "B.params": {
+   "lams_eps0.5": [
+    0.88,
+    0.95,
+    0.99
+   ],
+   "gammas": [
+    0.1,
+    0.15,
+    0.4
+   ]
+  },
+  "B.3DMatch": {
+   "speed": 1.5035995659097043,
+   "risk%": 0.24645717806531117,
+   "gave_up%": 0.0,
+   "gave_up_of_unsolvable%": 0.0
+  },
+  "B.3DLoMatch": {
+   "speed": 1.0027057162630855,
+   "risk%": 0.16844469399213924,
+   "gave_up%": 0.4491858506457047,
+   "gave_up_of_unsolvable%": 0.26548672566371684
+  },
+  "C": {
+   "0.5": {
+    "lams": [
+     0.6,
+     0.92,
+     1.01,
+     1.01,
+     0.96,
+     0.98
+    ],
+    "3DMatch": {
+     "routed_low%": 61.737523105360445,
+     "speed": 1.6147755910168862,
+     "risk%": 0.43130006161429446
+    },
+    "3DLoMatch": {
+     "routed_low%": 20.774845592363842,
+     "speed": 1.0215139849828223,
+     "risk%": 0.16844469399213924
+    }
+   },
+   "0.7": {
+    "lams": [
+     0.7,
+     0.93,
+     1.01,
+     1.01,
+     0.96,
+     0.5
+    ],
+    "3DMatch": {
+     "routed_low%": 53.48120764017252,
+     "speed": 1.6798802740905696,
+     "risk%": 0.49291435613062234
+    },
+    "3DLoMatch": {
+     "routed_low%": 10.668163952835485,
+     "speed": 1.0200100363053068,
+     "risk%": 0.16844469399213924
+    }
+   },
+   "0.85": {
+    "lams": [
+     0.7,
+     0.93,
+     1.01,
+     1.01,
+     1.01,
+     0.5
+    ],
+    "3DMatch": {
+     "routed_low%": 47.38139248305607,
+     "speed": 1.5576753119169011,
+     "risk%": 0.3080714725816389
+    },
+    "3DLoMatch": {
+     "routed_low%": 6.457046603032005,
+     "speed": 1.0091975380104379,
+     "risk%": 0.16844469399213924
+    }
+   }
+  }
+ }
+}

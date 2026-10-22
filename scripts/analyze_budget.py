@@ -32,12 +32,18 @@ MARGIN = {"3DMatch": 0.01, "3DLoMatch": 0.02, "val": 0.01, "kitti_test": 0.01, "
           "fcgf_3DMatch": 0.01, "fcgf_3DLoMatch": 0.02, "fcgf_kitti_test": 0.01,
           # protocol v2: 2 pp at low overlap (10-30 %), 1 pp elsewhere, as above
           "v2_blind_hi": 0.01, "v2_blind_lo": 0.02, "kitti_raw_blind": 0.01, "fcgfown_3DMatch": 0.01,
-          "fcgfown_3DLoMatch": 0.02, "fcgfown_kitti_raw_blind": 0.01, "fcgfown_kitti_test": 0.01}
+          "fcgfown_3DLoMatch": 0.02, "fcgfown_kitti_raw_blind": 0.01, "fcgfown_kitti_test": 0.01,
+          "v3_blind_hi": 0.01, "v3_blind_lo": 0.02,
+          "v3_blind_hi@unseen": 0.01, "v3_blind_lo@unseen": 0.02}
 
 
 def load(subset, prefix="budget"):
     if "+" in subset:  # union of splits, e.g. "kitti_val+kitti_calib"
         return [r for s in subset.split("+") for r in load(s, prefix)]
+    if subset.endswith("@unseen"):  # protocol v3, deviation 1: blind pairs that appear in no earlier log
+        base = subset[: -len("@unseen")]
+        ids = set(json.loads((RESULTS_ROOT / "protocol_v3" / "strictly_unseen.json").read_text())[base])
+        return [r for r in load(base, prefix) if r["pair_id"] in ids]
     path = LOG_ROOT / f"{prefix}_{subset}.jsonl"
     if not path.exists():
         return []

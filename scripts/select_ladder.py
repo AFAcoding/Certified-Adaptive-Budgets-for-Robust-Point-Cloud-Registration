@@ -103,7 +103,7 @@ def crossfit(recs, est, ladder, k=K_FOLDS, seed=0):
     """Out-of-fold trajectories of the fitting pairs: fold f is scored by a controller (classifiers and, for ladders
     with several stages, the Markov model) fitted on the other folds, as the calibration pairs are later scored.
     Cached per fitting set (the policies only read the trajectories)."""
-    key = (id(recs), est, tuple(ladder), k, seed)
+    key = (id(recs), est, tuple(ladder), k, seed, A.CLASSIFIER)
     if key not in _CROSSFIT or _CROSSFIT[key][0] is not recs:  # the entry keeps recs alive, so its id is not reused
         _CROSSFIT[key] = (recs, _crossfit(recs, est, ladder, k, seed))
     return _CROSSFIT[key][1]
@@ -154,6 +154,7 @@ def fit_candidates(recs, est, ladders, n_cal, eps=B.EPS, n_groups=N_GROUPS, fami
 
         def add(policy, param, o):
             rows.append({"ladder": lname, "policy": policy, "fit_param": param, "fit_s": float(o.s.mean()),
+                         "fit_s_se": float(o.s.std(ddof=1) / np.sqrt(len(o.s))),  # for a 1-SE rule across choices
                          "fit_risk": float(np.mean(ref & ~o.ok))})
 
         if lname == "full":  # the standard estimator: zero risk, needs no certificate
@@ -268,21 +269,98 @@ def worst_case_ratio(recs, est, ladder, q=0.95):
 
 
 def select_and_certify(logs, est, ladders=None, eps=B.EPS, n_groups=N_GROUPS, families=FAMILIES + ("mondrian",),
-                       rho=None):
+                       rho=None, controller="logit"):
     """Choose on logs['train'] (out-of-fold), certify the choice on logs['val']. Returns (selected, candidates, built)
     with selected = {"marginal": cfg, "mondrian": cfg} (only the requested families) and built[tag] = (tr, mdps).
     rho: optional worst-case bound; only ladders whose full run costs at most (1 + rho) times the full budget on 95 %
-    of the fitting pairs are candidates (the full budget alone always is)."""
+    of the fitting pairs are candidates (the full budget alone always is).
+    controller: classifier kind of the stopping controller (acpr.analysis.CLASSIFIERS), or "auto" (protocol v3): the
+    kind whose chosen candidate (group-conditional if requested, else marginal) is cheapest on the fitting pairs,
+    out-of-fold. The choice uses the fitting pairs only, so the certificate of the chosen candidate is unchanged."""
     ladders = B.LADDERS_EXT if ladders is None else ladders
     if rho is not None:
         ladders = {n: l for n, l in ladders.items() if n == "full" or worst_case_ratio(logs["train"], est, l) <= 1 + rho}
-    rows = fit_candidates(logs["train"], est, ladders, len(logs["val"]), eps, n_groups, families)
-    selected, built = {}, {}
     tags = (["marginal"] if set(families) - {"mondrian"} else []) + (["mondrian"] if "mondrian" in families else [])
+    best = None
+    for kind in (A.CLASSIFIERS if controller == "auto" else (controller,)):
+        A.CLASSIFIER = kind
+        rows_k = fit_candidates(logs["train"], est, ladders, len(logs["val"]), eps, n_groups, families)
+        cost = choose(rows_k, tags[-1])["fit_s"]
+        if best is None or cost < best[0]:
+            best = (cost, kind, rows_k)
+    _, kind, rows = best
+    A.CLASSIFIER = kind  # every later build (certification, tests) uses the chosen kind
+    selected, built = {}, {}
     for tag in tags:
         cfg, b = certify_choice(logs, est, choose(rows, tag), eps, n_groups)
+        cfg["classifier"] = kind
         selected[tag], built[tag] = cfg, b
     return selected, rows, built
+
+
+def load_gate_features(name, recs):
+    """Gate signals (scripts/gate_features.py) of the pairs of a log split ('a+b' for a union), in log order:
+    (X, seconds per pair)."""
+    from acpr.gate import FEATURES
+    F = {}
+    for part in name.split("+"):
+        with open(RESULTS_ROOT / "gate" / f"features_{part.split('@')[0]}.jsonl") as f:
+            for line in f:
+                r = json.loads(line)
+                F[r["pair_id"]] = r
+    X = np.array([[F[r["pair_id"]][k] for k in FEATURES] for r in recs], dtype=float)
+    return X, np.array([F[r["pair_id"]]["t_gate"] for r in recs], dtype=float)
+
+
+def gate_charges(recs, t_gate, prefix):
+    """Extra cost of computing the gate signals. With the compatibility order they are the first pass of the
+    ordering, which every pair that truncates pays anyway: gated pairs pay the signals, the others only what the
+    ordering does not already cover. With the ratio order every pair pays them. Operation count of the signals:
+    the ordering's O(P^2 + N m + N m^2)."""
+    t_ord = np.array([r.get("t_order", 0.0) for r in recs])
+    n = np.array([r["N_all"] for r in recs], dtype=float)
+    ops = np.minimum(n, 500) ** 2 + n * 100 + n * 100 * 100
+    if prefix == "budgetc":
+        return {"gated_s": t_gate, "gated_ops": ops, "open_s": np.maximum(t_gate - t_ord, 0.0), "open_ops": 0 * ops}
+    return {"gated_s": t_gate, "gated_ops": ops, "open_s": t_gate, "open_ops": ops}
+
+
+def gate_eval_charges(recs, prefix, kind):
+    """Reported (evaluation) cost of the gate, from its microbenchmark on development pairs (scripts/gate_cost.py,
+    one process, default BLAS, the same conditions for signals, ordering and prediction): every pair pays one
+    prediction; with the compatibility order the signals replace the ordering's first pass (extra: signals - ordering),
+    gated pairs pay the signals instead of the ordering; with the ratio order every pair pays the signals. The gate is
+    trained with gate_charges (frozen method v3); this consistent accounting (all three costs measured under the same
+    conditions, the prediction included) only changes the reported costs, in either direction."""
+    c = json.loads((RESULTS_ROOT / "protocol_v3" / "gate_cost.json").read_text())
+    sig, order, pred = c["signals_ms"] / 1e3, c["order_ms"] / 1e3, c["predict_ms"][kind] / 1e3
+    n = np.array([r["N_all"] for r in recs], dtype=float)
+    ops = np.minimum(n, 500) ** 2 + n * 100 + n * 100 * 100
+    one = np.ones(len(recs))
+    open_s = (max(sig - order, 0.0) + pred) if prefix == "budgetc" else sig + pred
+    return {"gated_s": (sig + pred) * one, "gated_ops": ops, "open_s": open_s * one,
+            "open_ops": 0 * ops if prefix == "budgetc" else ops}
+
+
+def gated_outcome(o, full, gated, ch):
+    """CAB behind the gate: gated pairs run the full budget directly (its outcome, plus the signals' cost)."""
+    return A.Outcome(np.where(gated, full.ok, o.ok), np.where(gated, full.ok15, o.ok15),
+                     np.where(gated, full.ce + ch["gated_ops"], o.ce + ch["open_ops"]),
+                     np.where(gated, full.s + ch["gated_s"], o.s + ch["open_s"]), np.where(gated, -1, o.stop))
+
+
+def fit_gate_for(logs, names, est, cfg, built, prefix):
+    """Train the hardness gate (acpr.gate.fit_gate) on the fitting and calibration pairs of a certified policy."""
+    from acpr.gate import fit_gate
+    tr, mdps = built
+    X, cab, full, tg = [], [], [], []
+    for s in ("train", "val"):
+        Xs, ts = load_gate_features(names[s], logs[s])
+        o = policy_outcome(tr[s], mdps, cfg["policy"], cfg["param"])
+        f = A.fixed_stage([B.trajectory_ladder(r, est, (4,)) for r in logs[s]], 0)
+        ch = gate_charges(logs[s], ts, prefix)
+        X.append(Xs), cab.append(o.s + ch["open_s"]), full.append(f.s), tg.append(ch["gated_s"])
+    return fit_gate(np.vstack(X), np.concatenate(cab), np.concatenate(full), np.concatenate(tg))
 
 
 def policy_outcome(tr_s, mdps, name, param):
@@ -325,7 +403,12 @@ DATASETS = {"3dmatch": {"train": "train", "val": "val", "tests": ["3DMatch", "3D
             "v2_indoor_fcgf": {"train": "fcgfown_v2_fit", "val": "fcgfown_val",
                                "tests": ["fcgfown_3DMatch", "fcgfown_3DLoMatch"]},
             "v2_kitti_fcgf": {"train": "fcgfown_kitti_fit", "val": "fcgfown_kitti_raw_cal",
-                              "tests": ["fcgfown_kitti_raw_blind", "fcgfown_kitti_test"]}}
+                              "tests": ["fcgfown_kitti_raw_blind", "fcgfown_kitti_test"]},
+            # protocol v3: fresh blind scenes (v3_blind_*), fitting without them, v2 calibration; the v2 test sets
+            # are evaluated too (not blind for v3)
+            "v3_indoor_fpfh": {"train": "v3_fit", "val": "v2_cal",
+                               "tests": ["v3_blind_hi", "v3_blind_lo", "v2_blind_hi", "v2_blind_lo", "3DMatch",
+                                         "3DLoMatch"]}}
 
 
 def main():
@@ -334,6 +417,9 @@ def main():
     ap.add_argument("--ladders", default="base", choices=["base", "extended"])
     ap.add_argument("--dataset", default="3dmatch", choices=list(DATASETS))
     ap.add_argument("--rho", type=float, default=None, help="worst-case bound (PROTOCOL.md variant)")
+    ap.add_argument("--controller", default="logit", choices=list(A.CLASSIFIERS) + ["auto"],
+                    help="stopping-controller classifier; auto = cheapest on the fitting pairs (protocol v3)")
+    ap.add_argument("--gate", action="store_true", help="hardness gate in front of CAB (protocol v3)")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
     D = DATASETS[args.dataset]
@@ -342,7 +428,8 @@ def main():
     ladders = B.LADDERS if args.ladders == "base" else B.LADDERS_EXT
     suffix = SUFFIX[args.prefix] + ("" if args.ladders == "base" else "_ext") + \
         ("" if args.dataset == "3dmatch" else f"_{args.dataset}") + \
-        ("" if args.rho is None else f"_rho{round(100 * args.rho):03d}")
+        ("" if args.rho is None else f"_rho{round(100 * args.rho):03d}") + \
+        ("" if args.controller == "logit" else f"_ctl{args.controller}") + ("_gate" if args.gate else "")
     out = {}
     lines = ["# Adaptive correspondence budgets: ladder/policy selection (validation) and test evaluation\n",
              "Reference on test = a single full-budget run (N = 4,000), i.e. the standard estimator. "
@@ -352,7 +439,12 @@ def main():
                      "second-order compatibility with the 100 most distinctive ones; the reordering time is "
                      "charged to every configuration that truncates (adaptive and fixed), never to the full run.\n")
     for est, ename in [("sc2", "SC²-PCR"), ("turbo", "TurboReg")]:
-        selected, rows, built = select_and_certify(logs, est, ladders, rho=args.rho)
+        selected, rows, built = select_and_certify(logs, est, ladders, rho=args.rho, controller=args.controller)
+        gates = {tag: fit_gate_for(logs, D, est, selected[tag], built[tag], args.prefix) for tag in selected} \
+            if args.gate else {}
+        for tag, g in gates.items():
+            selected[tag]["gate"] = {"kind": g.kind, "threshold": g.threshold,
+                                     "fitcal_saving": 1 - g.oof_total / g.cab_total}
         rows.sort(key=lambda x: x["fit_s"])
         lines.append(f"\n## {ename}\n\nStep 1, fitting pairs ({len(logs['train'])}, out-of-fold controller): operating "
                      f"point of every candidate at the loss share the certificate can accept for "
@@ -380,6 +472,13 @@ def main():
             for tag, x in [("marginal", marg), ("mondrian", mond)]:
                 tr, mdps = built[tag]
                 o = policy_outcome(tr[s], mdps, x["policy"], x["param"])
+                n_gated = 0
+                if args.gate:
+                    Xs, ts = load_gate_features(s, logs[s])
+                    gated = gates[tag].predict(Xs)
+                    if gates[tag].clf is not None:
+                        o = gated_outcome(o, full, gated, gate_eval_charges(logs[s], args.prefix, gates[tag].kind))
+                    n_gated = int(gated.sum())
                 cmp = B.paired(o, full, logs[s], B.MARGIN[s])
                 risk = float(np.mean(full.ok & ~o.ok))
                 lines.append(f"| {tag}: {x['ladder']} / {x['policy']} | {100 * o.ok.mean():.2f} | {1e3 * o.s.mean():.0f} | "
@@ -389,7 +488,7 @@ def main():
                 stops = np.bincount(np.clip(o.stop, 0, None), minlength=len(B.LADDERS_EXT[x["ladder"]]))
                 out[est]["test"].setdefault(s, {})[tag] = {"rr": float(o.ok.mean()), "s": float(o.s.mean()),
                                                            "risk": risk, **cmp,
-                                                           "stop_hist": stops.tolist()}
+                                                           "stop_hist": stops.tolist(), "gated": n_gated}
             for k in range(5):
                 fk = A.fixed_stage([B.trajectory_ladder(r, est, (k,)) for r in logs[s]], 0)
                 lines.append(f"| fixed budget N={BUDGETS[k]} (single run) | {100 * fk.ok.mean():.2f} | "

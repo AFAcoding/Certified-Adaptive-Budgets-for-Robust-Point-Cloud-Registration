@@ -401,7 +401,8 @@
      "ladder": "250-1000-2000-4000",
      "policy": "giveup"
     },
-    "fallback": false
+    "fallback": false,
+    "classifier": "logit"
    },
    "mondrian": {
     "ladder": "250-2000-4000",
@@ -425,7 +426,8 @@
      "ladder": "250-2000-4000",
      "policy": "mondrian"
     },
-    "fallback": false
+    "fallback": false,
+    "classifier": "logit"
    }
   },
   "test": {
@@ -455,7 +457,8 @@
       175,
       279,
       779
-     ]
+     ],
+     "gated": 0
     },
     "mondrian": {
      "rr": 0.616793893129771,
@@ -481,7 +484,8 @@
       0,
       330,
       980
-     ]
+     ],
+     "gated": 0
     },
     "full": {
      "rr": 0.6175572519083969,
@@ -514,7 +518,8 @@
       102,
       185,
       232
-     ]
+     ],
+     "gated": 0
     },
     "mondrian": {
      "rr": 0.9207207207207208,
@@ -540,7 +545,8 @@
       0,
       236,
       319
-     ]
+     ],
+     "gated": 0
     },
     "full": {
      "rr": 0.9225225225225225,
@@ -951,7 +957,8 @@
      "ladder": "500-2000-4000",
      "policy": "giveup"
     },
-    "fallback": false
+    "fallback": false,
+    "classifier": "logit"
    },
    "mondrian": {
     "ladder": "250-2000-4000",
@@ -975,7 +982,8 @@
      "ladder": "250-2000-4000",
      "policy": "mondrian"
     },
-    "fallback": false
+    "fallback": false,
+    "classifier": "logit"
    }
   },
   "test": {
@@ -1004,7 +1012,8 @@
       126,
       367,
       817
-     ]
+     ],
+     "gated": 0
     },
     "mondrian": {
      "rr": 0.6251908396946565,
@@ -1030,7 +1039,8 @@
       0,
       340,
       970
-     ]
+     ],
+     "gated": 0
     },
     "full": {
      "rr": 0.6259541984732825,
@@ -1062,7 +1072,8 @@
       62,
       249,
       244
-     ]
+     ],
+     "gated": 0
     },
     "mondrian": {
      "rr": 0.9207207207207208,
@@ -1088,7 +1099,8 @@
       0,
       230,
       325
-     ]
+     ],
+     "gated": 0
     },
     "full": {
      "rr": 0.9225225225225225,

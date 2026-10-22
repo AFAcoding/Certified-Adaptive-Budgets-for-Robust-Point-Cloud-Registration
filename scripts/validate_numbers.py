@@ -68,7 +68,10 @@ SETS = {"bh": ("v2_blind_hi", "v2_indoor_fpfh"), "bl": ("v2_blind_lo", "v2_indoo
         "m": ("3DMatch", "v2_indoor_fpfh"), "lo": ("3DLoMatch", "v2_indoor_fpfh"),
         "kr": ("kitti_raw_blind", "v2_kitti_fpfh"), "ki": ("kitti_test", "v2_kitti_fpfh"),
         "fm": ("fcgfown_3DMatch", "v2_indoor_fcgf"), "flo": ("fcgfown_3DLoMatch", "v2_indoor_fcgf"),
-        "fkr": ("fcgfown_kitti_raw_blind", "v2_kitti_fcgf"), "fki": ("fcgfown_kitti_test", "v2_kitti_fcgf")}
+        "fkr": ("fcgfown_kitti_raw_blind", "v2_kitti_fcgf"), "fki": ("fcgfown_kitti_test", "v2_kitti_fcgf"),
+        "th": ("v3_blind_hi", "v3_indoor_fpfh"), "tl": ("v3_blind_lo", "v3_indoor_fpfh")}
+LIVE_FILE = {fam: f"live_budget_compare_ext_{fam}.json" for _, fam in SETS.values()}
+LIVE_FILE["v3_indoor_fpfh"] = "live_budget_compare_ext_v3_indoor_fpfh_v3.json"
 ESTS = {"sc": "sc2", "tr": "turbo"}
 risks = []
 for d, (log, fam) in SETS.items():
@@ -110,7 +113,7 @@ print(f"group-conditional (compat) test risks: max {max(risks)[0]:.2f} % ({max(r
 
 # live speed-ups
 for d, (sub, fam) in SETS.items():
-    rows = json.loads((RB / f"live_budget_compare_ext_{fam}.json").read_text())
+    rows = json.loads((RB / LIVE_FILE[fam]).read_text())
     fn = fam
     for e, E in ESTS.items():
         rs = [r for r in rows if r["est"] == E and r["subset"] == sub]
@@ -123,5 +126,86 @@ for d, (sub, fam) in SETS.items():
         stall = max(max(r[j]["s"] for j in r["run_order"]) / np.median([q["full"]["s"] for q in rs]) for r in rs)
         if stall > 10:
             print(f"STALL left in {fn} {E} {sub}: {stall:.0f}x the median")
+            bad += 1
+# ---- the final method (protocol v3): classifier chosen on the fitting pairs + hardness gate (selections *_ctlauto_gate)
+# Shared code: the controller and the gate's decisions (S.build, S.fit_gate_for). Recomputed here: every pair's
+# outcome and cost, with this script's own accounting plus the gate's charges written out from gate_cost.json.
+from acpr import analysis as A  # noqa: E402
+from acpr.gate import FEATURES as GF  # noqa: E402
+
+GC = json.loads((ROOT / "results" / "protocol_v3" / "gate_cost.json").read_text())
+risks3 = []
+for d, (log, fam) in SETS.items():
+    D = S.DATASETS[fam]
+    for o, prefix in (("ratio", "budget"), ("compat", "budgetc")):
+        path = RB / f"ladder_selection{S.SUFFIX[prefix]}_ext_{fam}_ctlauto_gate.json"
+        if not path.exists():
+            continue
+        sel = json.loads(path.read_text())
+        logs = {"train": B.load(D["train"], prefix), "val": B.load(D["val"], prefix), log: B.load(log, prefix)}
+        recs = logs[log]
+        for e, E in ESTS.items():
+            for cert, tag in (("group", "mondrian"), ("marg", "marginal")):
+                x = sel[E]["selected"][tag]
+                A.CLASSIFIER = x["classifier"]
+                ladder = B.LADDERS_EXT[x["ladder"]]
+                tr, mdps = S.build(logs, E, ladder)
+                stops = S.policy_outcome(tr[log], mdps, x["policy"], x["param"]).stop
+                gate = S.fit_gate_for(logs, D, E, x, (tr, mdps), prefix)
+                A.CLASSIFIER = "logit"
+                if gate.kind != x["gate"]["kind"]:
+                    print(f"MISMATCH gate kind {fam} {o} {E} {tag}")
+                    bad += 1
+                if gate.clf is not None:
+                    F = {}
+                    for line in open(ROOT / "results" / "gate" / f"features_{log}.jsonl"):
+                        q = json.loads(line)
+                        F[q["pair_id"]] = [q[f] for f in GF]
+                    gated = gate.predict(np.array([F[r["pair_id"]] for r in recs]))
+                    sig, order, pred = GC["signals_ms"] / 1e3, GC["order_ms"] / 1e3, GC["predict_ms"][gate.kind] / 1e3
+                else:
+                    gated = np.zeros(len(recs), bool)
+                    sig = order = pred = 0.0
+                full_ok = np.array([bool(r[E][4]["ok15"]) for r in recs])
+                ok = np.where(gated, full_ok, [bool(r[E][ladder[k]]["ok15"]) for r, k in zip(recs, stops)])
+                fs = np.array([cost(r, E, (4,), 0, "s") for r in recs])
+                fops = np.array([cost(r, E, (4,), 0, "ops") for r in recs])
+                n_all = np.array([r["N_all"] for r in recs], dtype=float)
+                # the gate's signals are computed only when there is a gate
+                sig_ops = (np.minimum(n_all, 500) ** 2 + n_all * 100 + n_all * 100 * 100) * (gate.clf is not None)
+                extra_open = (max(sig - order, 0.0) + pred) if prefix == "budgetc" else sig + pred
+                s = np.where(gated, fs + sig + pred,
+                             [cost(r, E, ladder, k, "s") + extra_open for r, k in zip(recs, stops)])
+                ops = np.where(gated, fops + sig_ops,
+                               [cost(r, E, ladder, k, "ops") + (0 if prefix == "budgetc" else so)
+                                for r, k, so in zip(recs, stops, sig_ops)])
+                k = f"v3.{e}.{d}.{o}.{cert}"
+                rr, loss, risk = 100 * ok.mean(), 100 * (full_ok.mean() - ok.mean()), 100 * np.mean(full_ok & ~ok)
+                check(k + ".rr", rr, "{:.1f}", 0.05)
+                check(k + ".loss", loss, "{:.2f}", 0.005)
+                check(k + ".risk", risk, "{:.2f}", 0.005)
+                check(k + ".speed", fs.mean() / s.mean(), "{:.2f}", 0.005)
+                check(k + ".ops", fops.mean() / ops.mean(), "{:.2f}", 0.005)
+                if cert == "group":
+                    risks3.append((risk, k))
+if risks3:
+    print(f"final method, group-conditional test risks: max {max(risks3)[0]:.2f} % ({max(risks3)[1]}), "
+          f"all <= 1 %: {all(r <= 1.0 for r, _ in risks3)}")
+# live speed-ups of the final method (jobs "<prefix>+v3")
+for d, (sub, fam) in SETS.items():
+    path = RB / (f"live_budget_compare_ext_{fam}_v3.json")
+    if not path.exists():
+        continue
+    rows = json.loads(path.read_text())
+    for e, E in ESTS.items():
+        rs = [r for r in rows if r["est"] == E and r["subset"] == sub]
+        if not rs:
+            continue
+        f = np.mean([r["full"]["s"] for r in rs])
+        for o, pf in (("ratio", "budget+v3"), ("compat", "budgetc+v3")):
+            check(f"v3.{e}.{d}.{o}.live.speed", f / np.mean([r[pf]["s"] for r in rs]), "{:.2f}", 0.005)
+        stall = max(max(r[j]["s"] for j in r["run_order"]) / np.median([q["full"]["s"] for q in rs]) for r in rs)
+        if stall > 10:
+            print(f"STALL left in {path.name} {E} {sub}: {stall:.0f}x the median")
             bad += 1
 print("checks done;", "no mismatches" if bad == 0 else f"{bad} problems")

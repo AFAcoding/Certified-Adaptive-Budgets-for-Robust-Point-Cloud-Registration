@@ -89,18 +89,20 @@ def main():
     ap.add_argument("--per-set", type=int, default=100)
     ap.add_argument("--subset", default="3DMatch")
     ap.add_argument("--dataset", default="3dmatch", help="whose certified CAB to time (e.g. v2_indoor_fpfh)")
+    ap.add_argument("--method", default="v2", choices=["v2", "v3"], help="v3: classifier chosen on the fitting "
+                    "pairs and hardness gate (protocol v3)")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
     ds = L.make_dataset(args.dataset)
     rows = []
     for est in ["sc2", "turbo"]:
-        ctrl = L.Controller("budgetc", est, "extended", ds)
+        ctrl = L.Controller("budgetc" + ("+v3" if args.method == "v3" else ""), est, "extended", ds)
         pairs = sample(ds, args.subset, args.per_set)
         for j, p in enumerate(pairs):
             rows.append(time_pair(ds, est, ctrl, p, j, args.subset))
             if (j + 1) % 25 == 0:
                 print(f"  {est} {j + 1}/{len(pairs)}", flush=True)
-    out = RESULTS_ROOT / "budget" / f"live_equal_time_{args.subset}.json"
+    out = RESULTS_ROOT / "budget" / f"live_equal_time_{args.subset}{'_v3' if args.method == 'v3' else ''}.json"
     with open(out, "w") as f:
         json.dump(rows, f, indent=1)
     for est in ["sc2", "turbo"]:

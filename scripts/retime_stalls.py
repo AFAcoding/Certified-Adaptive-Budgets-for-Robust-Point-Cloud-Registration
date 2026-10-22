@@ -32,7 +32,11 @@ FILES = {"live_budget_compare_ext.json": ("3dmatch", False, False),
          "live_budget_compare_ext_v2_indoor_fpfh.json": ("v2_indoor_fpfh", False, False),
          "live_budget_compare_ext_v2_kitti_fpfh.json": ("v2_kitti_fpfh", False, False),
          "live_budget_compare_ext_v2_indoor_fcgf.json": ("v2_indoor_fcgf", False, False),
-         "live_budget_compare_ext_v2_kitti_fcgf.json": ("v2_kitti_fcgf", False, False)}
+         "live_budget_compare_ext_v2_kitti_fcgf.json": ("v2_kitti_fcgf", False, False),
+         # protocol v3 (method v3 = jobs "<prefix>+v3")
+         "live_budget_compare_ext_v3_indoor_fpfh_v3.json": ("v3_indoor_fpfh", False, False),
+         **{f"live_budget_compare_ext_{d}_v3.json": (d, False, False)
+            for d in ("v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf")}}
 EQUAL_TIME = (("3DMatch", "3dmatch"), ("v2_blind_hi", "v2_indoor_fpfh"))  # (test set, whose certificate is timed)
 
 
@@ -63,12 +67,12 @@ def main():
         for est in sorted({rows[i]["est"] for i in bad}):
             ctrls = {pf: L.Controller(pf, est, "extended", ds) for pf in prefixes}
             for subset in sorted({rows[i]["subset"] for i in bad if rows[i]["est"] == est}):
-                offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf)} for pf in prefixes}
+                offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf.split("+")[0])} for pf in prefixes}
                 pairs = {p.pair_id: p for p in ds.pairs(subset)}
                 for i in [i for i in bad if rows[i]["est"] == est and rows[i]["subset"] == subset]:
                     r = rows[i]
                     before = {j: r[j]["s"] for j in r["run_order"]}
-                    r.update(L.time_pair(ds, est, ctrls, pairs[r["pair_id"]], r["run_order"], offline))
+                    r.update(L.time_pair(ds, est, ctrls, pairs[r["pair_id"]], r["run_order"], offline, subset))
                     r["stalled"] = before
                     print(f"  {est} {r['pair_id']}: "
                           + ", ".join(f"{j} {before[j]:.2f} -> {r[j]['s']:.2f} s" for j in r["run_order"]), flush=True)
