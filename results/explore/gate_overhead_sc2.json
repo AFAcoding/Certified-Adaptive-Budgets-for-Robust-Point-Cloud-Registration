@@ -1,0 +1,11 @@
+{
+ "v2": 437.59601916632766,
+ "v3": 395.6842958340227,
+ "v3_1thr": 391.7978391628518,
+ "v3-v2 same-stop median ms": 19.89060000050813,
+ "v3-v2 same-stop n": 85,
+ "v3_1thr-v2 same-stop median ms": 19.420299970079213,
+ "v3_1thr-v2 same-stop n": 85,
+ "v3_1thr-v3 same-stop median ms": -0.9554999996908009,
+ "v3_1thr-v3 same-stop n": 97
+}

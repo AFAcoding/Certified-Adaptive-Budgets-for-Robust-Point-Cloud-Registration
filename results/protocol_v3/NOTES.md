@@ -31,3 +31,11 @@ feature runs, timed under parallel load (inflated). Printed offline speed-ups ch
 The 04:25 hypothesis that the offline v3 speed-ups were optimistic *because of the accounting* is refuted: the
 gate's computation costs ~3 ms per pair (signals replace the ordering; one prediction), so the offline numbers barely
 move; the ~40-48 ms live overhead is a runtime effect (likely thread-pool contention), reported as measured.
+
+## Overhead diagnosis on development pairs (2026-10-22, 13:10-13:40; blind pairs not re-timed)
+Median extra time of the final method over CAB without the gate on pairs with identical decisions: 10-20 ms
+(gate_overhead.py 19.9, live_breakdown.py 9.6, harness_check.py 15.7 interleaved / 16.4 deferred). Of it, ~4 ms is
+the boosted-tree gate's prediction (sklearn per-call overhead) and ~6 ms the estimator stages running slower on
+identical work. Limiting the classifier's OpenMP pool to one thread: -1 ms (thread-contention hypothesis refuted).
+Moving the harness's untimed offline checks after all timed runs: no change (harness-artifact hypothesis refuted).
+The 40-48 ms of the blind run is not reproduced on development pairs; its cause is not established. Paper corrected.

@@ -1,0 +1,22 @@
+{
+ "interleaved": {
+  "speed": {
+   "budget": 1.40694743960149,
+   "budgetc": 1.5052177382286105,
+   "budget+v3": 1.4398849561672864,
+   "budgetc+v3": 1.5087365748297472
+  },
+  "same_stop_n": 58,
+  "overhead_ms_median": 15.7428499951493
+ },
+ "deferred": {
+  "speed": {
+   "budget": 1.385737788506572,
+   "budgetc": 1.4671318316488733,
+   "budget+v3": 1.4068643790338589,
+   "budgetc+v3": 1.4557562665989565
+  },
+  "same_stop_n": 58,
+  "overhead_ms_median": 16.43744995817542
+ }
+}

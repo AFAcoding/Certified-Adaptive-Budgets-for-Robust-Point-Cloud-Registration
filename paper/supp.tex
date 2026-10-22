@@ -207,7 +207,7 @@ The gate was trained, and first evaluated, with an earlier accounting that charg
 
 \paragraphb{Live overhead.}
 Live, on the fresh pairs that the gate lets through and on which \method with and without the gate stop at the same stage, so that the estimator does the same work, the gated method takes \val{v3.gate.live.overhead.min}--\val{v3.gate.live.overhead.max}\,ms longer per pair (median), an order of magnitude more than the measured cost of signals and prediction.
-The process holds two OpenBLAS thread pools and the OpenMP pool of the tree classifier, each sized to the 16 hardware threads; contention between them after a prediction is the likely cause, but we did not establish it, and the reported times include the overhead as measured.
+We diagnosed it on development pairs only, since the blind pairs may not be timed again: there the overhead is \val{gate.dev.overhead.min}--\val{gate.dev.overhead.max}\,ms (median, identical decisions), of which about \val{gate.dev.pred.ms}\,ms is the classifier's prediction and the rest the estimator stages running slightly slower on identical work; limiting the classifier's thread pool to one thread changed it by \val{gate.dev.thread.diff}\,ms, and computing the timing harness's untimed offline checks after all timed runs instead of between them changed neither the overhead nor the speed-ups. We could not reproduce the larger overhead of the blind run and did not establish its cause; the reported times include it as measured.
 For \SCP above 30\,\% overlap it outweighs the gate's saving (\mainref{tab:blind}{Table~1}).
 
 \paragraphb{Untimed configuration.}

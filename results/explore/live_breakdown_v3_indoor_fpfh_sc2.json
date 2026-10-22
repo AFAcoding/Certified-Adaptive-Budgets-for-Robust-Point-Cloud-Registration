@@ -1,0 +1,27 @@
+{
+ "budgetc": {
+  "controller predict": 1.263621251564473,
+  "estimator stages (incl. stage record)": 521.0741000060807,
+  "ordering": 14.561398753721733,
+  "total": 537.415875003353,
+  "trajectory + features": 0.11678875307552516
+ },
+ "budgetc+v3": {
+  "controller predict": 0.7110837526852265,
+  "estimator stages (incl. stage record)": 220.00733375389245,
+  "gate predict": 4.214688752108486,
+  "gate signals": 14.242017501965165,
+  "total": 516.9524987519253,
+  "trajectory + features": 0.06429250424844213
+ },
+ "same_stop_pairs": 55,
+ "same_stop_median_diff_ms": {
+  "controller predict": 0.037100049667060375,
+  "estimator stages (incl. stage record)": 6.1147999949753284,
+  "gate predict": 4.062500025611371,
+  "gate signals": 12.05429999390617,
+  "ordering": -13.04720004554838,
+  "total": 9.602399950381368,
+  "trajectory + features": 0.001800013706088066
+ }
+}

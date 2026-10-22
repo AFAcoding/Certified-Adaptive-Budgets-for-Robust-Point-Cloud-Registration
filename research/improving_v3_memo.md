@@ -174,3 +174,10 @@ do not support: SC²-PCR winner verify / boosted trees / gate on: 3DMatch 1.68x,
 correspondence-geometry uncertainty improve the controller; no v4 candidate is named; the final method stays.**
 Remaining levers, by evidence: the gate's live implementation overhead (engineering, `scripts/explore/gate_overhead.py`)
 and larger fitting sets (the ranking noise is the binding constraint).
+
+## 15. Gate overhead diagnosis (2026-10-22, development pairs only)
+The earlier attribution to thread contention (sections 1, 6) is refuted: limiting the classifier's OpenMP pool changed
+the overhead by -1 ms, and moving the timing harness's untimed checks after the timed runs changed nothing. On
+development pairs the overhead is 10-20 ms (median, identical decisions): ~4 ms of sklearn per-call prediction cost and
+~6 ms of estimator stages running slower on identical work. A native (NumPy) gate and controller prediction removes the
+first part; the second needs investigation. The blind run's 40-48 ms is not reproduced and its cause is not established.

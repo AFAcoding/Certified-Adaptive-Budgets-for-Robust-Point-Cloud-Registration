@@ -1385,6 +1385,25 @@ def v3_results(ds):
                               for E in cur for t in cur[E]["test"]]
             if diffs:
                 val(f"v3.acct.maxdiff.{cert}", max(diffs), "{:.2f}")
+    # diagnosis of the gate's live overhead on development pairs (scripts/explore/gate_overhead.py, live_breakdown.py,
+    # harness_check.py): median extra time on pairs with identical decisions, the prediction's share, and the effect of
+    # limiting the classifier's thread pool to one thread
+    ex = RESULTS_ROOT / "explore"
+    dev = []
+    if (ex / "gate_overhead_sc2.json").exists():
+        go = json.loads((ex / "gate_overhead_sc2.json").read_text())
+        dev.append(go["v3-v2 same-stop median ms"])
+        val("gate.dev.thread.diff", go["v3_1thr-v3 same-stop median ms"], "{:+.0f}")
+    if (ex / "harness_check_sc2.json").exists():
+        hc = json.loads((ex / "harness_check_sc2.json").read_text())
+        dev += [hc["interleaved"]["overhead_ms_median"], hc["deferred"]["overhead_ms_median"]]
+    if (ex / "live_breakdown_v3_indoor_fpfh_sc2.json").exists():
+        lb = json.loads((ex / "live_breakdown_v3_indoor_fpfh_sc2.json").read_text())
+        dev.append(lb["same_stop_median_diff_ms"]["total"])
+        val("gate.dev.pred.ms", lb["same_stop_median_diff_ms"]["gate predict"], "{:.0f}")
+    if dev:
+        val("gate.dev.overhead.min", min(dev), "{:.0f}")
+        val("gate.dev.overhead.max", max(dev), "{:.0f}")
     gc = RESULTS_ROOT / "protocol_v3" / "gate_cost.json"
     if gc.exists():
         c = json.loads(gc.read_text())
