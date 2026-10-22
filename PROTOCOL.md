@@ -125,3 +125,49 @@ Everything else (ladders, families, eps, delta, G, dominance rule, both ordering
    from every set that fits, calibrates, chooses or gates method v3; other pairs of these scenes were v2 fitting
    pairs, which method v3 does not use. No 3DMatch training scene is free of earlier logs, so scene-level freshness
    with respect to protocol v2 is not attainable within 3DMatch; this is stated in the paper.
+
+# Evaluation protocol v4 (pre-registered 2026-10-22, before the v4 split was generated)
+
+Reason: after protocol v3, analyses on fitting, calibration and development data only found that (a) the speed-up is
+limited by the calibration set's size (with ~1,000 calibration pairs per difficulty group no loss can be accepted, and
+the 3DMatch speed-up still rose from 1.37x to 1.55x between 2,400 and 3,000 calibration pairs), (b) the choice among
+controller configurations is limited by the fitting set's size (with 1,000 fitting pairs the best configurations
+differ by about one standard error), and (c) part of the gate's live cost is the per-call overhead of scikit-learn
+predictions. v4 enlarges both sets, widens the choice and evaluates the fitted models natively.
+
+## Method v4 (frozen candidate space and choice rule)
+- Candidates, for each estimator, with the compatibility order: controller signals {base (v3), base + geometric
+  verification of each stage's pose (`scripts/explore/verify_features.py`), base + correspondence-geometry
+  uncertainty (`scripts/explore/geom_features.py`), base + both} x classifier {logit, poly2, hgb} x number of
+  difficulty groups G in {2, 3} x gate {off, on}. Ladders, families, eps = 1 %, delta = 0.1, the dominance rule and
+  choose-then-certify as in v3; the extra signals' measured cost is charged to every visited stage.
+- Choice: the configuration with the lowest out-of-fold mean cost on the v4 fitting pairs (gate on: times one minus
+  the gate's out-of-fold saving, the gate trained on fitting + calibration pairs as in v3). Configurations within one
+  standard error of the best are tied; among ties the simplest wins: fewest extra signals, then logit < poly2 < hgb,
+  then G = 3 (the v3 default) before G = 2, then no gate. The ratio order is reported for the chosen configuration.
+- Implementation: the fitted classifiers and the gate are evaluated natively (NumPy); their decisions must equal
+  scikit-learn's on every fitting and calibration pair before any blind pair is processed.
+
+## Data v4 (indoor, FPFH)
+- Pool: the 56 3DMatch training scenes that were not a blind scene of protocol v2 or v3 (13 v2 calibration scenes,
+  43 v2 fitting scenes); pairs with overlap > 0.1.
+- Blind test: pool scenes permuted with `numpy.random.default_rng(20261022)` and assigned until they hold at least
+  3,500 eligible pairs; a random sample of 3,000 of their pairs (seed 1), minus every pair that appears in any earlier
+  log under any role; reported above and below 30 % overlap.
+- Calibration: the eligible pairs of the other pool scenes that appear in no earlier log, at most 6,000 (random,
+  seed 2).
+- Fitting: the eligible pairs of the other pool scenes that already have compatibility- and ratio-order budget logs
+  (earlier fitting and calibration pairs); no new fitting logs.
+- The blind scenes are disjoint from the fitting and calibration pairs; blind and calibration pairs were never
+  processed before. No fresh outdoor or FCGF data exist: v4 is indoor FPFH only, and is also reported on the earlier
+  test sets as not blind.
+
+## Evaluation v4
+- Order: calibration logs and signals; every selection (methods v2, v3 and v4, all fitted and certified on the v4
+  fitting and calibration pairs) written to disk; only then are the blind pairs logged and evaluated, once.
+- Live timing: 300 random blind pairs per overlap part, the full budget and the v2, v3 and v4 configurations on the
+  same pairs, rotating order, on an otherwise idle machine.
+- Adoption rule: v4 replaces v3 as the paper's method only if, on the v4 blind test, it is non-inferior and within the
+  risk level for both estimators at both overlap levels, and its live mean time is lower than v3's on the same pairs
+  above 30 % overlap for both estimators (paired scene-stratified bootstrap ratio of mean times above 1), with the 95 %
+  interval above 1 for at least one of them. Otherwise v3 stays and v4 is reported as a negative or partial result.
