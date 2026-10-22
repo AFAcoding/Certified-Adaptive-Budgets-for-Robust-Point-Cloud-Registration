@@ -171,3 +171,27 @@ predictions. v4 enlarges both sets, widens the choice and evaluates the fitted m
   risk level for both estimators at both overlap levels, and its live mean time is lower than v3's on the same pairs
   above 30 % overlap for both estimators (paired scene-stratified bootstrap ratio of mean times above 1), with the 95 %
   interval above 1 for at least one of them. Otherwise v3 stays and v4 is reported as a negative or partial result.
+
+## Status of protocol v4 (2026-10-22, 14:20)
+**Not executed.** The v4 split was generated (`scripts/make_splits_v4.py`: metadata only; the fitting pairs' existing
+logs were copied), but no v4 calibration or blind pair was logged, processed or looked at. The authors decided to
+strengthen the evaluation of the final method (v3) instead: component ablations on earlier test sets, per-scene and
+group-wise checks of the fresh blind result, and a third estimator (pre-registered separately before it is run).
+
+# Protocol v3, addendum A: a third estimator, MAC (pre-registered 2026-10-22, before any MAC run on a blind pair)
+
+Purpose: test whether the final method (v3), frozen, carries over to another graph-based estimator.
+- Estimator: MAC (Zhang et al., CVPR 2023), re-implemented on CPU after the authors' implementation (`src/acpr/mac.py`):
+  first-order compatibility max(0, 1 - d^2/tau^2) pruned below 0.99, second-order graph, maximal cliques of at least
+  three nodes (igraph), node-guided clique selection, instance-equal SVD hypotheses, MAE scoring, 20-iteration
+  refinement (always applied; the authors' demo keeps it only if it is closer to the ground truth, which uses the
+  ground truth); tau = 0.10 m. Same FPFH correspondences, budgets, orderings and success criterion as the other
+  estimators. Fidelity is reported against the published FPFH recall (3DMatch 84.10 %, 3DLoMatch 40.88 %).
+- Methods: the final method (classifier chosen on the fitting pairs among the four v3 kinds, hardness gate) and CAB
+  without the gate (logistic controller), unchanged, with the v3 choice and certification rules.
+- Data (indoor FPFH only; no outdoor or FCGF runs): the v3 split (fitting v3_fit, calibration v2_cal, fresh blind test
+  v3_blind_hi / v3_blind_lo, evaluated once for MAC), and the protocol-v2 indoor family (fitting v2_fit, calibration
+  v2_cal; held-out scenes and 3DMatch / 3DLoMatch, reported as earlier test sets).
+- Order: MAC logs of the fitting and calibration pairs and every MAC selection are written to disk before MAC runs on
+  any blind pair; then the blind pairs are logged and evaluated once, and timed live (300 pairs per overlap part,
+  full budget and both configurations on the same pairs). All results are reported, favourable or not.
