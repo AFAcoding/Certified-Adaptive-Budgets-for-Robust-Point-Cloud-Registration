@@ -230,3 +230,13 @@ implementation; those logs are archived (logs/mac_python_impl/) and not used.
   logs, a single evaluation (which must reproduce the selections), and live timing on an otherwise idle machine
   (300 random pairs per test set, full budget and both configurations on the same pairs, compatibility order; a family
   whose configurations are all certified as the full budget is not timed). All results are reported, favourable or not.
+
+## Addendum B, amendment 1 (2026-10-23, 12:05, before any MAC run on a KITTI calibration or test pair)
+MAC with FPFH on KITTI uses the compatibility cut-off 0.99 (the authors' Python implementation's rule, an edge needs
+d < 0.1 tau, as indoors) instead of the C++ KITTI value 0.9. With 0.9 the clique search found up to 25 million maximal
+cliques per run on KITTI fitting pairs (mean 143 s per full-budget run, up to 1,310 s; the graph reduction does not
+trigger on these graphs), which puts the pre-registered KITTI evaluation (3,403 pairs and live timing) out of reach
+on our machine (estimated two days of logs and live timing). On the 47 KITTI fitting pairs logged with 0.9, cut-off
+0.99 registers exactly the same pairs (95.7 %, as SC2-PCR and TurboReg; no pair differs), with a mean of 7.5 s per
+run and 80x fewer cliques. Only fitting pairs (kitti_train) had been processed; those logs are archived
+(logs/mac_kitti_cut09/) and the KITTI family is restarted with the amended setting. FCGF on KITTI keeps 0.999.
