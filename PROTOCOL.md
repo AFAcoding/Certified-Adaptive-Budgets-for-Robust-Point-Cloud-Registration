@@ -240,3 +240,29 @@ on our machine (estimated two days of logs and live timing). On the 47 KITTI fit
 0.99 registers exactly the same pairs (95.7 %, as SC2-PCR and TurboReg; no pair differs), with a mean of 7.5 s per
 run and 80x fewer cliques. Only fitting pairs (kitti_train) had been processed; those logs are archived
 (logs/mac_kitti_cut09/) and the KITTI family is restarted with the amended setting. FCGF on KITTI keeps 0.999.
+
+# Protocol v3, addendum C: live timing on a GPU (pre-registered 2026-10-23, before any GPU run)
+
+An additional measurement, not part of any evaluation: every configuration is already certified, and nothing is chosen,
+fitted or certified on GPU results.
+- Pairs: the samples of the CPU live timing (300 random pairs per test set, seed 0) of the ten timed test sets of
+  SC2-PCR and TurboReg (fresh blind, both overlap parts; held-out scenes, both parts; KITTI raw drives; 3DMatch;
+  3DLoMatch; KITTI odometry; FCGF 3DMatch; FCGF 3DLoMatch; FCGF on KITTI is certified as the full budget and not
+  timed), and for MAC the fresh blind test (its maximal-clique search runs on the CPU, as in the authors' code).
+- Implementations: PyTorch ports of SC2-PCR, TurboReg, MAC's graph stages, the compatibility ordering, the gate's
+  signals and the CAB controller (gpu/cab_gpu.py), following the CPU code operation by operation (distances in double
+  precision, graph products in single precision, TF32 disabled); the certified controllers and gates are exported as
+  arrays whose probabilities equal the fitted classifiers' (gpu/export_bundle.py checks them to 1e-9 on every pair).
+  The bundle's correspondences are recomputed single-threaded, as in the logs (with multi-threaded BLAS the last bits
+  of the brute-force nearest-neighbour distances, used on KITTI and with FCGF, change and with them a few
+  correspondences); checked: the recomputed gate signals equal the logged ones exactly. Checks on fitting pairs before
+  the run: the ports reproduce the CPU stopping decisions and full-budget outcomes on 15 indoor pairs for all three
+  estimators and on 15 KITTI pairs for TurboReg; SC2-PCR's local search ranks integer scores whose ties torch breaks
+  differently from NumPy (2 of 15 KITTI decisions differ), and with NumPy's ranking the port reproduces the CPU
+  estimates exactly (pose differences below 1e-8); the GPU runs keep torch's native ranking.
+- Timing, as on the CPU: one process, the device synchronised around every run, the order of the runs rotated from
+  pair to pair, five untimed warm-up pairs per set and estimator; the full budget and both certified configurations
+  (CAB without the gate, the final method) on the same pairs; correspondences are inputs, as on the CPU.
+- Reported, whatever they are: the GPU model, mean time per pair, the speed-up of each configuration over the full
+  budget with scene-stratified bootstrap intervals, the recall of every run, and the agreement of the GPU stopping
+  decisions and full-budget outcomes with the CPU logs (a few sorts can break ties differently on the GPU).
