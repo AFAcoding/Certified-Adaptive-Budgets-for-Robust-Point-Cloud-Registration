@@ -162,6 +162,4 @@ cd paper && latexmk -pdf supp.tex && latexmk -pdf main.tex
 - **Statistics.** Speed-up intervals use a scene-stratified bootstrap; recall losses are tested for non-inferiority (1 pp margin, 2 pp at low overlap); paired comparisons use McNemar's exact test.
 - **Cost accounting.** Every distinct computation is charged once, including the ordering, the gate's signals and prediction, and the FastMAC sampling signal. Live timing is the primary measure: the gate's live overhead (40–48 ms per pair) is far above its isolated cost (3 ms), which no offline accounting captures.
 
-## License
 
-No license is granted. The code is published for transparency and reproducibility; all rights are reserved. The datasets keep their own terms of use.
