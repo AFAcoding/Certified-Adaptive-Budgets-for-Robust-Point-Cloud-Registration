@@ -11,6 +11,7 @@ from the CPU evaluation and are exported as plain arrays.
 | `run_gpu_timing.py` | the timing itself; prints speed-ups and the agreement with the CPU decisions, writes one JSON |
 | `CAB_GPU_timing_part1.ipynb` | the Colab notebook that was run: unpacks the bundle from Google Drive, times the fresh blind test (all three estimators) and the held-out scenes (SC2-PCR and TurboReg), and publishes the results to `results/gpu/` |
 | `CAB_GPU_timing_part2.ipynb` | SC2-PCR and TurboReg on the six further test sets (`gpu_bundle_part2.zip`; written by `make_part2_notebook.py`) |
+| `CAB_GPU_timing_part3.ipynb` | MAC on the eight further test sets (addendum C, amendment 1; `gpu_bundle_part3.zip`, assembled by `make_part3.py`) |
 | `CAB_GPU_timing.ipynb` | the same for all ten test sets in one run |
 | `make_part2.py` | helper used on our machine to assemble the bundle of the six further sets from parallel exports |
 
