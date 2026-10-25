@@ -106,3 +106,15 @@ The 40-48 ms of the blind run is not reproduced on development pairs; its cause 
   as the full budget (both orderings, with and without the gate, marginal and group-conditional), so by the
   addendum's rule this family was not timed.
 - scripts/retime_stalls.py at the end: no stalled pair in any live file.
+
+## Addendum C: GPU timing, parts 2 and 3 (2026-10-25)
+- Part 2 (SC2-PCR and TurboReg on KITTI raw drives, 3DMatch, 3DLoMatch, KITTI odometry, FCGF 3DMatch and FCGF
+  3DLoMatch) ran on a Tesla T4 15:12-17:22 and was published by the notebook.
+- Amendment 1 (pushed 8ac340b before any MAC GPU run beyond the fresh blind test): MAC on the eight further timed test
+  sets. Its bundle reuses the exported correspondences (checked identical to a new single-threaded export of KITTI raw,
+  FCGF 3DMatch and FCGF 3DLoMatch); part 3 ran on a Tesla T4 in four batches, published 19:21-21:24.
+- All 30 conditions: GPU stopping decisions equal the CPU's offline decisions on at least
+  98 % of the pairs; SC2-PCR and TurboReg speed-ups within 0.14 of the CPU's; largest
+  realized risk on the 300-pair samples 1.00 % (3 of
+  300, in 2 conditions); the final method faster than CAB without the gate in
+  23 of 30 conditions, SC2-PCR above 30 % overlap included (unlike the CPU live run).

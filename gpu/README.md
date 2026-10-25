@@ -16,8 +16,8 @@ from the CPU evaluation and are exported as plain arrays.
 | `make_part2.py` | helper used on our machine to assemble the bundle of the six further sets from parallel exports |
 
 Steps:
-1. `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -I gpu/export_bundle.py --sets th,tl,bh,bl` (needs the data and the logs), then zip `gpu_bundle/` and upload it to Google Drive.
+1. `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -I gpu/export_bundle.py --sets th,tl,bh,bl` (needs the data and the logs); `make_part2.py` and `make_part3.py` assemble the bundles of parts 2 and 3. Upload the zip to Google Drive.
 2. Open the notebook with a GPU runtime (Colab, or VS Code with the Colab extension) and *Run all*. Give a fine-grained GitHub token (this repository, *Contents: read and write*) when asked, or store it as the Colab secret `GITHUB_TOKEN`. Never write the token into the notebook.
 3. `python -I scripts/paper_assets.py` turns the published JSON into the paper's numbers (`gpu_results`, supplementary Sec. E).
 
-The bundles are not published, since they hold correspondences and ground truth derived from the datasets. The published run (Tesla T4) covers the fresh blind test for all three estimators and the held-out scenes of protocol v2 for SC2-PCR and TurboReg. The six further sets of addendum C are exported; `CAB_GPU_timing_part2.ipynb` times them, and `scripts/paper_assets.py` adds every published result file to the paper's GPU table.
+The bundles are not published, since they hold correspondences and ground truth derived from the datasets. Published runs (Tesla T4, `results/gpu/`): part 1, the fresh blind test (all three estimators) and the held-out scenes (SC2-PCR, TurboReg); part 2, SC2-PCR and TurboReg on the six further test sets; part 3 (amendment 1), MAC on the eight further test sets. Together: all three estimators on all ten timed test sets, 30 conditions. `scripts/paper_assets.py` reads every published result file.

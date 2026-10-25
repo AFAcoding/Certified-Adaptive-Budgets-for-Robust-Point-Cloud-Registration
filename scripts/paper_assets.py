@@ -1506,6 +1506,10 @@ def gpu_results(gpu_dir=None, bundle=None):
         val("gpu.v3.risk.max.where", f"{ENAME[w[1]]} on {dsent(w[2])}")
         val("gpu.v3.risk.max.lost", str(int(round(w[0] / 100 * int(VALS[f"gpu.{w[1]}.{w[2]}.n"])))))
         val("gpu.v3.risk.max.n", VALS[f"gpu.{w[1]}.{w[2]}.n"])
+        val("gpu.v3.risk.max.count", str(sum(r[0] == w[0] for r in risks)))
+        val("gpu.conds.n", str(len(risks)))
+        # the gate on the GPU: conditions where the final method is faster than CAB without the gate
+        val("gpu.gate.faster", str(sum(num(f"gpu.{e}.{c}.v3.speed") > num(f"gpu.{e}.{c}.v2.speed") for _, e, c in risks)))
     gaps = [abs(num(f"gpu.{e}.{c}.v3.speed") - num(f"v3.{e}.{c}.compat.live.speed")) for e in ESTS for c in cfg["sets"]
             if f"gpu.{e}.{c}.v3.speed" in VALS and f"v3.{e}.{c}.compat.live.speed" in VALS]
     if gaps:

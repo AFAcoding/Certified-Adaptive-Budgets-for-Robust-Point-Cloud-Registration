@@ -25,7 +25,7 @@ Fresh blind test (protocol v3), compatibility order, group-conditional certifica
 | Fresh scenes, overlap 10–30 % (647) | 1.01× | 1.05× | 1.06× |
 | Fresh scenes, overlap > 30 %, on a GPU (Tesla T4, 300 pairs) | 1.78× | 1.98× | 3.44× |
 
-Every configuration is statistically non-inferior in recall, and the realized risk is ≤ 1 % on all 72 test conditions, MAC included (at most 0.62 %). Against CAB without the gate on the same pairs, the final method is 1.28× faster for TurboReg and 1.06× for MAC above 30 % overlap, but 0.95× for SC²-PCR there: the gate costs 40–48 ms per pair live in this implementation (3.2 ms when timed alone). Earlier test sets, ablations and every configuration are in the paper and `results/`.
+Every configuration is statistically non-inferior in recall, and the realized risk is ≤ 1 % on all 72 test conditions, MAC included (at most 0.62 %). Against CAB without the gate on the same pairs, the final method is 1.28× faster for TurboReg and 1.06× for MAC above 30 % overlap, but 0.95× for SC²-PCR there: the gate costs 40–48 ms per pair live in this implementation (3.2 ms when timed alone). On the GPU all three estimators were timed on all ten test sets (30 conditions): the stopping decisions equal the CPU's on at least 98 % of the pairs, SC²-PCR's and TurboReg's speed-ups are within 0.14 of the CPU's, and the final method is faster than CAB without the gate in 23 of the 30 conditions. Earlier test sets, ablations and every configuration are in the paper and `results/`.
 
 ## Contents
 
@@ -36,7 +36,7 @@ Every configuration is statistically non-inferior in recall, and the realized ri
 | `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR, TurboReg and MAC re-implementations (`mac.py`, with its authors' reduction of dense graphs), compatibility ordering, the hardness gate (`gate.py`), FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
 | `scripts/` | every experiment, analysis and figure script (see the pipeline below); `scripts/explore/` holds the exploration on development data |
 | `results/` | the selection reports (`*.md`/`*.json`), live timings and summaries that the paper's numbers come from; `results/protocol_v2/` and `results/protocol_v3/` hold the splits, the KITTI raw pairs with their ICP ground truth, the FCGF verification, the gate's cost and the protocol-v3 notes; `results/gate/` the gate's signals; `results/explore/` the exploration results |
-| `gpu/` | the GPU timing (addendum C): PyTorch ports, the bundle exporter and the Colab notebook that was run (`gpu/README.md`); its results are in `results/gpu/` |
+| `gpu/` | the GPU timing (addendum C and its amendment): PyTorch ports, the bundle exporters and the three Colab notebooks that were run (`gpu/README.md`); the results are in `results/gpu/` |
 | `scripts/download_logs.py` | downloads the per-pair logs of all experiments into `logs/`: the zip of release v4.0 (109 files, with MAC's), or that of v3.0 (without MAC's) if v4.0 is not available |
 
 Datasets are not redistributed; the scripts below download or prepare them from their official sources.
