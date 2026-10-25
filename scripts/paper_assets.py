@@ -1472,7 +1472,7 @@ def gpu_results(gpu_dir=None, bundle=None):
                       f"\\textbf{{{num(k + '.v3.speed'):.2f}\\X}}"]
         if any_e:
             L.append(" & ".join(cells) + " \\\\")
-            if code == "tl":
+            if code in ("tl", "kr"):  # fresh blind test | blind sets of protocol v2 | development benchmarks
                 L.append("\\midrule")
     if agree_all:
         val("gpu.agree.min", 100 * min(agree_all), "{:.0f}")
