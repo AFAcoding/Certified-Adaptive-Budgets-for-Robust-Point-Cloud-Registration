@@ -294,16 +294,26 @@ None of the re-fitted certificates exceeds 1\,\% on either test set (largest ris
 \section{Live timing on a GPU}
 \label{supp:gpu}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/gpu_vs_cpu.pdf}
+\caption{\textbf{GPU against CPU.} Live speed-up of the final method over the full budget on the GPU against the CPU, one point per test set and estimator (300 pairs each), with scene-stratified 95\,\% bootstrap intervals; log scales. Points on the diagonal keep the CPU's speed-up.}
+\label{fig:gpuvscpu}
+\end{figure}
+
+
 \paragraphb{Setup.}
 A pre-registered additional measurement (protocol~v3, addendum~C and its amendment for MAC): nothing is chosen, fitted or certified on its results.
 PyTorch ports of \SCP, TurboReg and MAC's graph stages, of the compatibility ordering, of the gate's signals and of the controller follow the CPU code operation by operation (distances in double precision, graph products in single precision); MAC's maximal-clique search stays on the CPU, as in the authors' implementations.
 The certified controllers and gates are exported as arrays whose probabilities equal the fitted classifiers' (checked to $10^{-9}$), and the correspondences of the CPU live-timing samples (300 pairs per test set) are exported single-threaded, exactly as logged.
 Every run is timed with the device synchronised, the order of the runs rotated from pair to pair, after untimed warm-up runs, on a \val{gpu.device} (Google Colab).
 Before the run, the ports reproduced the CPU decisions and outcomes on fitting pairs; \SCP's local search ranks integer scores whose ties PyTorch breaks differently from NumPy, which the GPU runs keep.
+
+\paragraphb{Coverage.}
 \SCP and TurboReg are timed on all \val{gpu.sets.n} test sets of addendum~C, MAC on \val{gpu.mc.sets.n} of them (with FCGF on KITTI every configuration is the full budget).
 
 \paragraphb{Results.}
-\Cref{tab:gpu} lists the full budget's time and the speed-ups of both configurations.
+\Cref{tab:gpu} lists the full budget's time and the speed-ups of both configurations, and \cref{fig:gpuvscpu} compares them with the CPU's.
 The savings carry over: on the fresh pairs above 30\,\% overlap, \method is \val{gpu.sc.th.v3.speed}\X, \val{gpu.tr.th.v3.speed}\X and \val{gpu.mc.th.v3.speed}\X faster than the full budget for \SCP, TurboReg and MAC (CPU: \val{v3.sc.th.compat.live.speed}\X, \val{v3.tr.th.compat.live.speed}\X and \val{v3.mc.th.compat.live.speed}\X), and at low overlap it costs about the full budget, as on the CPU.
 For \SCP and TurboReg the GPU speed-up of the final method is within \val{gpu.cpugap.max} of the CPU's on every test set, and on the timed samples it loses at most \val{gpu.v3.risk.max}\,\% of the pairs that the full budget registers (\val{gpu.v3.risk.max.where}: \val{gpu.v3.risk.max.lost} of \val{gpu.v3.risk.max.n}), within the certified level.
 The GPU stopping decisions equal the CPU's offline decisions on \val{gpu.agree.mean}\,\% of the pairs on average (at least \val{gpu.agree.min}\,\% per set), and the full-budget outcomes agree on at least \val{gpu.fullagree.min}\,\%.
@@ -378,7 +388,7 @@ Estimator & Order & 250 & 500 & 1k & 2k & full & 250 & 500 & 1k & 2k & full & 25
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/tradeoff_all.pdf}
-\caption{\textbf{Recall vs.\ time} on the FPFH test sets. Lines: fixed budgets $N=250\dots4000$ under ratio order (grey) and our compatibility order (blue), time relative to the full budget of the same run. Markers: certified \method operating points, coloured by ordering (filled diamond: group-conditional certificate; open square: marginal certificate).}
+\caption{\textbf{Recall vs.\ time} on the FPFH test sets, one row per estimator. Lines: fixed budgets $N=250\dots4000$ under ratio order (grey) and our compatibility order (blue), time relative to the full budget of the same run (log scale). Markers: certified operating points of \method without the gate, coloured by ordering (filled diamond: group-conditional certificate; open square: marginal certificate).}
 \label{fig:tradeoffall}
 \end{figure*}
 
@@ -529,17 +539,17 @@ This is why the ordering buys TurboReg accuracy more than time, and why wall-clo
 \label{supp:limits}
 Four questions about the protocol can be answered with the logs we already have: how many calibration pairs a certificate needs, how the guarantee holds group by group, how much the choice of $\varepsilon$ and $G$ matters, and what bounding the worst case costs. The studies that re-run the selection (calibration size, sensitivity, re-fitted controllers) use the development benchmarks only, so the blind test sets are evaluated once.
 
-\paragraphb{How many calibration pairs a certificate needs.}\looseness=-1
+{\interlinepenalty=10000 \clubpenalty=10000 \paragraphb{How many calibration pairs a certificate needs.}\looseness=-1
 With no loss observed among $n$ calibration pairs, the exact binomial test certifies a 1\,\% level at $\delta=0.1$ only if $n\ge230$, and the group-conditional certificate needs $339$ pairs in each of its three groups at level $\delta/3$.
 \Cref{tab:calsize} checks this on random subsets of the calibration pools of 3DMatch and KITTI (20 subsets per size, from 100 pairs to the whole pool), re-certifying the thresholds of \method's selected configuration and evaluating each certificate once on test.
-The group-conditional certificate first appears between 900 and 1{,}200 pairs, as the bound predicts ($3\times339=1{,}017$).
+The group-conditional certificate first appears between 900 and 1{,}200 pairs, as the bound predicts ($3\times339=1{,}017$).\par}
 
 The marginal certificate appears from 300 pairs, but on KITTI up to \val{cal.kitti.marg.over.max}\,\% of the marginal certificates (TurboReg) exceed the 1\,\% level on test, while no group-conditional certificate does at any size (largest risk \val{cal.group.worst.max}\,\%).
 The safety of the group-conditional certificate is paid for with a calibration set of about a thousand pairs.
 
-\paragraphb{Checks of the guarantee.}
+{\interlinepenalty=10000 \clubpenalty=10000 \paragraphb{Checks of the guarantee.}
 Proposition~1 bounds the risk of every difficulty group, and hence of any mixture of easy and hard pairs; the worst mixture puts all its weight on the group with the largest risk.
-\Cref{tab:evidence} reports this worst-case risk on test.
+\Cref{tab:evidence} reports this worst-case risk on test.\par}
 
 {\clubpenalty=10000 For \method it is at most \val{ev.worst.group.fpfh.max}\,\% on the FPFH test sets and \val{ev.worst.group.max}\,\% overall; the marginal certificate, evaluated on the same groups, reaches up to \val{ev.worst.marg.max}\,\%, which a test set made only of such pairs would lose.
 Of the \val{ev.groups.n} test groups, \val{ev.groups.over} exceed 1\,\% for \method (at most \val{ev.groups.over.risk}\,\%, \val{ev.groups.over.lost} of \val{ev.groups.over.n} pairs); the certificate bounds the expected risk of each group, and in a group of \val{ev.groups.over.n} pairs a single pair moves the realized risk by \val{ev.groups.over.step}\pp.
@@ -568,8 +578,8 @@ Re-fitting the controller on ten bootstrap resamples of the fitting pairs and re
 \paragraphb{Sensitivity to the risk level and the number of groups.}
 \Cref{tab:sens} repeats the selection with other risk levels $\varepsilon$ and numbers of groups $G$ (compatibility order; for each setting the candidate is chosen on the fitting pairs, certified on the calibration pool and evaluated once on test).
 
-\looseness=1 The speed-up grows with $\varepsilon$, from \val{sens.sc.3dmatch.0.01.3.speed}\X at 1\,\% to \val{sens.sc.3dmatch.0.05.3.speed}\X at 5\,\% for \SCP on 3DMatch, and the realized risk stays below $\varepsilon$ at every level; at $\varepsilon=0.5$\,\% the pools cannot certify anything and \method runs the full budget.
-With one or two groups the chosen candidates also stay within the level on these test sets (at most \val{sens.g12.risk.max}\,\%) and are faster, but only the group-conditional certificate covers other mixes of difficulty (\cref{tab:evidence}); four or more groups need more calibration pairs than the pools contain, and \method runs the full budget.
+{\interlinepenalty=10000 \clubpenalty=10000 The speed-up grows with $\varepsilon$, from \val{sens.sc.3dmatch.0.01.3.speed}\X at 1\,\% to \val{sens.sc.3dmatch.0.05.3.speed}\X at 5\,\% for \SCP on 3DMatch, and the realized risk stays below $\varepsilon$ at every level; at $\varepsilon=0.5$\,\% the pools cannot certify anything and \method runs the full budget.
+With one or two groups the chosen candidates also stay within the level on these test sets (at most \val{sens.g12.risk.max}\,\%) and are faster, but only the group-conditional certificate covers other mixes of difficulty (\cref{tab:evidence}); four or more groups need more calibration pairs than the pools contain, and \method runs the full budget.\par}
 
 \paragraphb{Bounding the worst case.}\looseness=1
 The pre-registered worst-case variant admits a ladder only if running all its stages costs at most $1+\rho$ times the full budget on 95\,\% of the fitting pairs, and otherwise leaves the selection unchanged (\cref{tab:worstcase}); the protocol fixed $\rho\in\{0.10,0.25\}$ in advance.
@@ -627,9 +637,10 @@ Test set & min.\ $n$ & ${>}1$\,\% & max & min.\ $n$ & ${>}1$\,\% & max\\
 \paragraphb{Variants.}
 \emph{Fewer seeds}: \SCP on all correspondences with a maximum seed ratio of 0.025 or 0.01 instead of 0.2 (non-maximum suppression already limits the seeds to a few hundred).
 \emph{Fewer cliques}: TurboReg with $K_1=500$ or $250$ instead of 2{,}000.
-\emph{Uniform sampling}: a random subset of $N$ correspondences.
+
+{\clubpenalty=10000 \emph{Uniform sampling}: a random subset of $N$ correspondences.
 \emph{FastMAC-style sampling}~\cite{zhang2024fastmac}: compatibility weights $W_{ij}=1-S_{ij}^2/(2d^2)$, kept if above 0.999, on all correspondences (second-order graph $W\odot WW$ as published, or the first-order graph $W$ as a cheaper variant); the degree signal $s=W\mathbf 1$ is high-pass filtered, $f=(\mathrm{Diag}(s)-W)s$, and $N$ correspondences are drawn without replacement with probability $\propto f_i^2$.
-The signal is computed once per pair and charged to every budget.
+The signal is computed once per pair and charged to every budget.\par}
 
 {\interlinepenalty=10000 \clubpenalty=10000 \paragraphb{Measurement.}
 Recall is measured on every second test pair (by index; \val{eq.n.bh} pairs of the held-out scenes and \val{eq.n.lo} 3DLoMatch pairs; FastMAC-style second order on every fourth, fewer seeds/cliques on every eighth), and time live on \val{eq.sc.live.n} test pairs.\par}
@@ -654,17 +665,18 @@ Variant & time & $\Delta$ & time & $\Delta$\\
 The certification machinery is not specific to correspondence budgets.
 We also applied it to a pose search, which replaces a robust estimator altogether, and compare it with RANSAC.
 
-\paragraphb{Search.}
+{\interlinepenalty=10000 \clubpenalty=10000 \paragraphb{Search.}
 Rotations come from a scrambled Sobol sequence~\cite{sobol1967} mapped to SO(3)~\cite{shoemake1992uniform}, in nested grids of 256 to 2{,}048 rotations.
 For a rotation $R$, every correspondence votes for the translation $\mathbf q_i-R\mathbf p_i$ (source centred); votes are hashed into cells whose side grows with the grid's covering angle, and the densest of two staggered cell grids scores $R$.
 The best basins after pose-space non-maximum suppression are refined by annealed least squares.
 The anytime schedule (256 rotations, 1 basin) $\to$ (256, 4) $\to$ (1{,}024, 4) $\to$ (2{,}048, 16) was chosen on validation; its reference is the schedule run to completion.
 \emph{Progressive voting} scores rotations on growing prefixes of the ratio-sorted correspondences and keeps the best quarter in each round, successive halving~\cite{jamieson2016successive} applied to rotation search (CAPS-fast); full voting scores all of them (CAPS-accurate).
-The controller is the Markov controller of \mainref{sec:controller}{Sec.~3.3}, certified with the marginal certificate; cost is counted in correspondence evaluations (CE).
+The controller is the Markov controller of \mainref{sec:controller}{Sec.~3.3}, certified with the marginal certificate; cost is counted in correspondence evaluations (CE).\par}
 
-{\clubpenalty=10000 \looseness=-1 \paragraphb{Results.}
-On the same 1{,}000 mutual FPFH correspondences and the official RMSE criterion, CAPS-fast is \val{A.psh.m.ransac.live}\X faster than RANSAC with its classical stopping rule on 3DMatch at equal recall and \val{A.psh.lo.ransac.live}\X faster on 3DLoMatch, where it registers \val{A.psh.lo.ransac.pdrr}\pp more pairs (\cref{tab:caps}); CAPS-accurate registers \val{A.full.lo.ransac.pdrr}\pp more 3DLoMatch pairs than RANSAC, but runs at \val{A.full.lo.ransac.live}--\val{A.full.m.ransac.live}\X its speed.
-The Markov controller is the cheapest certified family and the only one non-inferior on 3DMatch (\cref{tab:capscontrollers}).
+{\interlinepenalty=10000 \clubpenalty=10000 \paragraphb{Results.}
+On the same 1{,}000 mutual FPFH correspondences and the official RMSE criterion, CAPS-fast is \val{A.psh.m.ransac.live}\X faster than RANSAC with its classical stopping rule on 3DMatch at equal recall and \val{A.psh.lo.ransac.live}\X faster on 3DLoMatch, where it registers \val{A.psh.lo.ransac.pdrr}\pp more pairs (\cref{tab:caps}); CAPS-accurate registers \val{A.full.lo.ransac.pdrr}\pp more 3DLoMatch pairs than RANSAC, but runs at \val{A.full.lo.ransac.live}--\val{A.full.m.ransac.live}\X its speed.\par}
+
+{\interlinepenalty=10000 \clubpenalty=10000 The Markov controller is the cheapest certified family and the only one non-inferior on 3DMatch (\cref{tab:capscontrollers}).
 RANSAC's classical rule spends \val{A.waste.psh.m.share}\,\% and \val{A.waste.psh.lo.share}\,\% of its budget on pairs with fewer than ten true correspondences, which it almost never registers (\cref{tab:ransacwaste}).
 Against fixed search, CAPS is cheaper than the largest configuration run once on 3DMatch (\val{A.psh.m.direct.ceratio}--\val{A.full.m.direct.ceratio}\X fewer CE) but not on 3DLoMatch (\val{A.psh.lo.direct.ceratio}--\val{A.full.lo.direct.ceratio}\X).\par}
 

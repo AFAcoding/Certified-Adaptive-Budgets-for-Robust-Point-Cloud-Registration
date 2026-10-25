@@ -369,40 +369,63 @@ def cab_results():
             L.append(" & ".join(cells) + " \\\\")
     (TAB / "supp_fixed_budgets.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
-    fig_tradeoff_all(ds, fixed)
+    fig_tradeoff_all(ds, fixed, logs)
     return ds, logs, fixed
 
 
-def fig_tradeoff_all(ds, fixed):
-    """Supplementary figure: recall vs relative time of every fixed budget, with CAB's certified operating points
-    (colour: ordering; filled diamond: group-conditional certificate; open square: marginal certificate)."""
-    dsf = [d for d in ds if d not in FCGF and d not in BLIND3]  # operating points of CAB without the gate
-    fig, axes = plt.subplots(len(ESTS), len(dsf), figsize=(7.0, 2.05 * len(ESTS) + 0.45), squeeze=False)
-    for r, e in enumerate(ESTS):
+def fig_tradeoff_all(ds, fixed, logs=None):
+    """Supplementary figure: recall vs relative time of every fixed budget, with the certified operating points of CAB
+    without the gate (colour: ordering; filled diamond: group-conditional certificate; open square: marginal
+    certificate). One row per estimator (MAC from the merged MAC logs, where they exist), one column per FPFH test set;
+    time relative to the full budget of the same run, log scale."""
+    import matplotlib.ticker as mticker
+    dsf = [d for d in ds if d not in FCGF and d not in BLIND3]
+    short = {"bh": "Held-out scenes", "bl": "Held-out, low overlap", "kr": "KITTI raw drives", "m": "3DMatch",
+             "lo": "3DLoMatch", "ki": "KITTI odometry"}
+    rows = dict(ESTS)
+    if logs is not None and all(f"mc.{d}.compat.group.speed" in VALS for d in dsf) and \
+            all(all(isinstance(r.get("mac"), list) for r in logs[(d, o)]) for d in dsf for o in PREFIX):
+        rows["mc"] = "mac"
+        for d in dsf:
+            for o in PREFIX:
+                fixed[(d, o, "mc")] = fixed_points(logs[(d, o)], "mac")
+    W, ROW, TOP, BOT = 7.0, 1.42, 0.22, 0.95
+    fig, axes = plt.subplots(len(rows), len(dsf), figsize=(W, TOP + ROW * len(rows) + BOT), squeeze=False,
+                             sharey="col")
+    xmin = min(p[0] / fixed[(d, o, e)][-1][0] for e in rows for d in dsf for o in PREFIX for p in fixed[(d, o, e)])
+    for r, e in enumerate(rows):
         for c, d in enumerate(dsf):
             ax = axes[r, c]
             for o, col, name in (("ratio", GRAY, "ratio order"), ("compat", BLUE, "our ordering")):
                 pts = fixed[(d, o, e)]
-                ax.plot([p[0] / pts[-1][0] for p in pts], [100 * p[1] for p in pts], "-o", color=col, lw=1.5, ms=3.6,
-                        mec="white", mew=0.6, label=f"fixed budgets, {name}", zorder=2)
+                ax.plot([p[0] / pts[-1][0] for p in pts], [100 * p[1] for p in pts], "-o", color=col, lw=1.4, ms=3.2,
+                        mec="white", mew=0.5, label=f"fixed budgets, {name}", zorder=2)
             for cert, mk, cname in (("group", "D", "group-conditional"), ("marg", "s", "marginal")):
                 for o, col, name in (("ratio", DARK, "ratio order"), ("compat", BLUE, "our ordering")):
                     k = f"{e}.{d}.{o}.{cert}"
-                    ax.plot([1.0 / num(k + ".speed")], [num(k + ".rr")], mk, ls="none", ms=6.0 if mk == "D" else 5.6,
+                    ax.plot([1.0 / num(k + ".speed")], [num(k + ".rr")], mk, ls="none", ms=5.6 if mk == "D" else 5.2,
                             color=col, mfc=col if cert == "group" else "white", mec="white" if cert == "group" else col,
-                            mew=0.6 if cert == "group" else 1.3, zorder=5 if cert == "group" else 4,
+                            mew=0.6 if cert == "group" else 1.2, zorder=5 if cert == "group" else 4,
                             label=f"CAB, {name}, {cname}")
-            ax.set_xlim(0, 1.04)
-            ax.set_title(f"{ENAME[e].replace('$^2$', '²')}, {DNAME[d]}", loc="left")
+            ax.set_xscale("log")
+            ax.set_xlim(0.8 * xmin, 1.3)
+            ax.xaxis.set_major_locator(mticker.FixedLocator([0.01, 0.1, 1]))
+            ax.xaxis.set_major_formatter(mticker.FixedFormatter(["0.01", "0.1", "1"]))
+            ax.xaxis.set_minor_formatter(mticker.NullFormatter())
+            ax.yaxis.set_major_locator(mticker.MaxNLocator(4))
             style(ax)
-            if r == len(ESTS) - 1:
-                ax.set_xlabel("time / full-budget time")
+            if r == 0:
+                ax.set_title(short[d], loc="center", fontsize=FS_LABEL)
+            if r < len(rows) - 1:
+                ax.tick_params(labelbottom=False)
             if c == 0:
-                ax.set_ylabel("recall (%)")
-    fig.tight_layout(rect=(0, 0.085, 1, 1), w_pad=1.0, h_pad=0.8)
-    # legend columns: fixed budgets | CAB, group-conditional | CAB, marginal
-    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.0),
-               handlelength=1.8)
+                ax.set_ylabel(f"{ENAME[e].replace('$^2$', '²')}\nrecall (%)", fontsize=FS_LABEL)
+    fig.subplots_adjust(left=0.085, right=0.99, top=1 - TOP / fig.get_figheight(), wspace=0.42, hspace=0.18,
+                        bottom=BOT / fig.get_figheight())
+    fig.text(0.535, (BOT - 0.33) / fig.get_figheight(), "time relative to the full budget of the same run (log scale)",
+             ha="center", va="center", fontsize=FS_LABEL)
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="lower center", ncol=3, bbox_to_anchor=(0.535, 0.0),
+               handlelength=1.8, columnspacing=1.6, fontsize=FS_LEGEND)
     fig.savefig(FIG / "tradeoff_all.pdf", facecolor="white")
     plt.close(fig)
 
@@ -1495,7 +1518,51 @@ def gpu_results(gpu_dir=None, bundle=None):
         val("gpu.fullagree.min", 100 * min(full_all), "{:.0f}")
     L.append("\\bottomrule")
     (TAB / "supp_gpu.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    fig_gpu_vs_cpu([c for c in cfg["sets"]])
     return True
+
+
+def fig_gpu_vs_cpu(codes):
+    """Supplementary figure: live speed-up of the final method on the GPU against the CPU, per test set and estimator,
+    with the bootstrap intervals of both; the diagonal marks equal speed-ups."""
+    marks = {"sc": ("o", BLUE), "tr": ("s", ORANGE), "mc": ("^", PURPLE)}
+    fig, ax = plt.subplots(figsize=(3.35, 2.75))
+    lo_all, hi_all = [], []
+    for e, (mk, col) in marks.items():
+        pts = [c for c in codes if f"gpu.{e}.{c}.v3.speed" in VALS and f"v3.{e}.{c}.compat.live.speed" in VALS]
+        if not pts:
+            continue
+        x = np.array([num(f"v3.{e}.{c}.compat.live.speed") for c in pts])
+        y = np.array([num(f"gpu.{e}.{c}.v3.speed") for c in pts])
+        xe = np.array([[num(f"v3.{e}.{c}.compat.live.speedlo") for c in pts], [num(f"v3.{e}.{c}.compat.live.speedhi") for c in pts]])
+        ye = np.array([[num(f"gpu.{e}.{c}.v3.speedlo") for c in pts], [num(f"gpu.{e}.{c}.v3.speedhi") for c in pts]])
+        ax.errorbar(x, y, xerr=np.abs(xe - x), yerr=np.abs(ye - y), fmt="none", ecolor=col, elinewidth=0.7, alpha=0.55,
+                    zorder=2)
+        ax.plot(x, y, mk, ls="none", ms=5.2, color=col, mec="white", mew=0.6, zorder=3,
+                label=f"{ENAME[e].replace('$^2$', '²')} ({len(pts)} test sets)")
+        lo_all += list(xe[0]) + list(ye[0])
+        hi_all += list(xe[1]) + list(ye[1])
+    lim = (0.9 * min(lo_all), 1.08 * max(hi_all))
+    ax.plot(lim, lim, color=MUTED, lw=0.9, ls=(0, (3, 2)), zorder=1)
+    ax.text(lim[1] / 1.04, lim[1] / 1.04, "equal", rotation=45, ha="right", va="bottom", color=INK2,
+            fontsize=FS_LEGEND, rotation_mode="anchor")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(*lim)
+    ax.set_ylim(*lim)
+    ticks = [t for t in (1, 1.5, 2, 3, 4) if lim[0] <= t <= lim[1]]
+    for axis in (ax.xaxis, ax.yaxis):
+        axis.set_major_locator(matplotlib.ticker.FixedLocator(ticks))
+        axis.set_major_formatter(matplotlib.ticker.FixedFormatter([f"{t:g}×" for t in ticks]))
+        axis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+    ax.set_xlabel("speed-up on the CPU (live)")
+    ax.set_ylabel("speed-up on the GPU (live)")
+    ax.set_aspect("equal")
+    style(ax)
+    ax.legend(loc="upper left", frameon=False, handletextpad=0.3, borderaxespad=0.2)
+    fig.tight_layout(pad=0.3)
+    fig.savefig(FIG / "gpu_vs_cpu.pdf", facecolor="white")
+    plt.close(fig)
 
 
 def v3_results(ds):
