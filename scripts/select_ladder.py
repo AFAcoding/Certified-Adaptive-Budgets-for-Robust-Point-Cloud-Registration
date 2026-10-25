@@ -420,16 +420,24 @@ def main():
     ap.add_argument("--controller", default="logit", choices=list(A.CLASSIFIERS) + ["auto"],
                     help="stopping-controller classifier; auto = cheapest on the fitting pairs (protocol v3)")
     ap.add_argument("--gate", action="store_true", help="hardness gate in front of CAB (protocol v3)")
+    ap.add_argument("--estimators", default="sc2,turbo",
+                    help="comma-separated estimators; a set other than sc2,turbo writes its own files (e.g. _mac)")
+    ap.add_argument("--no-tests", action="store_true",
+                    help="choose and certify only, writing the selection before any test pair is loaded")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
     D = DATASETS[args.dataset]
+    tests = [] if args.no_tests else D["tests"]
     logs = {"train": B.load(D["train"], args.prefix), "val": B.load(D["val"], args.prefix),
-            **{s: B.load(s, args.prefix) for s in D["tests"]}}
+            **{s: B.load(s, args.prefix) for s in tests}}
     ladders = B.LADDERS if args.ladders == "base" else B.LADDERS_EXT
+    ests = args.estimators.split(",")
     suffix = SUFFIX[args.prefix] + ("" if args.ladders == "base" else "_ext") + \
         ("" if args.dataset == "3dmatch" else f"_{args.dataset}") + \
         ("" if args.rho is None else f"_rho{round(100 * args.rho):03d}") + \
-        ("" if args.controller == "logit" else f"_ctl{args.controller}") + ("_gate" if args.gate else "")
+        ("" if args.controller == "logit" else f"_ctl{args.controller}") + ("_gate" if args.gate else "") + \
+        ("" if ests == ["sc2", "turbo"] else "_" + "_".join(ests)) + ("_selection_only" if args.no_tests else "")
+    ENAMES = {"sc2": "SC²-PCR", "turbo": "TurboReg", "mac": "MAC"}
     out = {}
     lines = ["# Adaptive correspondence budgets: ladder/policy selection (validation) and test evaluation\n",
              "Reference on test = a single full-budget run (N = 4,000), i.e. the standard estimator. "
@@ -438,7 +446,7 @@ def main():
         lines.append("Compatibility-ordered budgets: a truncated budget takes the top-N correspondences by "
                      "second-order compatibility with the 100 most distinctive ones; the reordering time is "
                      "charged to every configuration that truncates (adaptive and fixed), never to the full run.\n")
-    for est, ename in [("sc2", "SC²-PCR"), ("turbo", "TurboReg")]:
+    for est, ename in [(e, ENAMES[e]) for e in ests]:
         selected, rows, built = select_and_certify(logs, est, ladders, rho=args.rho, controller=args.controller)
         gates = {tag: fit_gate_for(logs, D, est, selected[tag], built[tag], args.prefix) for tag in selected} \
             if args.gate else {}
@@ -463,7 +471,7 @@ def main():
                          f"{100 * x['val_risk']:.2f} | {1e3 * x['val_s']:.0f} |")
         marg, mond = selected["marginal"], selected["mondrian"]
         out[est] = {"candidates": rows, "selected": selected, "test": {}}
-        for s in D["tests"]:
+        for s in tests:
             lines.append(f"\n### {ename}, {s} test ({len(logs[s])} pairs)\n")
             lines.append("| configuration | RR % | mean time (ms) | ΔRR vs full, pp [95% UB] | non-inferior | "
                          "speed-up vs full [95% CI] | McNemar p | risk % |")

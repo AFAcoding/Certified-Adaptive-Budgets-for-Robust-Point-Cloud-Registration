@@ -31,7 +31,7 @@
 %% number can slip in.
 \makeatletter
 \newcommand{\defval}[2]{\@namedef{val@#1}{#2}}
-\newcommand{\val}[1]{\@ifundefined{val@#1}{\textbf{\textcolor{red}{??#1}}}{\@nameuse{val@#1}}}
+\newcommand{\val}[1]{\@ifundefined{val@#1}{\textbf{\textcolor{red}{??\detokenize{#1}}}}{\@nameuse{val@#1}}}
 \newcommand{\tablebody}[1]{\@@input #1 } % expandable input, safe at the start of a tabular row
 \makeatother
 \IfFileExists{numbers.tex}{\input{numbers}}{}
@@ -61,8 +61,8 @@ Making them cheaper is easy; making them cheaper \emph{safely} is not: every fix
 We present certified adaptive budgets (\method), a drop-in wrapper that runs an unchanged estimator on growing budgets of mutually consistent correspondences and stops as soon as a learned controller is confident; a cheap gate sends pairs that would need the full budget straight to it.
 The stopping rule is certified per difficulty group with Learn-then-Test, so that with high probability at most 1\,\% of the pairs registered by the full estimator are lost, for any mix of difficulties.
 We evaluate it under pre-registered protocols with blind test sets, with hand-crafted and learned descriptors; the final method is tested once on \val{v3.n.blind} indoor pairs that no earlier experiment had processed.
-Around \SCP and TurboReg, \method is \val{v3.sc.th.compat.live.speed}\X and \val{v3.tr.th.compat.live.speed}\X faster on these pairs with statistically non-inferior recall, and its realized risk stays within the certified level on all \val{v3.risk.n} test conditions, whereas marginal certificates and uniform sampling exceed it.
-Where nearly every pair needs the full budget, \method declines to cut instead of losing pairs, at a cost of at most \val{v3.live.min.pct}\,\% in time.
+Around \SCP, TurboReg and MAC, \method is \val{v3.sc.th.compat.live.speed}\X, \val{v3.tr.th.compat.live.speed}\X and \val{v3.mc.th.compat.live.speed}\X faster on these pairs with statistically non-inferior recall, also on a GPU, and its realized risk stays within the certified level on all \val{v3.riskall.n} test conditions, whereas marginal certificates and uniform sampling exceed it.
+Where nearly every pair needs the full budget, \method declines to cut instead of losing pairs, at a cost of at most \val{v3.liveall.min.pct}\,\% in time.
 \end{abstract}
 
 
@@ -78,7 +78,7 @@ The most accurate estimators today, such as \SCP~\cite{chen2022sc2pcr}, MAC~\cit
 They spend this cost uniformly: every configuration fixes $N$ for every pair, and evaluations sweep it from 250 to 5{,}000~\cite{huang2021predator,qin2022geotransformer}.
 
 Yet pairs differ enormously in difficulty.
-Run on only 250 correspondences chosen by our ordering (\cref{sec:ordering}), \SCP already registers \val{sc.bh.compat.fix0.rr}\,\% of the pairs of our held-out indoor scenes in \val{sc.bh.compat.fix0.ms}\,ms, against \val{sc.bh.compat.group.full}\,\% in \val{sc.bh.compat.fix4.ms}\,ms with all 4{,}000.
+Run on only 250 correspondences chosen by our ordering (\cref{sec:ordering}), \SCP already registers \val{eq.sc.bh.compat.250.rr}\,\% of the pairs of our held-out indoor scenes in \val{eq.sc.compat.250.ms}\,ms, against \val{eq.sc.bh.full.rr}\,\% in \val{eq.sc.full.ms}\,ms with all 4{,}000 (live time).
 Other pairs need every correspondence, and some cannot be registered at all.
 
 \paragraphb{Cheaper is easy; safe is not.}
@@ -100,10 +100,9 @@ Our contributions are:
 \begin{itemize}[leftmargin=12pt,itemsep=1pt,topsep=2pt]
 \item A drop-in wrapper that adapts the correspondence budget of a graph-based estimator to each pair, with a certified bound on the pairs lost against the full estimator that is valid for any mixture of difficulties, and a pre-estimation gate that keeps the bound (\cref{sec:method}).
 \item A two-pass anchor ordering that fills small budgets with consistent correspondences at a fraction of the cost of the full graph, and an analysis of which pairs it can rescue (\cref{sec:ordering,sec:why}).
-\item Evidence under two pre-registered protocols, with blind test sets (held-out 3DMatch training scenes, KITTI raw drives outside the odometry benchmark, and for the final method pairs never processed before), hand-crafted (FPFH) and learned (FCGF) descriptors, live timing and paired tests, that the certified wrapper stays within its risk level on every test set, while marginal certificates and fixed shortcuts (fewer seeds or cliques, uniform or FastMAC-style sampling, fixed budgets) do not (\cref{sec:main,sec:shift,sec:equaltime}).
+\item Evidence under pre-registered protocols with blind test sets (held-out 3DMatch scenes, KITTI raw drives outside the odometry benchmark and, for the final method, pairs never processed before), FPFH and FCGF descriptors, three graph-based estimators, live timing on a CPU and a GPU and paired tests, that the certified wrapper stays within its risk level on every test set, while marginal certificates and fixed shortcuts (fewer seeds or cliques, uniform or FastMAC-style sampling, fixed budgets) do not (\cref{sec:main,sec:shift,sec:equaltime}).
 \end{itemize}
-On the fresh blind pairs \method is \val{v3.sc.th.compat.live.speed}\X faster for \SCP and \val{v3.tr.th.compat.live.speed}\X for TurboReg, and on the official 3DMatch benchmark \val{v3.sc.m.compat.live.speed}\X and \val{v3.tr.m.compat.live.speed}\X.
-Where the data leave nothing to save, at low overlap and on outdoor raw drives, it declines to cut rather than losing pairs, and we show that the remaining time is spent on pairs that no budget can register or that need every correspondence; where its controller cannot tell success from failure, it runs the full budget.
+On the fresh blind pairs \method is \val{v3.sc.th.compat.live.speed}\X faster for \SCP, \val{v3.tr.th.compat.live.speed}\X for TurboReg and \val{v3.mc.th.compat.live.speed}\X for MAC, the costliest of the three; where the data leave nothing to save, at low overlap and on outdoor raw drives, it declines to cut rather than lose pairs, and where its controller cannot tell success from failure, it runs the full budget.
 
 
 %% ====================================================================================================
@@ -117,17 +116,16 @@ Spatial compatibility between correspondence pairs~\cite{bai2021pointdsc} is the
 \SCP~\cite{chen2022sc2pcr} scores pairs by second-order compatibility and grows consensus sets from spectral seeds, MAC~\cite{zhang2023mac} enumerates maximal cliques, and TurboReg~\cite{yan2025turboreg} replaces clique enumeration by pivot-guided search of 3-cliques; TEASER~\cite{yang2020teaser} and KISS-Matcher~\cite{lim2025kissmatcher} prune outliers with certifiable or graph-theoretic tests.
 All of them build a graph over the $N$ putative correspondences, so their cost is set by $N$, which each configuration fixes for every pair.
 FastMAC~\cite{zhang2024fastmac} reduces the number of correspondences passed to MAC by stochastic spectral sampling, but computes its sampling signal on the full second-order graph and uses one sampling ratio for all pairs; TurboReg notes that downsampling correspondences speeds up clique search at a cost in accuracy~\cite{yan2025turboreg}.
-These works are complementary to ours: \method leaves the estimator unchanged, wraps any of them, and decides per pair how many correspondences it needs, with a bound on what this costs in accuracy; its ordering uses the same pairwise test, but only against a small anchor set.
+Among registration pipelines, DIPR~\cite{ai2023dipr} stops iterations early with hand-set thresholds, and BUFFER-X-Lite~\cite{lim2026bufferxlite} skips feature scales when an inlier count exceeds a user-defined threshold, losing up to 1.6\pp of success on 3DMatch.
+\method is complementary: it leaves the estimator unchanged, wraps any of them, and decides per pair how many correspondences it needs, with a bound on the accuracy this costs.
 
 \paragraphb{Sampling and stopping in RANSAC.}
-RANSAC~\cite{fischler1981ransac} adapts its number of hypotheses to an estimate of the inlier ratio.
-PROSAC~\cite{chum2005prosac} draws from quality-ordered correspondences, sequential tests~\cite{matas2005sprt} and preemption~\cite{nister2003preemptive} stop evaluating poor hypotheses early, MAGSAC++~\cite{barath2020magsacpp} and SupeRANSAC~\cite{barath2025superansac} improve scoring and sampling, BANSAC~\cite{piedade2023bansac} adapts sampling online, and Sch\"onberger \etal~\cite{schonberger2025fixing} show that the classical stopping criterion is miscalibrated.
-These rules stop when a model seems good enough, but none bounds the accuracy lost relative to a reference estimator; we compare a certified adaptive pose search with RANSAC in \suppref{supp:caps}.
+RANSAC~\cite{fischler1981ransac} adapts its number of hypotheses to the estimated inlier ratio; PROSAC~\cite{chum2005prosac} draws from quality-ordered correspondences, sequential tests~\cite{matas2005sprt} and preemption~\cite{nister2003preemptive} discard poor hypotheses early, MAGSAC++~\cite{barath2020magsacpp} and SupeRANSAC~\cite{barath2025superansac} improve scoring and sampling, BANSAC~\cite{piedade2023bansac} adapts sampling online, and Sch\"onberger \etal~\cite{schonberger2025fixing} show that the classical stopping criterion is miscalibrated.
+None of these rules bounds the accuracy lost against a reference estimator; \suppref{supp:caps} compares a certified adaptive pose search with RANSAC.
 
 \paragraphb{Adaptive computation with guarantees.}
 Early exits and adaptive computation time~\cite{graves2016act,teerapittayanon2016branchynet} let networks spend less on easy inputs, and CALM~\cite{schuster2022calm} and Fast-yet-Safe~\cite{jazbec2024fastyetsafe} certify early exits with Learn-then-Test~\cite{angelopoulos2021ltt}, a distribution-free risk-control procedure.
 We bring this guarantee to robust geometric estimators, where the reference is the full estimator rather than a network's last layer, and show that its marginal form breaks under the shifts in difficulty that separate registration benchmarks.
-In registration, DIPR~\cite{ai2023dipr} and BUFFER-X-Lite~\cite{lim2026bufferxlite} stop iterations or feature scales early, with hand-set thresholds and without a bound on the pairs lost.
 Monitoring anytime algorithms by dynamic programming~\cite{hansen2001monitoring} and the value of computation~\cite{russell1991right} motivate our Markov controller, and our difficulty-conditional certificates follow the group-conditional (Mondrian) guarantees of conformal prediction~\cite{vovk2005alrw}.
 
 
@@ -136,13 +134,6 @@ Monitoring anytime algorithms by dynamic programming~\cite{hansen2001monitoring}
 %% ====================================================================================================
 \section{Certified adaptive budgets}
 \label{sec:method}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figures/qualitative.pdf}
-\caption{\textbf{What the cheap budget contains.} The 250 correspondences given to the estimator on a 3DMatch test pair, drawn at their reference endpoints on the reference fragment, seen from slightly above its sensor. Left: the 250 most distinctive (Lowe ratio). Right: the 250 most consistent with inlier-rich anchors (ours). Blue: true correspondences; orange: outliers.}
-\label{fig:qualitative}
-\end{figure}
 
 \subsection{Problem setup}
 \label{sec:setup}
@@ -175,6 +166,13 @@ s_i=\sum_{a\in A} C_{ia}\,\big(C\,C_{AA}\big)_{ia},
 the number of anchor triangles that $i$ closes, and fill each budget with the highest-scoring correspondences (ties keep the ratio order).
 A budget that covers all correspondences keeps the standard input, so the full stage is exactly the reference.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{figures/qualitative.pdf}
+\caption{\textbf{What the cheap budget contains.} The 250 correspondences given to the estimator on a 3DMatch test pair, drawn at their reference endpoints on the reference fragment, seen from slightly above its sensor. Left: the 250 most distinctive (Lowe ratio). Right: the 250 most consistent with inlier-rich anchors (ours). Blue: true correspondences; orange: outliers.}
+\label{fig:qualitative}
+\end{figure}
+
 \paragraphb{Anchors decide.}
 The obvious anchors, the $m=100$ most distinctive correspondences, fail exactly where help is needed: in hard pairs they are nearly all outliers (\val{abl.ratio.top100.true} inliers on average and none in \val{abl.ratio.top100.zero}\,\% of validation pairs), and outliers that happen to agree with each other are promoted.
 We therefore select anchors in a first pass: among the $P=500$ most distinctive correspondences, the $m=100$ with the highest first-order degree $\sum_{j\le P}C_{ij}$ become anchors, which raises the share of inliers among anchors to \val{abl.anchors.true}\,\%.
@@ -193,7 +191,7 @@ Before the estimator runs, the gate computes cheap signals of the correspondence
 The gated result is the reference itself, so the gate can only remove losses and needs no certificate of its own: every guarantee below holds for the gated policy unchanged.
 Its classifier and threshold minimise the out-of-fold total cost on the fitting and calibration pairs.
 
-\begin{algorithm}[t]
+\begin{algorithm}[h]
 \caption{\method at test time}
 \label{alg:cab}
 \begin{algorithmic}[1]
@@ -265,22 +263,23 @@ The \val{kr.n.test} blind pairs come from the 49 KITTI~\cite{geiger2012kitti} ra
 FPFH~\cite{rusu2009fpfh} descriptors (5\,cm voxels indoors, 30\,cm outdoors); for every source point the nearest target descriptor, sorted by Lowe ratio and capped at $N=4{,}000$.
 FCGF~\cite{choy2019fcgf} features are computed for every split with the official weights by our re-implementation of the network, which reproduces the released test features up to rounding (\suppref{supp:impl}).
 FCGF was trained on all 3DMatch training scenes and on odometry sequences 0--5, so it has no blind indoor test; it is fitted on the indoor fitting pairs, certified on the \val{v2_indoor_fcgf.n.cal} pairs of the 3DMatch validation scenes and tested on the development benchmarks, and outdoors it is certified on \val{v2_kitti_fcgf.n.cal} pairs of 42 raw drives and tested blind on the \val{fkr.n.test} pairs of the other 7.
-\SCP~\cite{chen2022sc2pcr} and TurboReg~\cite{yan2025turboreg} are re-implemented on CPU.
-At the full budget they come within \val{fid.fcgf.indoor.gap.min}--\val{fid.fcgf.indoor.gap.max}\pp of the published recall on 3DMatch and 3DLoMatch with FCGF, and within \val{fid.fpfh.indoor.gap.min}--\val{fid.fpfh.indoor.gap.max}\pp with FPFH (\suppref{supp:impl}).
+\SCP~\cite{chen2022sc2pcr}, TurboReg~\cite{yan2025turboreg} and MAC~\cite{zhang2023mac}, added by pre-registered addenda before it ran on any test pair, are re-implemented on CPU, MAC with its authors' reduction of dense graphs.
+At the full budget all three come within \val{fid.fcgf.indoor.gap.min}--\val{fid.fcgf.indoor.gap.max}\pp of the published recall on 3DMatch and 3DLoMatch with FCGF and within \val{fid.fpfh.indoor.gap.min}--\val{fid.fpfh.indoor.gap.max}\pp with FPFH (\suppref{supp:impl}).
 
 \paragraphb{Metrics.}
 A pair is registered if RE${}\le15^\circ$ and TE${}\le30$\,cm indoors, and RE${}\le5^\circ$ and TE${}\le60$\,cm outdoors; recall (RR) is over all pairs.
-The \emph{loss} of a configuration is the recall lost against the full budget with its one-sided 95\,\% upper bound (scene-stratified bootstrap~\cite{efron1993bootstrap}); it is \emph{non-inferior} if the bound is below 1\pp (2\pp at low overlap), and its \emph{risk} is the fraction of pairs registered by the full budget but not by \method.
+The \emph{loss} of a configuration is the recall lost against the full budget with its one-sided 95\,\% upper bound (scene-stratified bootstrap~\cite{efron1993bootstrap}); it is \emph{non-inferior} if the bound is below 1\pp (2\pp at low overlap), and its \emph{risk} is the share of pairs registered by the full budget but lost.
 
 \paragraphb{Cost.}
 \emph{Wall-clock speed-ups} are measured \emph{live}: one process with the default multi-threaded BLAS on a laptop CPU (AMD Ryzen~7 5700U, 8 cores), the same \val{sc.m.live.n} random test pairs per set for every configuration, and the order of the runs rotated from pair to pair.
 Each run includes everything the configuration needs, such as the ordering in \method or the sampling signal in FastMAC.
+The live timing is repeated on a GPU (NVIDIA T4) with PyTorch ports of the estimators and of \method (\suppref{supp:gpu}).
 Because time depends on the machine, we also count \emph{operations}: the dominant arithmetic of every stage a pair visits (compatibility tests, graph products, consensus and hypothesis scoring, $O(N^2)$ to $O(N^3)$ in the budget $N$) plus the $O(P^2+Nm^2)$ of our ordering, averaged over the full test set (\suppref{supp:impl}).
-Live and offline stopping decisions agree on at least \val{live.agree.min}\,\% of the pairs in every live run.
+Live and offline stopping decisions agree on at least \val{live.agree.minall}\,\% of the pairs in every live run and \val{live.agree.indoor.min}\,\% indoors; the differences come from multi-threaded arithmetic, which on KITTI also changes a few nearest neighbours.
 
 \begin{table*}[t]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{\textbf{Fresh blind test} (protocol~v3: pairs never processed before, evaluated once; compatibility order, group-conditional certificates). RR: recall (\%). Loss: recall lost against the full budget (pp) with its one-sided 95\,\% upper bound; \cmark: non-inferior (bound below 1\pp; 2\pp at low overlap). Time: live wall-clock speed-up over the full budget on \val{v3.sc.th.live.n} random pairs per set, every configuration timed on the same pairs. Ops: reduction of the hardware-independent operation count over the full test set. Risk: pairs registered by the full budget but lost (\%, target ${\le}\,1$). \method without gate (v2): the configuration of protocol~v2 (logistic controller, no gate), fitted on the same pairs.}
+\caption{\textbf{Fresh blind test} (protocol~v3: pairs never processed before, evaluated once; compatibility order, group-conditional certificates). RR: recall (\%). Loss: recall lost against the full budget (pp) with its one-sided 95\,\% upper bound; \cmark: non-inferior (bound below 1\pp; 2\pp at low overlap). Time: live wall-clock speed-up over the full budget on \val{v3.sc.th.live.n} random pairs per set, every configuration timed on the same pairs. Ops: reduction of the hardware-independent operation count over the full test set. Risk: pairs registered by the full budget but lost (\%, target ${\le}\,1$). \method without gate (v2): the configuration of protocol~v2 (logistic controller, no gate), fitted on the same pairs. MAC: pre-registered addenda.}
 \label{tab:blind}
 \begin{tabular}{@{}l ccccc ccccc@{}}
 \toprule
@@ -294,16 +293,18 @@ Method & RR & Loss [UB] & Time & Ops & Risk & RR & Loss [UB] & Time & Ops & Risk
 
 \begin{table*}[t]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{\textbf{Earlier test sets} (protocol-v2 blind sets and development benchmarks; not blind for the final method). Live speed-up of \method without gate (v2) and of \method; \method's operation reduction, risk (\%) and non-inferiority. $^\dagger$Full budget (\cref{sec:shift}). $^*$Offline. Complete results of both configurations: \suppref{supp:results}.}
+\caption{\textbf{Earlier test sets} (protocol-v2 blind sets and development benchmarks; not blind for the final method). Live speed-up of \method without gate (v2) and of \method ($^*$offline; $^\dagger$full budget, \cref{sec:shift}); \method's operation reduction and risk (\%). \method is non-inferior in every case unless marked $^\ddagger$. Complete results: \suppref{supp:results}.}
 \label{tab:main}
-\begin{tabular}{@{}l ccccc ccccc@{}}
+\begin{fitbox}
+\begin{tabular}{@{}l cccc cccc cccc@{}}
 \toprule
-& \multicolumn{5}{c}{\SCP} & \multicolumn{5}{c}{TurboReg}\\
-\cmidrule(lr){2-6}\cmidrule(l){7-11}
-Test set & v2 & \method & Ops & Risk & NI & v2 & \method & Ops & Risk & NI\\
+& \multicolumn{4}{c}{\SCP} & \multicolumn{4}{c}{TurboReg} & \multicolumn{4}{c}{MAC}\\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}\cmidrule(l){10-13}
+Test set & v2 & \method & Ops & Risk & v2 & \method & Ops & Risk & v2 & \method & Ops & Risk\\
 \midrule
 \tablebody{tables/v3_all.tex}
 \end{tabular}
+\end{fitbox}
 \end{table*}
 
 \subsection{Main results}
@@ -311,30 +312,34 @@ Test set & v2 & \method & Ops & Risk & NI & v2 & \method & Ops & Risk & NI\\
 \Cref{tab:blind} reports the fresh blind test, with every choice made on the fitting pairs and every certificate computed on the calibration pairs before any blind pair was processed.
 On pairs above 30\,\% overlap, \method runs \SCP \val{v3.sc.th.compat.live.speed}\X and TurboReg \val{v3.tr.th.compat.live.speed}\X faster than the standard full budget (\val{v3.sc.th.compat.group.ops}\X and \val{v3.tr.th.compat.group.ops}\X fewer operations) and loses \val{v3.sc.th.compat.group.loss} and \val{v3.tr.th.compat.group.loss}\pp of recall, with one-sided 95\,\% bounds of \val{v3.sc.th.compat.group.ub} and \val{v3.tr.th.compat.group.ub}\pp: both are statistically non-inferior, and the realized risks of \val{v3.sc.th.compat.group.risk} and \val{v3.tr.th.compat.group.risk}\,\% are inside the certified 1\,\%.
 At low overlap the gate sends most pairs to the full budget directly, and \method is \val{v3.sc.tl.compat.live.speed}\X and \val{v3.tr.tl.compat.live.speed}\X faster, no longer slower than the full budget.
-Against \method without the gate (v2) on the same pairs and clock, the final method is \val{v3.tr.th.compat.live.vs2}\X [\val{v3.tr.th.compat.live.vs2lo}, \val{v3.tr.th.compat.live.vs2hi}] as fast for TurboReg above 30\,\% overlap and \val{v3.sc.tl.compat.live.vs2}\X and \val{v3.tr.tl.compat.live.vs2}\X at low overlap, but \val{v3.sc.th.compat.live.vs2}\X [\val{v3.sc.th.compat.live.vs2lo}, \val{v3.sc.th.compat.live.vs2hi}] for \SCP above 30\,\% overlap: there, on the pairs it lets through, it nearly always stops where \method without the gate stops, and the gate's live overhead outweighs its saving (\cref{sec:conclusion}); offline, where the gate costs \val{gate.signals.ms}\,ms of signals that replace the ordering's own \val{gate.order.ms}\,ms and a prediction of \val{gate.pred.hgb.ms}\,ms, it is \val{v3.sc.th.compat.group.speed}\X against \val{sc.th.compat.group.speed}\X.
-On every earlier test set (\cref{tab:main}) the final method stays within the risk level and is non-inferior.
-It is faster than \method without the gate for TurboReg on every set where it cuts, and for \SCP on most, with the largest change on the KITTI raw drives (\val{v3.sc.kr.compat.live.speed}\X and \val{v3.tr.kr.compat.live.speed}\X, against \val{sc.kr.compat.live.speed}\X and \val{tr.kr.compat.live.speed}\X), where the gate removes the slowdown of protocol~v2; for \SCP it is slightly slower on 3DMatch and on FCGF 3DLoMatch.
+On every earlier test set (\cref{tab:main}) \method stays within the risk level and is non-inferior, and on the KITTI raw drives the gate removes the slowdown of protocol~v2 (\val{v3.sc.kr.compat.live.speed}\X and \val{v3.tr.kr.compat.live.speed}\X, against \val{sc.kr.compat.live.speed}\X and \val{tr.kr.compat.live.speed}\X).
+MAC, whose full budget is the costliest of the three (\val{mc.th.live.fullms}\,ms per fresh pair above 30\,\% overlap, against \val{sc.th.live.fullms} and \val{tr.th.live.fullms}\,ms), gains most: \method runs it \val{v3.mc.th.compat.live.speed}\X faster above 30\,\% overlap and \val{v3.mc.tl.compat.live.speed}\X at low overlap, at realized risks of \val{v3.mc.th.compat.group.risk} and \val{v3.mc.tl.compat.group.risk}\,\%, and \val{v3.mc.ki.compat.live.speed}\X on KITTI odometry.
+On a GPU the savings carry over: \val{gpu.sc.th.v3.speed}\X, \val{gpu.tr.th.v3.speed}\X and \val{gpu.mc.th.v3.speed}\X above 30\,\% overlap on the fresh pairs (\suppref{supp:gpu}).
 
 \subsection{The guarantee under shift}
 \label{sec:shift}
 A certificate is only worth having if it holds on data that differ from the calibration data.
-\Cref{fig:teaser}(c) collects the realized risk on every test set: \method stays within the 1\,\% level in all \val{v3.risk.n} cases (at most \val{v3.risk.max}\,\%).
+\Cref{fig:teaser}(c) collects the realized risk on every test set: \method stays within the 1\,\% level in all \val{v3.riskall.n} cases, MAC included (at most \val{v3.riskall.max}\,\%).
 Two alternatives do not, each for a different reason.
 
 \emph{Marginal certificates} hold only for the calibration mix of difficulties.
 With the final method they exceed their level on 3DMatch and on FCGF 3DMatch (\val{v3.sc.m.compat.marg.risk} and \val{v3.sc.fm.compat.marg.risk}\,\% for \SCP), and in protocol~v2 they did on the blind KITTI raw drives, whose pairs are much harder than the odometry calibration pairs (\val{sc.kr.compat.group.full} vs.\ \val{sc.ki.compat.group.full}\,\% full-budget recall): \val{tr.kr.ratio.marg.risk}\,\% for TurboReg with the ratio order.
+With MAC they exceed it on the blind KITTI raw drives (\val{v3.mc.kr.compat.marg.risk}\,\%) and, without the gate, on the fresh low-overlap pairs (\val{mc.tl.compat.marg.risk}\,\%).
 The group-conditional certificates stay within the level in every case, as \cref{prop:groups} predicts.
-In the protocol-v2 configuration, the marginal certificates' test risk within one difficulty group reaches \val{ev.worst.marg.fpfh.max}\,\%, against at most \val{ev.worst.group.fpfh.max}\,\% for the group-conditional ones on the FPFH test sets (\suppref{supp:limits}), and on KITTI odometry a single threshold loses \val{cal.tr.kitti_test.marginal.pool}\,\% of TurboReg's pairs, where the group-conditional thresholds lose \val{cal.tr.kitti_test.mondrian.pool}\,\%.
+In protocol~v2 the marginal certificates' risk within one difficulty group reached \val{ev.worst.marg.fpfh.max}\,\%, against at most \val{ev.worst.group.fpfh.max}\,\% for the group-conditional ones (\suppref{supp:limits}).
 
 \emph{Fixed shortcuts} carry no certificate.
 Uniform sampling of 2{,}000 correspondences loses \val{eq.sc.bh.rand2000.risk} and \val{eq.tr.bh.rand2000.risk}\,\% of the pairs registered by the full estimator on the held-out scenes, and \val{eq.sc.lo.rand2000.risk} and \val{eq.tr.lo.rand2000.risk}\,\% on 3DLoMatch (\cref{sec:equaltime}).
 
 \emph{Learned descriptors.}
-With FCGF, the controller and its certificate are fitted on FCGF features, and the guarantee holds again (risks of at most \val{v3.risk.max}\,\% over all test sets), but the savings are small (\cref{tab:main}): the pairs FCGF solves are solved by the first stage already, and its few failures are hard to tell from successes.
-On the KITTI raw drives the controller cannot tell them apart at all: its fitting pairs are FCGF's own training pairs, on which nearly every first stage succeeds, so it learns no failure signal; the certificate rejects every early stop on the calibration drives, and \method runs the full budget, although 250 correspondences already register \val{sc.fkr.compat.fix0.rr}\,\% of the blind pairs.
-A certificate thus protects against a weak controller, at the price of speed; it cannot replace fitting data with failures.
+With FCGF the guarantee holds again, but the savings are small (\cref{tab:main}): the pairs FCGF solves are solved at the first stage, and its few failures are hard to tell from successes; on KITTI, whose fitting pairs are FCGF's own training pairs, the controller learns no failure signal, and the certificate keeps the full budget, although 250 correspondences register \val{sc.fkr.compat.fix0.rr}\,\% of the blind pairs.
 
-\begin{table}[t]
+\subsection{Equal-time comparison}
+\label{sec:equaltime}
+Is adaptivity needed, or would any cheaper way of running the estimator do as well?
+\Cref{fig:teaser,tab:equaltime} compare \method with five alternatives on the same pairs and the same live clock, for \SCP and TurboReg (the comparison predates the MAC addenda).
+To match \method's recall, each needs \val{eq.reach.x.min}--\val{eq.reach.x.max} times \method's time.
+\begin{table}[h]
 \centering\footnotesize\setlength{\tabcolsep}{2.6pt}
 \caption{\textbf{Equal-time comparison} on the held-out scenes of protocol~v2 (not blind for the final method). Each cheaper variant is a recall--time curve closed by the full budget (live time, recall on every second test pair, \val{eq.n.bh} pairs). Min.: cheapest configuration (ms). At \method: the variant's recall at \method's time (\%), and \method's advantage on the same pairs (pp). Match: time the variant needs to reach \method's recall.}
 \label{tab:equaltime}
@@ -345,11 +350,6 @@ Variant & Min. & At \method & $\Delta$ & Match\\
 \tablebody{tables/equal_time.tex}
 \end{tabular}
 \end{table}
-
-\subsection{Equal-time comparison with cheaper estimators}
-\label{sec:equaltime}
-Is adaptivity needed, or would any cheaper way of running the estimator do as well?
-\Cref{fig:teaser,tab:equaltime} compare \method with five alternatives on the same pairs and the same live clock.
 \emph{Fewer seeds or cliques} barely save time: the cheapest settings still take \val{eq.sc.cheap.min.ms} and \val{eq.tr.cheap.min.ms}\,ms (full budget: \val{eq.sc.full.ms} and \val{eq.tr.full.ms}\,ms), because building the compatibility graph over all correspondences dominates.
 Neither does \emph{FastMAC-style sampling} as published: its signal on the full second-order graph alone takes \val{eq.sc.fm2.signal.ms}\,ms on a CPU; on the first-order graph the signal costs \val{eq.sc.fm1.signal.ms}\,ms, and at \method's time this variant registers \val{eq.sc.fm1.gapu}\pp fewer pairs (\SCP).
 \emph{Fixed budgets} reach any time but trail \method by \val{eq.sc.ratio.gapu}--\val{eq.sc.compat.gapu}\pp (\SCP) and \val{eq.tr.compat.gapu}--\val{eq.tr.ratio.gapu}\pp (TurboReg) at its time, because a fixed rule must serve the hardest pairs it wants to keep, while \method spends the extra correspondences only where the first budget failed.
@@ -359,7 +359,7 @@ On 3DLoMatch (\suppref{supp:equaltime}) there is nothing to win at equal time: e
 
 \subsection{When it pays off, and why}
 \label{sec:why}
-\begin{table}[t]
+\begin{table}[h]
 \centering\footnotesize\setlength{\tabcolsep}{2.6pt}
 \caption{\textbf{When \method pays off.} Per test set, blind sets first (\SCP\,/\,TurboReg): recall of the cheapest budget ($N=250$, compatibility order, \%), share of pairs no stage registers (\%), live speed-up of \method ($^\dagger$full budget, see \cref{sec:shift}) and realized risk (\%).}
 \label{tab:payoff}
@@ -376,11 +376,10 @@ Test set & $N{=}250$ & Unsolvable & Speed-up & Risk\\
 
 \paragraphb{When it pays off.}
 \Cref{tab:payoff} lines up all test sets.
-The speed-up is set mainly by the data, through how often a small budget already succeeds and how few pairs are unsolvable: with the same wrapper, it is largest where 250 correspondences register about two thirds of the pairs (held-out scenes and 3DMatch), small on KITTI odometry, where most pairs need 2{,}000 correspondences (\val{sc.ki.compat.fix0.rr}\,\% at $N=250$), and close to one at low overlap, where \val{sc.tl.unsolv.pairs}\,\% of the fresh pairs and \val{sc.bl.unsolv.pairs}\,\% of the held-out pairs are unsolvable; on the raw drives, where only \val{sc.kr.compat.fix0.rr}\,\% of the pairs are registered at $N=250$, the gate turns the slowdown of protocol~v2 into a small gain.
+The speed-up is set mainly by the data, through how often a small budget already succeeds and how few pairs are unsolvable: with the same wrapper, it is largest where 250 correspondences register about two thirds to three quarters of the pairs (fresh and held-out scenes, 3DMatch), small on KITTI odometry, where most pairs need 2{,}000 correspondences (\val{sc.ki.compat.fix0.rr}\,\% at $N=250$), and close to one at low overlap, where \val{sc.tl.unsolv.pairs}\,\% of the fresh pairs and \val{sc.bl.unsolv.pairs}\,\% of the held-out pairs are unsolvable and hard to recognise early (after the first stage, final success is predicted with an AUROC of only \val{reg.sc.lo.auc} on 3DLoMatch, against \val{reg.sc.m.auc} on 3DMatch); on the raw drives, where only \val{sc.kr.compat.fix0.rr}\,\% of the pairs are registered at $N=250$, the gate turns the slowdown of protocol~v2 into a small gain.
 The risk stays within the level in every row: where there is nothing to save, \method spends the full budget rather than losing pairs, at the price of the first stage it tries on the pairs the gate lets through (lowest speed-up \val{v3.live.min}\X, \val{v3.live.min.where}), which also lengthens the slowest pairs (\cref{sec:conclusion}).
-The next two paragraphs explain the two extremes of the data.
 
-\begin{figure}[t]
+\begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{figures/anchors.pdf}
 \caption{\textbf{Which pairs a cheap budget can rescue.} (a)~\SCP success on the 3DMatch and 3DLoMatch test pairs, by the number of true correspondences among the 100 anchors: at $N=250$, our ordering (blue) recovers most of the full-budget success for 5--49 true anchors (shaded) and nothing below. (b)~Share of the test pairs with fewer than 5, 5--49 and at least 50 true anchors: only the middle group (blue) can be rescued by a cheap budget, and its share differs most between test sets.}
@@ -392,23 +391,22 @@ The ordering changes what the cheapest budget can do: with $N=250$, \SCP registe
 \Cref{fig:anchors}(a) shows for which pairs.
 On 3DMatch and 3DLoMatch, the gain is \val{anch.test.mid.gain.lo} to \val{anch.test.mid.gain.hi}\pp for pairs with 5--49 true anchors and below 1\pp elsewhere: there, pairs with fewer than five are rarely registered even with the full budget, and pairs with fifty or more were solved already.
 \Cref{fig:anchors}(b) shows why the benefit varies across datasets: \val{anch.lo.lt5}\,\% of 3DLoMatch pairs have fewer than five true anchors, against \val{anch.m.lt5}\,\% on 3DMatch.
-On KITTI \val{anch.ki.lt5}\,\% do, yet the full budget registers \val{sc.ki.ratio.group.full}\,\% of the pairs: their inliers are rarely among the most distinctive correspondences, from which the anchors are drawn, so the pairs are solvable but only with large budgets, which is why the speed-up on KITTI is modest (\cref{tab:payoff}).
+On KITTI \val{anch.ki.lt5}\,\% do, yet the full budget registers \val{sc.ki.ratio.group.full}\,\%: the inliers are rarely among the most distinctive correspondences, so these pairs need large budgets (\cref{tab:payoff}).
 
-
-\paragraphb{Unsolvable pairs.}
-\supptabref{tab:headroom} bounds what any stopping rule can achieve on the same ladder.
-Without failure detection, the best possible speed-up for \SCP on the held-out scenes is \val{sc.bh.compat.acc}\X with the compatibility order (\val{sc.bh.ratio.acc}\X with the ratio order): the ordering raises the ceiling itself, and \method without the gate reaches \val{sc.bh.compat.margfrac}\,\% of it with marginal and \val{sc.bh.compat.groupfrac}\,\% with group-conditional certificates.
-The remaining headroom of the full oracle comes from \emph{unsolvable} pairs, which are \val{sc.bh.unsolv.pairs}\,\% of the held-out pairs but \val{sc.bl.unsolv.pairs}\,\% at low overlap and \val{bl.unsolv.time.range}\,\% of its full-budget time.
-Recognising them early is hard: after the first stage, the value-of-continuing model predicts final success with an AUROC of \val{reg.sc.m.auc} on 3DMatch but \val{reg.sc.lo.auc} on 3DLoMatch.
 
 \subsection{Ablations}
 \label{sec:ablations}
 
 \paragraphb{Anchors.}
-Two passes are what make the ordering work (\supptabref{tab:ablation}): with the most distinctive correspondences as anchors, one pass triples the inliers in the cheap budget but barely changes \SCP's success at $N=250$ and lowers it at 500 and 1{,}000, while two passes gain \val{abl.sc2.k0.gain.two} and \val{abl.sc2.k1.gain.two}\pp at $N=250$ and 500.
+Two passes make the ordering work (\supptabref{tab:ablation}): one pass with the most distinctive correspondences as anchors barely changes \SCP's success at $N=250$, two passes gain \val{abl.sc2.k0.gain.two}\pp.
 
 \paragraphb{Certificates.}
-With marginal certificates \method without the gate is faster on the held-out scenes (\val{sc.bh.compat.marg.speed}\X and \val{tr.bh.compat.marg.speed}\X offline, against \val{sc.bh.compat.group.speed}\X and \val{tr.bh.compat.group.speed}\X), but these certificates exceed their level elsewhere (\cref{sec:shift}); varying the risk level and the number of groups trades speed for risk smoothly, with the realized risk always below $\varepsilon$ (\suppref{supp:limits}).
+Marginal certificates are faster (\val{sc.bh.compat.marg.speed}\X against \val{sc.bh.compat.group.speed}\X for \SCP on the held-out scenes, offline) but exceed their level elsewhere (\cref{sec:shift}); the risk level and the number of groups trade speed for risk smoothly (\suppref{supp:limits}).
+
+\paragraphb{Gate and classifier.}
+On the fresh pairs and the same clock, the final method is \val{v3.tr.th.compat.live.vs2}\X [\val{v3.tr.th.compat.live.vs2lo}, \val{v3.tr.th.compat.live.vs2hi}] as fast as \method without the gate (v2) for TurboReg and \val{v3.mc.th.compat.live.vs2}\X for MAC above 30\,\% overlap and at least as fast at low overlap, but \val{v3.sc.th.compat.live.vs2}\X [\val{v3.sc.th.compat.live.vs2lo}, \val{v3.sc.th.compat.live.vs2hi}] for \SCP above 30\,\% overlap, where the gate's live overhead outweighs its saving (\cref{sec:conclusion}); on the GPU, \method without the gate is \val{gpu.sc.th.v2.speed}\X, \val{gpu.tr.th.v2.speed}\X and \val{gpu.mc.th.v2.speed}\X faster than the full budget on these pairs (\SCP, TurboReg, MAC), against \val{gpu.sc.th.v3.speed}\X, \val{gpu.tr.th.v3.speed}\X and \val{gpu.mc.th.v3.speed}\X with it.
+Added one at a time on the earlier test sets (\suppref{supp:v3evidence}, offline), the gate is faster on \val{abl3.gate.faster} of \val{abl3.gate.n} conditions where \method cuts and never riskier, as it only sends pairs to the full budget; choosing the classifier kind is faster on \val{abl3.clf.faster} and slower on \val{abl3.clf.slower}, and raises the risk on \val{abl3.clf.riskier}, by at most \val{abl3.clf.dr.max}\pp, within the level.
+Combined, the final method is faster on \val{abl3.v3.faster} and slower on \val{abl3.v3.slower}.
 
 %% ====================================================================================================
 %% Limitations and conclusion
@@ -417,16 +415,16 @@ With marginal certificates \method without the gate is faster on the held-out sc
 \label{sec:conclusion}
 
 \paragraphb{Limitations.}
-Our estimators are CPU re-implementations; on a GPU the cost gap between small and large budgets narrows, and the speed-ups must be measured again.
+Our estimators are re-implementations; on a GPU our PyTorch ports keep the savings (\suppref{supp:gpu}), but they are not tuned for speed, and in an optimised GPU implementation fixed per-run costs could narrow the gap between small and large budgets.
 \method lowers the mean time per pair, not the worst case: a pair that needs the whole ladder also pays for the stages tried before, up to \val{v3.lat.p99.max}\,\% more than one full run at the 99th percentile (\val{v3.lat.p99.where}).
-In our implementation the gate costs \val{v3.gate.live.overhead.min}--\val{v3.gate.live.overhead.max}\,ms per pair live (median over pairs with identical decisions), against \val{gate.pred.hgb.ms}\,ms for its prediction timed alone, and \val{gate.dev.overhead.min}--\val{gate.dev.overhead.max}\,ms on development pairs, where we could not trace it to the classifier's threads or to the timing harness; it makes \method slower than without the gate for \SCP above 30\,\% overlap, and the blind results include it.
+Live, the gate costs \val{v3.gate.live.overhead.min}--\val{v3.gate.live.overhead.max}\,ms per pair (median over pairs with identical decisions), far more than the \val{gate.pred.hgb.ms}\,ms of its prediction timed alone, for a reason we could not establish (\suppref{supp:v3}); it makes \method slower than without the gate for \SCP above 30\,\% overlap, and the blind results include it.
 Only the fresh test is blind for the final method, whose gate and classifier choice were found on development data after the protocol-v2 evaluation; it is indoor and FPFH only, and its scenes are fresh with respect to the data that fit, calibrate and choose the final method, but every 3DMatch training scene had appeared in earlier logs.
-A certificate needs calibration data, and its speed needs fitting data with failures: on random calibration subsets, the group-conditional certificate appeared only from about a thousand pairs (\suppref{supp:limits}), and with FCGF on KITTI, whose fitting pairs are FCGF's own training pairs, \method can only run the full budget; FCGF has seen every 3DMatch training scene, so learned descriptors are tested blind only outdoors.
+A certificate needs calibration data (the group-conditional one appeared from about a thousand pairs on random subsets, \suppref{supp:limits}) and, to be fast, fitting data with failures; FCGF has seen every 3DMatch training scene, so learned descriptors are tested blind only outdoors.
 
 \paragraphb{Conclusion.}
 Not every pair needs every correspondence, but a cheaper estimator is only useful if one knows what it loses.
 Consistency-ordered budgets, a difficulty-conditional certificate of a candidate chosen beforehand and a pre-estimation gate make graph-based estimators markedly faster where the data allow, at statistically non-inferior recall and within the certified risk on every test set, including pairs that no experiment had processed before; marginal certificates and fixed shortcuts give no such assurance.
-A certificate is only as fast as its controller, which needs fitting data with failures, and an improvement found after a blind evaluation needs a new one: the gate held for TurboReg and at low overlap, but not for \SCP above 30\,\% overlap.
+A certificate is only as fast as its controller, which needs fitting data with failures.
 The headroom left (\supptabref{tab:headroom}) lies in correct poses that the controller does not yet recognise and in pairs that no budget can register: sharper verification of each stage's pose, rather than the choice of budget, is the next step.
 
 {\small

@@ -33,7 +33,11 @@ from acpr.experiment import info_and_eligibility  # noqa: E402
 from acpr.features import get_fpfh  # noqa: E402
 from acpr.metrics import evaluate_transform  # noqa: E402
 
-FNS = {"sc2": sc2_pcr, "turbo": turboreg}
+from acpr.mac import SETTINGS as MAC_SETTINGS  # noqa: E402
+from acpr.mac import mac  # noqa: E402
+
+FNS = {"sc2": sc2_pcr, "turbo": turboreg, "mac": mac}
+BASE_ESTS = ("sc2", "turbo")  # selection files of other estimators carry a suffix, e.g. _mac
 BUDGETS = [250, 500, 1000, 2000, 4000]
 
 
@@ -149,7 +153,7 @@ class Controller:
         # fitting pairs and the hardness gate; selection files with suffix _ctlauto_gate)
         prefix, _, variant = job.partition("+")
         suffix = S.SUFFIX[prefix] + ("" if ladders == "base" else "_ext") + ds.suffix + \
-            ("_ctlauto_gate" if variant == "v3" else "")
+            ("_ctlauto_gate" if variant == "v3" else "") + ("" if est in BASE_ESTS else f"_{est}")
         sel = json.loads((RESULTS_ROOT / "budget" / f"ladder_selection{suffix}.json").read_text())
         cfg = sel[est]["selected"]["mondrian"]
         self.prefix, self.est, self.ds, self.ladder_name = prefix, est, ds, cfg["ladder"]
@@ -236,9 +240,11 @@ class V2(ThreeDMatch):
             thr = json.loads((RESULTS_ROOT / "kitti" / "thresholds.json").read_text())
             self.inlier, self.compat_thr = 0.6, thr["sc2_d_thre"]
             self.kw = {"sc2": {"d_thre": thr["sc2_d_thre"], "inlier_thr": 0.6, "nms_radius": 0.6},
-                       "turbo": {"tau": thr["turbo_tau"], "inlier_thr": 0.6}}
+                       "turbo": {"tau": thr["turbo_tau"], "inlier_thr": 0.6},
+                       "mac": MAC_SETTINGS["kitti_fcgf" if "fcgf" in name else "kitti_fpfh"]}
         else:
-            self.inlier, self.compat_thr, self.kw = 0.10, 0.10, {"sc2": {}, "turbo": {}}
+            self.inlier, self.compat_thr = 0.10, 0.10
+            self.kw = {"sc2": {}, "turbo": {}, "mac": MAC_SETTINGS["indoor"]}
 
     def _v2(self, subset):
         from acpr import v2data
@@ -323,7 +329,7 @@ def time_pair(ds, est, ctrls, p, jobs, offline, subset=None):
 
 def summary(rows, ds, prefixes):
     print("\nlive single-process benchmark (adaptive budget vs. standard full-budget estimator):")
-    for est in ["sc2", "turbo"]:
+    for est in sorted({r["est"] for r in rows}):
         for subset in ds.tests:
             rs = [r for r in rows if r["est"] == est and r["subset"] == subset]
             if not rs:  # subset not timed in this run
@@ -353,12 +359,14 @@ def main():
     ap.add_argument("--recal", action="store_true", help="FCGF: use the selection re-certified on FCGF")
     ap.add_argument("--refit", action="store_true", help="FCGF: controller re-fitted and re-certified on FCGF")
     ap.add_argument("--subsets", default=None, help="comma-separated test subsets to time (default: all tests)")
+    ap.add_argument("--estimators", default="sc2,turbo", help="comma-separated estimators (sc2, turbo, mac)")
     args = ap.parse_args()
     prefixes = args.prefixes.split(",")
     ds = make_dataset(args.dataset, args.recal, args.refit)
     sys.stdout.reconfigure(encoding="utf-8")
     rows = []
-    for est in ["sc2", "turbo"]:
+    ests = args.estimators.split(",")
+    for est in ests:
         ctrls = {pf: Controller(pf, est, args.ladders, ds) for pf in prefixes}
         for subset in (args.subsets.split(",") if args.subsets else ds.tests):
             offline = {pf: {r["pair_id"]: r for r in B.load(subset, pf.split("+")[0])} for pf in prefixes}
@@ -377,7 +385,8 @@ def main():
         name = "live_budget.json"
     else:
         name = f"live_budget_compare{'' if args.ladders == 'base' else '_ext'}{ds.outtag}" + \
-            ("_v3" if any("+v3" in pf for pf in prefixes) else "") + ".json"
+            ("_v3" if any("+v3" in pf for pf in prefixes) else "") + \
+            ("" if ests == list(BASE_ESTS) else "_" + "_".join(ests)) + ".json"
     with open(RESULTS_ROOT / "budget" / name, "w") as f:
         json.dump(rows, f, indent=1)
     summary(rows, ds, prefixes)

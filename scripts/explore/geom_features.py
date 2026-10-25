@@ -31,7 +31,7 @@ import numpy as np  # noqa: E402
 
 from acpr import LOG_ROOT, RESULTS_ROOT  # noqa: E402
 
-BLIND = ("v2_blind_hi", "v2_blind_lo", "v3_blind_hi", "v3_blind_lo", "kitti_raw_blind")
+BLIND = ("v2_blind_hi", "v2_blind_lo", "v3_blind_hi", "v3_blind_lo", "v4_blind_hi", "v4_blind_lo", "kitti_raw_blind")
 TAU = 0.10
 BUDGETS = (250, 500, 1000, 2000, 4000)
 _PAIRS = {}

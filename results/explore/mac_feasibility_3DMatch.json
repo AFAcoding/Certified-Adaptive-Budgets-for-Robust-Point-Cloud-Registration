@@ -1,0 +1,425 @@
+{
+ "rows": [
+  {
+   "pair_id": "3DMatch/7-scenes-redkitchen/53_55",
+   "N": 4000,
+   "mac@250": {
+    "s": 1.0688725000363775,
+    "ok": false,
+    "cliques": 280,
+    "selected": 149
+   },
+   "sc2@250": {
+    "s": 0.028293699957430363,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@500": {
+    "s": 0.06661939999321476,
+    "ok": false,
+    "cliques": 740,
+    "selected": 330
+   },
+   "sc2@500": {
+    "s": 0.09274380002170801,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@1000": {
+    "s": 0.27410059998510405,
+    "ok": false,
+    "cliques": 2357,
+    "selected": 739
+   },
+   "sc2@1000": {
+    "s": 0.13866830000188202,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@2000": {
+    "s": 1.0939217999693938,
+    "ok": false,
+    "cliques": 7650,
+    "selected": 1543
+   },
+   "sc2@2000": {
+    "s": 0.32120429998030886,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@4000": {
+    "s": 4.672964700032026,
+    "ok": false,
+    "cliques": 18134,
+    "selected": 3101
+   },
+   "sc2@4000": {
+    "s": 1.3324152000132017,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   }
+  },
+  {
+   "pair_id": "3DMatch/sun3d-home_at-home_at_scan1_2013_jan_1/42_43",
+   "N": 3058,
+   "mac@250": {
+    "s": 0.5047163999988697,
+    "ok": true,
+    "cliques": 26483,
+    "selected": 193
+   },
+   "sc2@250": {
+    "s": 0.020107899967115372,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@500": {
+    "s": 1.4972258000052534,
+    "ok": true,
+    "cliques": 93885,
+    "selected": 419
+   },
+   "sc2@500": {
+    "s": 0.07797599997138605,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@1000": {
+    "s": 1.8492556000128388,
+    "ok": true,
+    "cliques": 106493,
+    "selected": 903
+   },
+   "sc2@1000": {
+    "s": 0.09136449999641627,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@2000": {
+    "s": 2.8261788000236265,
+    "ok": true,
+    "cliques": 112868,
+    "selected": 1815
+   },
+   "sc2@2000": {
+    "s": 0.39786470000399277,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@4000": {
+    "s": 4.233962300000712,
+    "ok": true,
+    "cliques": 116321,
+    "selected": 2645
+   },
+   "sc2@4000": {
+    "s": 0.606431899999734,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   }
+  },
+  {
+   "pair_id": "3DMatch/sun3d-home_md-home_md_scan9_2012_sep_30/19_56",
+   "N": 3102,
+   "mac@250": {
+    "s": 0.033027299970854074,
+    "ok": true,
+    "cliques": 1199,
+    "selected": 200
+   },
+   "sc2@250": {
+    "s": 0.012998899968806654,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@500": {
+    "s": 0.10977189999539405,
+    "ok": true,
+    "cliques": 3524,
+    "selected": 408
+   },
+   "sc2@500": {
+    "s": 0.06222439999692142,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@1000": {
+    "s": 0.34634879999794066,
+    "ok": true,
+    "cliques": 7028,
+    "selected": 813
+   },
+   "sc2@1000": {
+    "s": 0.12907550000818446,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@2000": {
+    "s": 1.0832654999685474,
+    "ok": true,
+    "cliques": 10388,
+    "selected": 1506
+   },
+   "sc2@2000": {
+    "s": 0.4320130000123754,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@4000": {
+    "s": 2.521271899982821,
+    "ok": true,
+    "cliques": 15933,
+    "selected": 2388
+   },
+   "sc2@4000": {
+    "s": 0.6797672999673523,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   }
+  },
+  {
+   "pair_id": "3DMatch/sun3d-hotel_uc-scan3/14_15",
+   "N": 4000,
+   "mac@250": {
+    "s": 0.08358979999320582,
+    "ok": true,
+    "cliques": 5051,
+    "selected": 189
+   },
+   "sc2@250": {
+    "s": 0.019223299983423203,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@500": {
+    "s": 0.489362699969206,
+    "ok": true,
+    "cliques": 31380,
+    "selected": 392
+   },
+   "sc2@500": {
+    "s": 0.07728510000742972,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@1000": {
+    "s": 1.3367992999847047,
+    "ok": true,
+    "cliques": 78240,
+    "selected": 820
+   },
+   "sc2@1000": {
+    "s": 0.09269610000774264,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@2000": {
+    "s": 2.3237460000091232,
+    "ok": true,
+    "cliques": 93422,
+    "selected": 1753
+   },
+   "sc2@2000": {
+    "s": 0.37794239999493584,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@4000": {
+    "s": 5.947363900020719,
+    "ok": true,
+    "cliques": 111691,
+    "selected": 3564
+   },
+   "sc2@4000": {
+    "s": 1.2025156000163406,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   }
+  },
+  {
+   "pair_id": "3DMatch/sun3d-hotel_umd-maryland_hotel1/20_21",
+   "N": 3694,
+   "mac@250": {
+    "s": 0.10169699997641146,
+    "ok": true,
+    "cliques": 4721,
+    "selected": 182
+   },
+   "sc2@250": {
+    "s": 0.02045200002612546,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@500": {
+    "s": 0.19234299997333437,
+    "ok": true,
+    "cliques": 8742,
+    "selected": 394
+   },
+   "sc2@500": {
+    "s": 0.06842149997828528,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@1000": {
+    "s": 0.43212879996281117,
+    "ok": true,
+    "cliques": 12420,
+    "selected": 801
+   },
+   "sc2@1000": {
+    "s": 0.1652128000278026,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@2000": {
+    "s": 1.3191775999730453,
+    "ok": true,
+    "cliques": 18458,
+    "selected": 1632
+   },
+   "sc2@2000": {
+    "s": 0.3149489000206813,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@4000": {
+    "s": 3.9863484000088647,
+    "ok": true,
+    "cliques": 32136,
+    "selected": 3069
+   },
+   "sc2@4000": {
+    "s": 0.902260800008662,
+    "ok": true,
+    "cliques": null,
+    "selected": null
+   }
+  },
+  {
+   "pair_id": "3DMatch/sun3d-mit_76_studyroom-76-1studyroom2/0_45",
+   "N": 4000,
+   "mac@250": {
+    "s": 0.028458000044338405,
+    "ok": false,
+    "cliques": 781,
+    "selected": 188
+   },
+   "sc2@250": {
+    "s": 0.03480740002123639,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@500": {
+    "s": 0.08300149999558926,
+    "ok": false,
+    "cliques": 2038,
+    "selected": 363
+   },
+   "sc2@500": {
+    "s": 0.07271199999377131,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@1000": {
+    "s": 0.2994450000114739,
+    "ok": false,
+    "cliques": 4922,
+    "selected": 768
+   },
+   "sc2@1000": {
+    "s": 0.11872159998165444,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@2000": {
+    "s": 1.1228809999884106,
+    "ok": false,
+    "cliques": 11832,
+    "selected": 1518
+   },
+   "sc2@2000": {
+    "s": 0.4748564999899827,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   },
+   "mac@4000": {
+    "s": 4.2944126999937,
+    "ok": false,
+    "cliques": 24419,
+    "selected": 3071
+   },
+   "sc2@4000": {
+    "s": 1.1407700999989174,
+    "ok": false,
+    "cliques": null,
+    "selected": null
+   }
+  }
+ ],
+ "summary": {
+  "250": {
+   "mac_s": 0.3033935000033428,
+   "sc2_s": 0.02264719998735624,
+   "mac_ok": 0.6666666666666666,
+   "sc2_ok": 0.6666666666666666,
+   "mac_cliques_max": 26483
+  },
+  "500": {
+   "mac_s": 0.40638738332199864,
+   "sc2_s": 0.0752271333282503,
+   "mac_ok": 0.6666666666666666,
+   "sc2_ok": 0.6666666666666666,
+   "mac_cliques_max": 93885
+  },
+  "1000": {
+   "mac_s": 0.7563463499924789,
+   "sc2_s": 0.12262313333728041,
+   "mac_ok": 0.6666666666666666,
+   "sc2_ok": 0.6666666666666666,
+   "mac_cliques_max": 106493
+  },
+  "2000": {
+   "mac_s": 1.6281951166553579,
+   "sc2_s": 0.3864716333337128,
+   "mac_ok": 0.6666666666666666,
+   "sc2_ok": 0.6666666666666666,
+   "mac_cliques_max": 112868
+  },
+  "4000": {
+   "mac_s": 4.276053983339807,
+   "sc2_s": 0.9773601500007013,
+   "mac_ok": 0.6666666666666666,
+   "sc2_ok": 0.8333333333333334,
+   "mac_cliques_max": 116321
+  }
+ }
+}

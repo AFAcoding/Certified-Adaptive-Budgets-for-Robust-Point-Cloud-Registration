@@ -2,7 +2,7 @@
 
 Code, results and paper of *Not All Pairs Need All Correspondences: Certified Adaptive Budgets for Robust Point Cloud Registration* (`paper/main.pdf`, 8 pages + references; `paper/supp.pdf`, supplementary material).
 
-**Certified adaptive budgets (CAB)** wrap an unchanged robust estimator (re-implemented SC²-PCR and TurboReg):
+**Certified adaptive budgets (CAB)** wrap an unchanged robust estimator (re-implemented SC²-PCR, TurboReg and MAC):
 - They run it on growing budgets of correspondences, ordered by mutual consistency.
 - A learned controller stops as soon as it is confident; its classifier is chosen on the fitting pairs.
 - A cheap **hardness gate** sends pairs that would only pay for extra stages straight to the full budget; it can only remove losses.
@@ -11,6 +11,7 @@ Code, results and paper of *Not All Pairs Need All Correspondences: Certified Ad
 The paper's claims rest on **pre-registered protocols** ([PROTOCOL.md](PROTOCOL.md)):
 - **Protocol v2**: CAB without the gate, evaluated once on blind held-out 3DMatch training scenes and KITTI raw drives outside the odometry benchmark.
 - **Protocol v3**: the final method (gate and classifier choice, found afterwards on development data only), evaluated once on a **fresh blind test** of 2,623 indoor pairs that no earlier experiment had processed under any role (377 previously seen pairs were removed before processing).
+- **Addenda A–C** (each committed before it touched a test pair): MAC as a third estimator on every family of test sets, with its authors' reduction of dense graphs (A, B; amendment 1 sets its KITTI FPFH cut-off on fitting pairs), and live timing on a GPU (C).
 
 The protocol-v2 blind sets and the official 3DMatch, 3DLoMatch and KITTI odometry test sets are reported for the final method as earlier test sets, not as blind tests. Correspondences come from FPFH and from FCGF, computed by a PyTorch re-implementation of the network that reproduces the released features.
 
@@ -18,23 +19,25 @@ The protocol-v2 blind sets and the official 3DMatch, 3DLoMatch and KITTI odometr
 
 Fresh blind test (protocol v3), compatibility order, group-conditional certificates:
 
-| Test set | SC²-PCR | TurboReg |
-|---|---|---|
-| Fresh scenes, overlap > 30 % (1,976 pairs) | 1.68× | 2.10× |
-| Fresh scenes, overlap 10–30 % (647) | 1.01× | 1.05× |
+| Test set | SC²-PCR | TurboReg | MAC |
+|---|---|---|---|
+| Fresh scenes, overlap > 30 % (1,976 pairs) | 1.68× | 2.10× | 2.71× |
+| Fresh scenes, overlap 10–30 % (647) | 1.01× | 1.05× | 1.06× |
+| Fresh scenes, overlap > 30 %, on a GPU (Tesla T4, 300 pairs) | 1.78× | 1.98× | 3.44× |
 
-Every configuration is statistically non-inferior in recall, and the realized risk is ≤ 1 % on all 48 test conditions (at most 0.55 %). Against CAB without the gate on the same pairs, the final method is 1.28× faster for TurboReg above 30 % overlap, but 0.95× for SC²-PCR there: the gate costs 40–48 ms per pair live in this implementation (3 ms when timed alone). Earlier test sets, ablations and every configuration are in the paper and `results/`.
+Every configuration is statistically non-inferior in recall, and the realized risk is ≤ 1 % on all 72 test conditions, MAC included (at most 0.62 %). Against CAB without the gate on the same pairs, the final method is 1.28× faster for TurboReg and 1.06× for MAC above 30 % overlap, but 0.95× for SC²-PCR there: the gate costs 40–48 ms per pair live in this implementation (3.2 ms when timed alone). Earlier test sets, ablations and every configuration are in the paper and `results/`.
 
 ## Contents
 
 | Path | What it is |
 |---|---|
 | `paper/` | the paper: LaTeX sources, the generated `numbers.tex`, `tables/` and `figures/`, and the PDFs |
-| `PROTOCOL.md` | the pre-registered evaluation protocols v2 and v3 and their deviations |
-| `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR and TurboReg re-implementations, compatibility ordering, the hardness gate (`gate.py`), FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
+| `PROTOCOL.md` | the pre-registered evaluation protocols v2 and v3, their addenda (MAC, GPU timing) and deviations |
+| `src/acpr/` | the library: data loading, FPFH correspondences, the FCGF re-implementation (`fcgf_net.py`, `safe_torch_load.py`), SC²-PCR, TurboReg and MAC re-implementations (`mac.py`, with its authors' reduction of dense graphs), compatibility ordering, the hardness gate (`gate.py`), FastMAC-style sampling, pose search, controllers and Learn-then-Test certification |
 | `scripts/` | every experiment, analysis and figure script (see the pipeline below); `scripts/explore/` holds the exploration on development data |
 | `results/` | the selection reports (`*.md`/`*.json`), live timings and summaries that the paper's numbers come from; `results/protocol_v2/` and `results/protocol_v3/` hold the splits, the KITTI raw pairs with their ICP ground truth, the FCGF verification, the gate's cost and the protocol-v3 notes; `results/gate/` the gate's signals; `results/explore/` the exploration results |
-| `scripts/download_logs.py` | downloads the per-pair logs of all experiments (130 MB zip from the v3.0 release) into `logs/` |
+| `gpu/` | the GPU timing (addendum C): PyTorch ports, the bundle exporter and the Colab notebook that was run (`gpu/README.md`); its results are in `results/gpu/` |
+| `scripts/download_logs.py` | downloads the per-pair logs of all experiments into `logs/`: the zip of release v4.0 (109 files, with MAC's), or that of v3.0 (without MAC's) if v4.0 is not available |
 
 Datasets are not redistributed; the scripts below download or prepare them from their official sources.
 
@@ -54,12 +57,14 @@ pip install -e .                   # the scripts run with python -I and import t
 The per-pair logs record every stage of every estimator on every pair. From them, all certified selections, test evaluations, tables and figures can be recomputed:
 
 ```bash
-python -I scripts/download_logs.py                                       # -> logs/*.jsonl (85 files)
+python -I scripts/download_logs.py                                       # -> logs/*.jsonl (109 files)
 # protocol v2 (CAB without the gate): choice on the fitting pairs, certification on the calibration pairs, single test evaluation
 python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf|v3_indoor_fpfh}
 # the final method (protocol v3): classifier chosen on the fitting pairs + hardness gate
 python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v3_indoor_fpfh|v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf} --controller auto --gate
 python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset ... --rho {0.10|0.25}   # worst-case variant
+# MAC (addenda A, B): the same selections with --estimators mac, with and without --controller auto --gate
+python -I scripts/select_ladder.py --prefix {budget|budgetc} --ladders extended --dataset {v3_indoor_fpfh|v2_indoor_fpfh|v2_kitti_fpfh|v2_indoor_fcgf|v2_kitti_fcgf} --estimators mac [--controller auto --gate]
 # further checks on the development benchmarks (all from the logs)
 python -I scripts/calibration_size.py      # certification on random calibration subsets of growing size
 python -I scripts/sensitivity.py           # risk level epsilon and number of difficulty groups
@@ -135,6 +140,14 @@ python -I scripts/paper_assets.py && python -I scripts/validate_numbers.py
 ```
 `results/protocol_v3/NOTES.md` records the evaluation as it happened, including a re-run of the final method's selections with a consistent accounting of the gate's cost (`scripts/run_v3_reeval.sh`; identical choices and per-pair outcomes).
 
+**3b. MAC on every family (addenda A, B)**
+```bash
+WORKERS=6 bash scripts/run_mac_families.sh > logs/mac_all.log 2>&1   # needs igraph
+```
+Family by family (indoor FPFH, KITTI FPFH, indoor FCGF, KITTI FCGF): MAC logs of the fitting and calibration pairs, every selection written to disk, then the test logs, the single evaluation (`scripts/check_same_selection.py` checks that it reproduces the written selections) and live timing; finally `scripts/retime_stalls.py`. The log builder runs single-threaded BLAS workers and recycles them (on Windows, igraph's `maximal_cliques(file=...)` leaks one C-runtime stream per call).
+
+**3c. GPU timing (addendum C)**: see `gpu/README.md`.
+
 **4. Exploration (development data only, after protocol v3)**
 `scripts/explore/` holds the studies summarised in `research/improving_v3_memo.md` and in `results/explore/`: budget prediction, certified give-up and start-rung routing, and a factorial study of extra controller signals (geometric verification, correspondence-geometry uncertainty) with a selection rule fixed in advance; none improved the final method on development data.
 
@@ -155,7 +168,7 @@ cd paper && latexmk -pdf supp.tex && latexmk -pdf main.tex
 
 ## Protocol notes
 
-- **Pre-registration.** PROTOCOL.md was committed before any of the new data was downloaded; its one amendment (the outdoor split) was committed before any raw-drive scan was downloaded. Each blind test set was evaluated once, after every selection had been written to disk.
+- **Pre-registration.** PROTOCOL.md was committed before any of the new data was downloaded; its one amendment (the outdoor split) was committed before any raw-drive scan was downloaded. Each blind test set was evaluated once, after every selection had been written to disk. The addenda for MAC (A, B, with amendment 1 on fitting pairs only) and the GPU timing (C) were committed before they touched any test pair.
 - **Protocol v3.** The gate and the classifier choice were found after the protocol-v2 blind evaluation, on development data only, so the final method was pre-registered again and tested once on fresh pairs. A leakage check before any of them was processed removed 377 pairs that had appeared in earlier logs as fitting or training pairs; the blind scenes are disjoint from every set that fits, calibrates, chooses or gates the final method.
 - **Choose, then certify.** The ladder, the policy family and the difficulty groups are chosen on the fitting pairs only (5-fold out-of-fold controller scores); only the chosen candidate is certified on the calibration pairs. Certifying several candidates on the same calibration pairs and keeping the cheapest would void the guarantee (an earlier version of this code did that; its results are kept in `results/budget/legacy_calibration_selection/`).
 - **Development history.** The first protocol (selections without the `v2_` suffix in `results/budget/`) used the 3DMatch validation scenes for both design and certification, and fitted FCGF on held-out test pairs. Its results are kept for transparency; the paper reports protocol v2.

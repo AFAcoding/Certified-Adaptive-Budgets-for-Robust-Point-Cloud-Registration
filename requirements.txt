@@ -4,5 +4,7 @@ scipy==1.18.1
 scikit-learn==1.9.1
 open3d==0.20.0
 matplotlib==3.11.2
-# Only needed by scripts/prepare_3dmatch.py (Predator's 3DMatch fragments are torch-pickled):
+igraph==0.11.8
+# Not needed for the fast path; needed to prepare 3DMatch (Predator's fragments are torch-pickled), to compute
+# FCGF features (acpr.fcgf_net) and for the GPU timing (gpu/):
 # torch==2.14.1

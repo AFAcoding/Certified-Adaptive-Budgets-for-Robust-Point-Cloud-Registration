@@ -13,10 +13,11 @@ dependencies = [
     "scikit-learn>=1.5",
     "open3d>=0.18",
     "matplotlib>=3.8",
+    "igraph>=0.10",  # MAC's maximal-clique search (acpr.mac)
 ]
 
 [project.optional-dependencies]
-prepare = ["torch"]  # scripts/prepare_3dmatch.py only
+prepare = ["torch"]  # data preparation, FCGF features (acpr.fcgf_net) and the GPU timing (gpu/)
 
 [tool.setuptools.packages.find]
 where = ["src"]

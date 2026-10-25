@@ -4,6 +4,8 @@ An adaptive run executes at most its whole ladder, about twice a full-budget run
 STALL times the median full-budget time of its estimator and test set was interrupted (one KITTI pair took 321 s
 instead of about 1 s). Such a pair is timed again with the code of live_budget.py (or live_equal_time.py for the
 equal-time file): all of its runs, in their original order. The interrupted times stay in the row under "stalled".
+For MAC, whose cost varies by orders of magnitude between pairs with the number of maximal cliques, the reference is
+the pair's own full-budget time in the logs (single-threaded) instead of the median of its test set.
 
 Usage: python -I -u scripts/retime_stalls.py [--dry-run]   (on an otherwise idle machine, after live_budget.py)
 """
@@ -35,9 +37,24 @@ FILES = {"live_budget_compare_ext.json": ("3dmatch", False, False),
          "live_budget_compare_ext_v2_kitti_fcgf.json": ("v2_kitti_fcgf", False, False),
          # protocol v3 (method v3 = jobs "<prefix>+v3")
          "live_budget_compare_ext_v3_indoor_fpfh_v3.json": ("v3_indoor_fpfh", False, False),
+         # MAC (addenda A and B)
+         **{f"live_budget_compare_ext_{d}_v3_mac.json": (d, False, False)
+            for d in ("v3_indoor_fpfh", "v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf")},
          **{f"live_budget_compare_ext_{d}_v3.json": (d, False, False)
             for d in ("v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf")}}
 EQUAL_TIME = (("3DMatch", "3dmatch"), ("v2_blind_hi", "v2_indoor_fpfh"))  # (test set, whose certificate is timed)
+
+
+PAIR_RELATIVE = ("mac",)
+
+
+def own_full_times(rows):
+    """(estimator, pair) -> logged full-budget time of the pair, for the estimators in PAIR_RELATIVE."""
+    out = {}
+    for est, subset in {(r["est"], r["subset"]) for r in rows if r["est"] in PAIR_RELATIVE}:
+        for rec in B.load(subset, "budgetc"):
+            out[(est, rec["pair_id"])] = next(st["s"] for st in rec[est] if st["n"] >= rec["N_all"] and not st.get("repeat"))
+    return out
 
 
 def stalled(rows):
@@ -45,7 +62,9 @@ def stalled(rows):
     for r in rows:
         full.setdefault((r["est"], r["subset"]), []).append(r["full"]["s"])
     med = {k: float(np.median(v)) for k, v in full.items()}
-    return [i for i, r in enumerate(rows) if max(r[j]["s"] for j in r["run_order"]) > STALL * med[(r["est"], r["subset"])]]
+    own = own_full_times(rows)
+    return [i for i, r in enumerate(rows) if max(r[j]["s"] for j in r["run_order"])
+            > STALL * own.get((r["est"], r["pair_id"]), med[(r["est"], r["subset"])])]
 
 
 def main():

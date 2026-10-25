@@ -39,3 +39,70 @@ the boosted-tree gate's prediction (sklearn per-call overhead) and ~6 ms the est
 identical work. Limiting the classifier's OpenMP pool to one thread: -1 ms (thread-contention hypothesis refuted).
 Moving the harness's untimed offline checks after all timed runs: no change (harness-artifact hypothesis refuted).
 The 40-48 ms of the blind run is not reproduced on development pairs; its cause is not established. Paper corrected.
+
+## Addendum A (MAC): engineering notes (2026-10-22, 19:00-21:30; no blind pair processed)
+- Run 3 of the MAC logs stopped at 218 fitting pairs: igraph's `maximal_cliques(file=...)` leaves one C-runtime
+  stream open per call (the 509th call of a process fails, "fdopen() failed unexpectedly"). Fix: `acpr.mac` raises
+  the stream limit to 8,192 (`_setmaxstdio`) and the log builder replaces its workers every 100 pairs
+  (`multiprocessing.Pool(maxtasksperchild=100)`; `ProcessPoolExecutor(max_tasks_per_child=...)` hangs on Python
+  3.13.3). Re-running 4 logged pairs in recycled workers reproduced every logged field except the timings.
+  The run resumed at 20:33 with the 218 logged pairs kept.
+- Workers started after 21:00 (each is replaced after 100 pairs) use a lower-memory but bit-identical `acpr.mac` (edges streamed into igraph,
+  clique file read in chunks of at most 2 million members): identical transform and info on 8 inputs of 4 fitting
+  pairs (9k-239k cliques), also with a tiny chunk bound that forces many chunk boundaries; same run time; peak memory
+  on a 5.6M-clique pair 971 MB (a worker of the old version reached 3.8 GB on such pairs, with 0.8 GB of RAM free).
+- MAC's cost varies by orders of magnitude between pairs (a fitting pair with 16.5 million maximal cliques takes
+  ~6 min per stage, single-threaded), so the stall rule of the live timing (a run longer than 10x the median
+  full-budget time of its set) would flag legitimately heavy pairs. For MAC rows only, the reference is the pair's own
+  logged full-budget time (`retime_stalls.PAIR_RELATIVE`); the rule and every result for SC2-PCR and TurboReg are
+  unchanged (dry run: 0 stalled pairs in every existing live file, as before).
+- `live_budget.py` lacked the estimator keyword entry for MAC indoors (`{"mac": {}}`); added before the live run.
+
+## Addendum B (2026-10-22, 21:20-21:55; no MAC run on any test pair before it)
+- The authors asked for MAC on every family (KITTI, FCGF). The inlier counts of those fitting sets (FCGF indoors:
+  median 861, 44 % above 1,000; FCGF on KITTI: median ~3,700 of 4,000) made addendum A's MAC infeasible there.
+- Reading the authors' C++ implementation (the one behind their published numbers; Linux/registration.cpp, PCR.cpp,
+  funcs.cpp of zhangxy0517/3D-Registration-with-Maximal-Cliques, downloaded for reading only) showed two differences
+  from their Python implementation: a graph reduction before the clique search (clustering coefficients, Otsu
+  threshold; dense graphs are cut to their most clustered ~50+ nodes) and dataset-specific settings (KITTI: tau 0.6 m,
+  cut-off 0.9 FPFH / 0.999 FCGF, cliques of at least 4; recommended build igraph 0.10.6, whose code path uses 4).
+- Checks before pre-registering: the Python transcription of the reduction equals a literal transcription of the C++
+  loops on 10 synthetic graphs (sparse and dense paths, reduction triggered and not); on indoor FPFH fitting pairs it
+  leaves sparse graphs and their results unchanged (3 pairs identical to the earlier logs) and cuts the 3 heaviest
+  pairs from 5.6-16.5 million cliques and 120-392 s to 1.6-2.8 thousand cliques and 1.5-2.3 s, all still registered;
+  6 fitting pairs per family run in 1-35 s and agree with SC2-PCR's success on every pair.
+- The running addendum-A log build (520 v3_fit pairs, no test pair) was stopped at 21:20 and archived
+  (logs/mac_python_impl/, logs/mac_attempt4_python_impl_stopped.log). Addendum B was committed and pushed (139a861)
+  before the new run started at 21:53 (scripts/run_mac_all.sh, logs/mac_all.log).
+
+## Addendum B, amendment 1 (2026-10-23, 11:07-12:05)
+- Indoor FPFH family complete at 11:07 (all 8 selections reproduced at evaluation; live/offline agreement 100 %).
+  The remaining families were switched from 6 to 8 log workers (all physical cores) at that family boundary, before
+  any KITTI record was written; each family is built with one setting.
+- KITTI FPFH with the C++ cut-off 0.9: up to 25 million maximal cliques per full-budget run (1,310 s), mean 143 s;
+  47 kitti_train pairs logged in ~1 h. Cut-off 0.99 on the same 47 pairs: identical success on every pair, 7.5 s per
+  run. Amendment 1 (pushed, e318bff) before any KITTI calibration or test pair; the 0.9 logs are archived in
+  logs/mac_kitti_cut09/; KITTI family restarted at 12:03 with 8 workers.
+
+## Addendum C: GPU timing (2026-10-23)
+- Bundles exported single-threaded (as the logs; with several BLAS threads the brute-force nearest neighbours of KITTI
+  pairs change, verified: recomputed gate signals equal the logged ones exactly only single-threaded).
+- Part 1 (fresh blind and held-out scenes; SC2-PCR and TurboReg, MAC on the fresh blind test) ran on a Tesla T4
+  (Google Colab) 12:32-14:21 UTC and was published to results/gpu/ by the notebook. GPU stopping decisions equal the
+  CPU's offline decisions on 98-100 % of the pairs per set.
+- Part 2 (six further sets) was exported and uploaded as a private draft release, but not run before the paper was
+  finalised (the notebook's 6-hour wait for it in Drive expired); it can be added later without changing anything else.
+
+## Addendum B: the remaining families (2026-10-23 12:03 to 2026-10-24 03:11)
+- KITTI FPFH (12:03-17:35), indoor FCGF (17:35-00:06) and KITTI FCGF (00:06-03:11), 8 log workers
+  (`WORKERS=8 FROM=2 bash scripts/run_mac_families.sh`, logs/mac_rest.log). In every family the selections were
+  written before its first test log, and the single evaluation reproduced every one of them
+  (scripts/check_same_selection.py).
+- Live, final method (300 pairs per set): KITTI raw drives 1.13x [1.08, 1.19], KITTI odometry 1.40x [1.31, 1.51],
+  FCGF 3DMatch 1.07x [1.04, 1.12], FCGF 3DLoMatch 1.06x [1.03, 1.09]; live and offline decisions agree on 94-100 %
+  of the pairs (on KITTI, multi-threaded arithmetic also changes a few brute-force nearest neighbours).
+- KITTI FCGF: on FCGF's own training pairs the first stage already registers 295 (ratio order) and 299
+  (compatibility order) of the 300 fitting pairs. As for SC2-PCR and TurboReg, every MAC configuration was certified
+  as the full budget (both orderings, with and without the gate, marginal and group-conditional), so by the
+  addendum's rule this family was not timed.
+- scripts/retime_stalls.py at the end: no stalled pair in any live file.

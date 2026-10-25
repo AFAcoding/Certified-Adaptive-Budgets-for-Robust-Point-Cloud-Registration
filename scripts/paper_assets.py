@@ -49,6 +49,16 @@ def dlabel(d):
     return DNAME[d] + (" (FCGF)" if d in FCGF else "")
 
 
+DSENT = {"bh": "the held-out scenes", "bl": "the held-out scenes at low overlap", "kr": "the KITTI raw drives",
+         "fkr": "the KITTI raw drives", "m": "3DMatch", "lo": "3DLoMatch", "ki": "KITTI odometry", "fm": "3DMatch",
+         "flo": "3DLoMatch", "fki": "KITTI odometry", "th": "the fresh scenes", "tl": "the fresh scenes at low overlap"}
+
+
+def dsent(d):
+    """A test set named in running text."""
+    return DSENT[d] + (" with FCGF" if d in FCGF else "")
+
+
 FAMS = ("v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf", "v3_indoor_fpfh")
 SEL = {(f, o): f"ladder_selection{'_compat' if o == 'compat' else ''}_ext_{f}.json" for f in FAMS for o in ("ratio", "compat")}
 SEL_RCERT = {}
@@ -57,7 +67,13 @@ LIVE["v3_indoor_fpfh"] = "live_budget_compare_ext_v3_indoor_fpfh_v3.json"  # als
 LIVE_XFER = {}
 PREFIX = {"ratio": "budget", "compat": "budgetc"}
 ESTS = {"sc": "sc2", "tr": "turbo"}
-ENAME = {"sc": "SC$^2$-PCR", "tr": "TurboReg"}
+ENAME = {"sc": "SC$^2$-PCR", "tr": "TurboReg", "mc": "MAC"}
+# MAC (protocol v3, addendum A): third estimator, indoor FPFH only; selection files carry the suffix _mac
+ESTS_ALL = {**ESTS, "mc": "mac"}
+MAC_SETS = ("th", "tl", "bh", "bl", "kr", "fkr", "m", "lo", "ki", "fm", "flo", "fki")  # addenda A and B
+# published recall of MAC (Zhang et al., CVPR 2023, Tables 1, 2 and 4)
+MAC_PUBLISHED = {("fpfh", "m"): 84.10, ("fpfh", "lo"): 40.88, ("fpfh", "ki"): 99.46,
+                 ("fcgf", "m"): 93.72, ("fcgf", "lo"): 59.85, ("fcgf", "ki"): 97.84}
 BUDGETS = [250, 500, 1000, 2000, 4000]
 VALS: dict[str, str] = {}
 
@@ -268,7 +284,7 @@ def cab_results():
     if worst is not None:
         val("cab.live.min", worst[0])
         val("cab.live.min.pct", 100 * (1 / worst[0] - 1), "{:.0f}")  # extra time where CAB is slowest
-        val("cab.live.min.where", f"{ENAME[worst[1]]} on {'FCGF ' if worst[2] in FCGF else ''}{DNAME[worst[2]]}")
+        val("cab.live.min.where", f"{ENAME[worst[1]]} on {dsent(worst[2])}")
 
     for (fam, o), fname in SEL_RCERT.items():  # FCGF, thresholds-only re-certification (supp)
         if not (RB / fname).exists():
@@ -336,6 +352,12 @@ def cab_results():
         L.append("\\midrule")
     L[-1] = ""
     (TAB / "supp_full_results.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    # too long for one page: blind test sets (fresh scenes first) and development benchmarks in two tables
+    rows = {d: [r for r in L if r.startswith(dlabel(d) + " & ")] for d in ds}
+    for name, sets in (("blind", [d for d in BLIND3 + BLIND if d in ds]),
+                       ("dev", [d for d in ds if d not in BLIND3 + BLIND])):
+        P = [x for d in sets for x in rows[d] + ["\\midrule"]]
+        (TAB / f"supp_full_results_{name}.tex").write_text("\n".join(P[:-1]) + "\n", encoding="utf-8")
 
     # ---- supplementary: fixed budgets
     L = []
@@ -689,21 +711,24 @@ def risk_ledger(ax):
         ("uniform sampling", "eq.{e}.{d}.rand2000.risk", ORANGE, "^", True),
         ("FPFH cert. on FCGF", "{e}.{d}.{o}.group.xfer.risk", RED, "X", True),
     ]
-    cab = [num(f"v3.{e}.{d}.{o}.group.risk") for d in sets_ for e in ESTS for o in PREFIX]
+    # every estimator run on a test set: SC2-PCR and TurboReg everywhere, MAC on the indoor FPFH sets (addendum A)
+    cab = [num(f"v3.{e}.{d}.{o}.group.risk") for d in sets_ for e in ESTS_ALL for o in PREFIX
+           if f"v3.{e}.{d}.{o}.group.risk" in VALS]
     val("cab.risk.max", max(cab), "{:.2f}")
     val("cab.risk.n", str(len(cab)))
-    marg = [(num(f"v3.{e}.{d}.{o}.marg.risk"), e, d, o) for d in sets_ for e in ESTS for o in PREFIX]
+    marg = [(num(f"v3.{e}.{d}.{o}.marg.risk"), e, d, o) for d in sets_ for e in ESTS_ALL for o in PREFIX
+            if f"v3.{e}.{d}.{o}.marg.risk" in VALS]
     val("marg.risk.max", max(marg)[0], "{:.2f}")
     val("marg.risk.over", str(sum(m[0] > 1.0 for m in marg)))
     val("marg.compat.risk.max", max(m[0] for m in marg if m[3] == "compat"), "{:.2f}")
-    # horizontal dot plot: one row per test set; every method at its worst over the two estimators and orderings
+    # horizontal dot plot: one row per test set; every method at its worst over the estimators and orderings
     XMAX = 14
     ax.axvspan(1.0, XMAX, color=RED, alpha=0.08, lw=0, zorder=0)
     ax.axvline(1.0, color=INK, lw=0.9, ls=(0, (3, 2)), zorder=2)
     for si, (label, pat, col, mk, filled) in enumerate(series):
         xs, ys = [], []
         for i, d in enumerate(sets_):
-            vals = [num(k) for k in {pat.format(e=e, d=d, o=o) for e in ESTS for o in PREFIX} if k in VALS]
+            vals = [num(k) for k in {pat.format(e=e, d=d, o=o) for e in ESTS_ALL for o in PREFIX} if k in VALS]
             if vals:
                 xs.append(max(vals))
                 ys.append(i + (-0.14, 0.14, 0.0, 0.0)[si])  # CAB above, its marginal variant below
@@ -763,6 +788,9 @@ def _equal_time_live(variants):
         val(f"eq.{e}.fm2.signal.ms", t["fm2_signal"], "{:,.0f}")
         val(f"eq.{e}.fm1.signal.ms", t["fm1_signal"], "{:,.0f}")
         val(f"eq.{e}.rand2000.ms", t["rand@2000"], "{:,.0f}")
+        for k in t:  # live time of every fixed budget of every variant, e.g. eq.sc.compat.250.ms
+            if "@" in k and k.split("@")[1].isdigit():
+                val(f"eq.{e}.{k.split('@')[0]}.{k.split('@')[1]}.ms", t[k], "{:,.0f}")
         cab_t, cab_rr, full_rr = t["cab"], num(f"eq.{e}.bh.cab.rr"), num(f"eq.{e}.bh.full.rr")
         L.append(f"\\multicolumn{{5}}{{@{{}}l}}{{\\textit{{{ENAME[e]}: full budget {t['full']:,.0f}\\,ms, {full_rr:.1f}\\,\\%; "
                  f"\\method {cab_t:,.0f}\\,ms, {cab_rr:.1f}\\,\\%}}}} \\\\")
@@ -834,6 +862,10 @@ def _equal_time_live(variants):
         ax.set_title(f"({letter}) {ENAME[e].replace('$^2$', '²')} on held-out scenes", loc="left")
         style(ax)
         L.append("\\midrule" if e == "sc" else "\\bottomrule")
+    reach = [num(k) for k in list(VALS) if k.startswith("eq.") and k.endswith(".reach.x")]
+    if reach:  # "Match" column: time to reach CAB's recall relative to CAB's time, over both estimators
+        val("eq.reach.x.min", min(reach), "{:.1f}")
+        val("eq.reach.x.max", max(reach), "{:.1f}")
     handles = {}
     for ax in axes[:2]:
         for hh, ll in zip(*ax.get_legend_handles_labels()):
@@ -1164,7 +1196,7 @@ def latency():
                     val(f"{k}.cab.p{p}", q(c, p), "{:,.0f}")
                 val(k + ".slower", slower, "{:.0f}")
                 val(k + ".overhead.p99", 100 * (q(c, 99) / q(f, 99) - 1), "{:+.0f}")
-                worst.append((100 * (q(c, 99) / q(f, 99) - 1), f"{ENAME[e]} on {dlabel(d)}"))
+                worst.append((100 * (q(c, 99) / q(f, 99) - 1), f"{ENAME[e]} on {dsent(d)}"))
                 L.append(f"{ENAME[e]}, {dlabel(d)} & {len(rs)} & {q(f, 50):,.0f} / {q(c, 50):,.0f} & "
                          f"{q(f, 90):,.0f} / {q(c, 90):,.0f} & {q(f, 99):,.0f} / {q(c, 99):,.0f} & {slower:.0f} \\\\")
     (TAB / "supp_latency.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
@@ -1260,6 +1292,197 @@ def sensitivity():
     (TAB / "supp_sensitivity.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
+def live_agreement():
+    """Smallest share of pairs whose live stopping decision equals the offline one, over every live run (every
+    estimator, configuration and test set), and over the runs outside KITTI: keys live.agree.minall / .indoor.min."""
+    allr, indoor = [], []
+    for path in sorted(RB.glob("live_budget_compare_ext*.json")):
+        rows = json.loads(path.read_text())
+        for est in {r["est"] for r in rows}:
+            for sub in {r["subset"] for r in rows if r["est"] == est}:
+                rs = [r for r in rows if r["est"] == est and r["subset"] == sub]
+                for job in [j for j in rs[0]["run_order"] if j != "full"]:
+                    a = float(np.mean([r[job]["stop"] == r[job]["offline_stop"] for r in rs]))
+                    allr.append(a)
+                    if "kitti" not in sub:
+                        indoor.append(a)
+    if allr:
+        val("live.agree.minall", 100 * min(allr), "{:.0f}")
+        val("live.agree.indoor.min", 100 * min(indoor), "{:.1f}")
+
+
+def mac_results():
+    """Protocol v3, addenda A and B (PROTOCOL.md): MAC on every family whose evaluation exists. Offline keys
+    mc.{d}.{o}.{cert}.* (CAB without the gate, selection files *_mac.json) and v3.mc.{d}.{o}.{cert}.* (the final method,
+    *_ctlauto_gate_mac.json), live keys (live_budget_compare_ext_<family>_v3_mac.json), all in the namespaces of the other
+    estimators, and the full-budget recall against the published one. Returns False while no family is complete."""
+    sel = {}
+    for fam in FAMS:
+        paths = {(o, kind): RB / f"ladder_selection{'_compat' if o == 'compat' else ''}_ext_{fam}{sfx}.json"
+                 for o in PREFIX for kind, sfx in (("v2", "_mac"), ("v3", "_ctlauto_gate_mac"))}
+        if all(q.exists() for q in paths.values()):
+            for (o, kind), q in paths.items():
+                sel[(fam, o, kind)] = json.loads(q.read_text())["mac"]
+    if not sel:
+        return False
+    names = {"logit": "logistic", "logit_c01": "logistic ($C{=}0.1$)", "poly2": "quadratic logistic",
+             "hgb": "boosted trees", None: "none"}
+    for fam in {f for f, _, _ in sel}:
+        for o in PREFIX:
+            cfg = sel[(fam, o, "v3")]["selected"]["mondrian"]
+            val(f"v3.mc.{fam}.{o}.clf", names[cfg["classifier"]])
+            val(f"v3.mc.{fam}.{o}.gate", names[cfg["gate"]["kind"]])
+    for d in MAC_SETS:
+        log, fam = DS[d]
+        if (fam, "compat", "v3") not in sel:
+            continue
+        for o in PREFIX:
+            n = len(B.load(log, PREFIX[o]))
+            for kind, pre in (("v2", ""), ("v3", "v3.")):
+                s_ = sel[(fam, o, kind)]
+                full = s_["test"][log]["full"]
+                for cert, tag in (("group", "mondrian"), ("marg", "marginal")):
+                    t = s_["test"][log][tag]
+                    k = f"{pre}mc.{d}.{o}.{cert}"
+                    val(k + ".rr", 100 * t["rr"], "{:.1f}")
+                    val(k + ".full", 100 * full["rr"], "{:.1f}")
+                    val(k + ".loss", 100 * t["delta_rr"], "{:.2f}")
+                    val(k + ".ub", 100 * t["ub95"], "{:.2f}")
+                    val(k + ".p", pfmt(t["mcnemar_p"]))
+                    val(k + ".ni", "yes" if t["non_inferior"] else "no")
+                    val(k + ".speed", t["speedup"])
+                    val(k + ".ops", t["ops_ratio"])
+                    val(k + ".risk", 100 * t["risk"], "{:.2f}")
+                    val(k + ".nlost", str(int(round(t["risk"] * n))))
+                    val(k + ".ms", 1e3 * t["s"], "{:,.0f}")
+                    val(k + ".fullms", 1e3 * full["s"], "{:,.0f}")
+                    val(k + ".ladder", s_["selected"][tag]["ladder"])
+                    if kind == "v3":
+                        val(k + ".gated", 100 * t.get("gated", 0) / max(n, 1), "{:.0f}")
+    # fidelity of the re-implementation: full-budget recall (the same in both orderings) on the development test sets
+    # (FCGF: features of our re-implementation of the network) against the published one
+    for (desc, d), pub in MAC_PUBLISHED.items():
+        key = f"mc.{'f' if desc == 'fcgf' else ''}{d}.ratio.group.full"
+        if key in VALS:
+            val(f"fid.mc.{desc}.{d}.ours", num(key), "{:.1f}")
+            val(f"fid.mc.{desc}.{d}.gap", pub - num(key), "{:.1f}")
+    # live: full budget, CAB without the gate ("budgetc") and the final method ("budgetc+v3") on the same pairs
+    agrees, p99, ovh, retimed = [], [], [], 0
+    for fam in FAMS:
+        path = RB / f"live_budget_compare_ext_{fam}_v3_mac.json"
+        if not path.exists():
+            continue
+        rows = [r for r in json.loads(path.read_text()) if r["est"] == "mac"]
+        retimed += sum("stalled" in r for r in rows)
+        for d in [d for d in MAC_SETS if DS[d][1] == fam]:
+            rs = [r for r in rows if r["subset"] == DS[d][0]]
+            if not rs:
+                continue
+            sc = np.array([r["scene"] for r in rs])
+            tf = np.array([r["full"]["s"] for r in rs])
+            val(f"mc.{d}.live.n", str(len(rs)))
+            val(f"mc.{d}.live.fullms", 1e3 * tf.mean(), "{:,.0f}")
+            val(f"mc.{d}.live.fullrr", 100 * np.mean([r["full"]["ok"] for r in rs]), "{:.0f}")
+            for pf, k in (("budgetc", f"mc.{d}.compat.live"), ("budgetc+v3", f"v3.mc.{d}.compat.live")):
+                ta = np.array([r[pf]["s"] for r in rs])
+                sp, lo, hi = boot_ratio(tf, ta, sc, 1)
+                val(k + ".speed", sp)
+                val(k + ".speedlo", lo)
+                val(k + ".speedhi", hi)
+                val(k + ".ms", 1e3 * ta.mean(), "{:,.0f}")
+                val(k + ".lost", str(sum(r["full"]["ok"] and not r[pf]["ok"] for r in rs)))
+                agree = np.mean([r[pf]["stop"] == r[pf]["offline_stop"] for r in rs])
+                val(k + ".agree", 100 * agree, "{:.0f}")
+                agrees.append(agree)
+            tb = np.array([r["budgetc"]["s"] for r in rs])
+            ta = np.array([r["budgetc+v3"]["s"] for r in rs])
+            sp, lo, hi = boot_ratio(tb, ta, sc, 3)
+            val(f"v3.mc.{d}.compat.live.vs2", sp)
+            val(f"v3.mc.{d}.compat.live.vs2lo", lo)
+            val(f"v3.mc.{d}.compat.live.vs2hi", hi)
+            p99.append((100 * (np.quantile(ta, 0.99) / np.quantile(tf, 0.99) - 1), d))
+            same = [r for r in rs if r["budgetc+v3"]["stop"] != -1 and r["budgetc+v3"]["stop"] == r["budgetc"]["stop"]]
+            if same:
+                ovh.append(1e3 * np.median([r["budgetc+v3"]["s"] - r["budgetc"]["s"] for r in same]))
+    val("mc.live.retimed", str(retimed))
+    if agrees:
+        val("mc.live.agree.min", 100 * min(agrees), "{:.0f}")
+    if p99:
+        w = max(p99)
+        val("v3.mc.lat.p99.max", w[0], "{:.0f}")
+        val("v3.mc.lat.p99.where", dlabel(w[1]))
+    if ovh:
+        val("v3.mc.gate.live.overhead.min", min(ovh), "{:.0f}")
+        val("v3.mc.gate.live.overhead.max", max(ovh), "{:.0f}")
+    return True
+
+
+def gpu_results(gpu_dir=None, bundle=None):
+    """GPU timing (PROTOCOL.md, addendum C) from results/gpu/*.json.gz (the latest file of each phase): per test set and
+    estimator, the full budget's mean time, the live speed-ups of CAB without the gate (v2) and of the final method
+    with scene-stratified bootstrap intervals, recall and risk on the GPU runs, and the agreement of the GPU stopping
+    decisions and full-budget outcomes with the CPU logs (references in gpu_bundle/config.json). Keys gpu.*."""
+    import gzip
+    gpu_dir = Path(gpu_dir) if gpu_dir else RESULTS_ROOT / "gpu"
+    files = sorted(gpu_dir.glob("cab_gpu_results_*.json.gz")) if gpu_dir.exists() else []
+    if not files:
+        return False
+    latest = {}
+    for f in files:  # one file per phase (sc2_turbo, mac); the latest of each
+        latest[f.name.split("_20")[0]] = f
+    cfg = json.loads((Path(bundle) if bundle else PROJECT_ROOT / "gpu_bundle" / "config.json").read_text())
+    rows, devices = [], set()
+    for f in latest.values():
+        d = json.loads(gzip.decompress(f.read_bytes()))
+        devices.add(d["device"])
+        rows += d["rows"]
+    val("gpu.device", " / ".join(sorted(devices)).replace("NVIDIA ", ""))
+    agree_all, full_all, L = [], [], []
+    for code in [c for c in BLIND3 + BLIND + ("m", "lo", "ki", "fm", "flo") if c in cfg["sets"]]:
+        cells, any_e = [dlabel(code)], False
+        for e, E in ESTS_ALL.items():
+            rs = [r for r in rows if r["set"] == code and r["est"] == E]
+            if not rs:
+                cells += ["--"] * 3
+                continue
+            any_e = True
+            ref = cfg["sets"][code]["estimators"][E]["reference"]
+            idx = {pid: i for i, pid in enumerate(json.loads(json.dumps([r["pair_id"] for r in rs])))}
+            sc = np.array([r["scene"] for r in rs])
+            tf = np.array([r["full"]["s"] for r in rs])
+            k = f"gpu.{e}.{code}"
+            val(k + ".n", str(len(rs)))
+            val(k + ".fullms", 1e3 * tf.mean(), "{:,.0f}")
+            val(k + ".fullrr", 100 * np.mean([r["full"]["ok"] for r in rs]), "{:.1f}")
+            for v in ("v2", "v3"):
+                ta = np.array([r[v]["s"] for r in rs])
+                sp, lo, hi = boot_ratio(tf, ta, sc, 1)
+                val(f"{k}.{v}.speed", sp)
+                val(f"{k}.{v}.speedlo", lo)
+                val(f"{k}.{v}.speedhi", hi)
+                val(f"{k}.{v}.rr", 100 * np.mean([r[v]["ok"] for r in rs]), "{:.1f}")
+                val(f"{k}.{v}.risk", 100 * np.mean([r["full"]["ok"] and not r[v]["ok"] for r in rs]), "{:.2f}")
+                stops = ref[v]["offline_stop"]
+                ag = np.mean([r[v]["stop"] == stops[i] for i, r in enumerate(rs)])
+                val(f"{k}.{v}.agree", 100 * ag, "{:.0f}")
+                agree_all.append(ag)
+            fa = np.mean([r["full"]["ok"] == ref["full_ok"][i] for i, r in enumerate(rs)])
+            full_all.append(fa)
+            cells += [f"{1e3 * tf.mean():,.0f}", f"{num(k + '.v2.speed'):.2f}\\X",
+                      f"\\textbf{{{num(k + '.v3.speed'):.2f}\\X}}"]
+        if any_e:
+            L.append(" & ".join(cells) + " \\\\")
+            if code == "tl":
+                L.append("\\midrule")
+    if agree_all:
+        val("gpu.agree.min", 100 * min(agree_all), "{:.0f}")
+        val("gpu.agree.mean", 100 * float(np.mean(agree_all)), "{:.0f}")
+        val("gpu.fullagree.min", 100 * min(full_all), "{:.0f}")
+    L.append("\\bottomrule")
+    (TAB / "supp_gpu.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    return True
+
+
 def v3_results(ds):
     """Protocol v3 (PROTOCOL.md): the final method (CAB with the classifier chosen on the fitting pairs and the
     hardness gate; selection files *_ctlauto_gate) on every test set, the fresh blind test th/tl included.
@@ -1353,7 +1576,7 @@ def v3_results(ds):
     if p99:
         w = max(p99)
         val("v3.lat.p99.max", w[0], "{:.0f}")
-        val("v3.lat.p99.where", f"{ENAME[w[1]]} on {'FCGF ' if w[2] in FCGF else ''}{DNAME[w[2]]}")
+        val("v3.lat.p99.where", f"{ENAME[w[1]]} on {dsent(w[2])}")
     if ovh:
         val("v3.gate.live.overhead.min", min(ovh), "{:.0f}")
         val("v3.gate.live.overhead.max", max(ovh), "{:.0f}")
@@ -1362,6 +1585,14 @@ def v3_results(ds):
     val("v3.risk.n", str(len(risks)))
     margs = [num(f"v3.{e}.{d}.{o}.marg.risk") for d in done for e in ESTS for o in PREFIX]
     val("v3.marg.risk.max", max(margs), "{:.2f}")
+    mc = [num(f"v3.mc.{d}.{o}.group.risk") for d in done for o in PREFIX if f"v3.mc.{d}.{o}.group.risk" in VALS]
+    if mc:  # MAC (addendum A): its own ledger, and the ledger over all three estimators
+        val("v3.mc.risk.max", max(mc), "{:.2f}")
+        val("v3.mc.risk.n", str(len(mc)))
+        val("v3.riskall.max", max(risks + mc), "{:.2f}")
+        val("v3.riskall.n", str(len(risks) + len(mc)))
+        mm = [num(f"v3.mc.{d}.{o}.marg.risk") for d in done for o in PREFIX if f"v3.mc.{d}.{o}.marg.risk" in VALS]
+        val("v3.mc.marg.risk.max", max(mm), "{:.2f}")
     lives = [(num(f"v3.{e}.{d}.compat.live.speed"), e, d) for d in done for e in ESTS
              if f"v3.{e}.{d}.compat.live.speed" in VALS]
     if all(d in done for d in BLIND3):
@@ -1370,7 +1601,12 @@ def v3_results(ds):
         w = min(lives)
         val("v3.live.min", w[0])
         val("v3.live.min.pct", 100 * (1 / w[0] - 1), "{:.0f}")
-        val("v3.live.min.where", f"{ENAME[w[1]]} on {'FCGF ' if w[2] in FCGF else ''}{DNAME[w[2]]}")
+        val("v3.live.min.where", f"{ENAME[w[1]]} on {dsent(w[2])}")
+        lives += [(num(f"v3.mc.{d}.compat.live.speed"), "mc", d) for d in done if f"v3.mc.{d}.compat.live.speed" in VALS]
+        w = min(lives)
+        val("v3.liveall.min", w[0])
+        val("v3.liveall.min.pct", 100 * (1 / w[0] - 1), "{:.0f}")
+        val("v3.liveall.min.where", f"{ENAME[w[1]]} on {dsent(w[2])}")
     # the evaluation was re-run with the gate-cost accounting of select_ladder.gate_eval_charges; the first run (archived)
     # used the signals' times of the feature runs and no prediction cost: largest change of an offline speed-up
     arch = RB / "v3_uncorrected_gate_accounting"
@@ -1421,9 +1657,11 @@ def v3_results(ds):
     def cell_live(key_off, key_live):
         return f"{VALS[key_live]}\\X" if key_live in VALS else f"{VALS[key_off]}$\\times^*$"
 
-    # Table 1: the fresh blind test (full budget, CAB without the gate = protocol v2 method, CAB)
+    # Table 1: the fresh blind test (full budget, CAB without the gate = protocol v2 method, CAB); MAC once its results
+    # exist (addendum A)
+    ests = [e for e in ESTS_ALL if e in ESTS or f"v3.{e}.th.compat.group.rr" in VALS]
     L = []
-    for e in ESTS:
+    for e in ests:
         L.append(f"\\multicolumn{{11}}{{@{{}}l}}{{\\textit{{{ENAME[e]}}}}} \\\\")
         for lab, kind in (("Full budget (standard)", None), ("\\method without gate (v2)", "v2"),
                           ("\\textbf{\\method (ours)}", "v3")):
@@ -1451,17 +1689,20 @@ def v3_results(ds):
     blocks = [("Blind test sets of protocol v2", [d for d in ("bh", "bl", "kr", "fkr") if d in done]),
               ("Development benchmarks", [d for d in ("m", "lo", "ki", "fm", "flo", "fki") if d in done])]
     for title, sets_ in blocks:
-        L.append(f"\\multicolumn{{11}}{{@{{}}l}}{{\\textit{{{title}}}}} \\\\")
+        L.append(f"\\multicolumn{{{1 + 4 * len(ests)}}}{{@{{}}l}}{{\\textit{{{title}}}}} \\\\")
         for d in sets_:
             cells = [dlabel(d)]
-            for e in ESTS:
+            for e in ests:
                 k2, k3 = f"{e}.{d}.compat", f"v3.{e}.{d}.compat"
-                ni = "\\cmark" if VALS[k3 + ".group.ni"] == "yes" else "\\xmark"
+                if k3 + ".group.rr" not in VALS:  # MAC: indoor FPFH only
+                    cells += ["--"] * 4
+                    continue
+                ni = "" if VALS[k3 + ".group.ni"] == "yes" else "$^\\ddagger$"  # not non-inferior
                 full_only = VALS[k3 + ".group.ladder"] == "full"
                 v2c = "1.00$\\times^\\dagger$" if VALS[k2 + ".group.ladder"] == "full" else \
                     cell_live(k2 + ".group.speed", k2 + ".live.speed")
                 v3c = "1.00$\\times^\\dagger$" if full_only else cell_live(k3 + ".group.speed", k3 + ".live.speed")
-                cells += [v2c, f"\\textbf{{{v3c}}}", f"{VALS[k3 + '.group.ops']}\\X", VALS[k3 + ".group.risk"], ni]
+                cells += [v2c, f"\\textbf{{{v3c}}}{ni}", f"{VALS[k3 + '.group.ops']}\\X", VALS[k3 + ".group.risk"]]
             L.append(" & ".join(cells) + " \\\\")
         L.append("\\midrule")
     L[-1] = "\\bottomrule"
@@ -1472,7 +1713,7 @@ def v3_results(ds):
     L = []
     for d in [d for d in BLIND3 + BLIND + ("m", "lo", "ki", "fm", "flo", "fki") if d in done]:
         fam = DS[d][1]
-        for e in ESTS:
+        for e in [e for e in ests if f"v3.{e}.{d}.compat.group.rr" in VALS]:
             for o in PREFIX:
                 k = f"v3.{e}.{d}.{o}.group"
                 lv = VALS.get(f"v3.{e}.{d}.{o}.live.speed")
@@ -1487,7 +1728,137 @@ def v3_results(ds):
         L.append("\\midrule")
     L[-1] = "\\bottomrule"
     (TAB / "supp_v3_full.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    # too long for one page: the blind test sets come first in L, then the development benchmarks
+    cut = [i for i, r in enumerate(L) if r in ("\\midrule", "\\bottomrule")]
+    nb = len([d for d in BLIND3 + BLIND if d in done])
+    (TAB / "supp_v3_full_blind.tex").write_text("\n".join(L[:cut[nb - 1]] + ["\\bottomrule"]) + "\n", encoding="utf-8")
+    (TAB / "supp_v3_full_dev.tex").write_text("\n".join(L[cut[nb - 1] + 1:]) + "\n", encoding="utf-8")
     return done
+
+
+def scene_label(s):
+    for a, b in (("sun3d-", "SUN3D "), ("bundlefusion-", "BundleFusion "), ("7-scenes-", "7-Scenes "),
+                 ("analysis-by-synthesis-", "AbS "), ("-sc_athena_oct_29_2012_scan1_", " ")):
+        s = s.replace(a, b)
+    return s.replace("_", "\\_")
+
+
+def v3_evidence():
+    """Supp tables of further evidence for the final method (compatibility order, group-conditional certificates):
+    the component ablation on the earlier test sets (selection files *_ctlauto: classifier chosen on the fitting pairs;
+    *_gate: hardness gate with the logistic controller), and, from results/budget/evidence_v3.json, the fresh blind test
+    per scene, the realized risk per difficulty group on every test set, and controllers re-fitted on bootstrap
+    resamples of the fitting pairs (development benchmarks). All speed-ups here are offline (full test sets)."""
+    variants = (("", "v2"), ("_ctlauto", "clf"), ("_gate", "gate"), ("_ctlauto_gate", "v3"))
+    sel = {}
+    for fam in ("v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf"):
+        for sfx, tag in variants:
+            path = RB / f"ladder_selection_compat_ext_{fam}{sfx}.json"
+            if not path.exists():
+                return
+            sel[(fam, tag)] = json.loads(path.read_text())
+    L, cmp_ = [], {"gate": [], "clf": [], "v3": []}
+    for d in ("bh", "bl", "kr", "fkr", "m", "lo", "ki", "fm", "flo", "fki"):
+        log, fam = DS[d]
+        cells = [dlabel(d)]
+        for e, E in ESTS.items():
+            r = {}
+            for _, tag in variants:
+                s_ = sel[(fam, tag)][E]
+                t = s_["test"][log]["mondrian"]
+                full = s_["selected"]["mondrian"]["ladder"] == "full"
+                r[tag] = (1.0 if full else t["speedup"], 100 * t["risk"], full)
+                val(f"abl3.{e}.{d}.{tag}.speed", r[tag][0])
+                val(f"abl3.{e}.{d}.{tag}.risk", r[tag][1], "{:.2f}")
+                sp = "1.00$^\\dagger$" if full else f"{t['speedup']:.2f}\\X"
+                cell = f"{sp}\\,({100 * t['risk']:.2f})"
+                cells.append(f"\\textbf{{{cell}}}" if tag == "v3" else cell)
+            if not all(x[2] for x in r.values()):  # some variant cuts: compare each with CAB without the gate
+                for tag in cmp_:
+                    cmp_[tag].append((r[tag][0] / r["v2"][0], r[tag][1] - r["v2"][1]))
+        L.append(" & ".join(cells) + " \\\\")
+        if d == "fkr":
+            L.append("\\midrule")
+    L.append("\\bottomrule")
+    (TAB / "supp_v3_ablation.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    for tag, xs in cmp_.items():
+        val(f"abl3.{tag}.n", str(len(xs)))
+        val(f"abl3.{tag}.faster", str(sum(a > 1.005 for a, _ in xs)))
+        val(f"abl3.{tag}.slower", str(sum(a < 0.995 for a, _ in xs)))
+        val(f"abl3.{tag}.riskier", str(sum(b > 1e-9 for _, b in xs)))
+        val(f"abl3.{tag}.gain.max", 100 * (max(a for a, _ in xs) - 1), "{:.0f}")
+        val(f"abl3.{tag}.dr.max", max(b for _, b in xs), "{:.2f}")
+    path = RB / "evidence_v3.json"
+    if not path.exists():
+        return
+    ev = json.loads(path.read_text())
+    # per scene, fresh blind test
+    L = []
+    for part, log in (("hi", "v3_blind_hi"), ("lo", "v3_blind_lo")):
+        title = "Overlap above 30\\,\\%" if part == "hi" else "Overlap 10--30\\,\\%"
+        L.append(f"\\multicolumn{{10}}{{@{{}}l}}{{\\textit{{{title}}}}} \\\\")
+        rows = ev["per_scene"][log]
+        for i in range(len(rows["sc2"])):
+            cells = [scene_label(rows["sc2"][i]["scene"]), str(rows["sc2"][i]["n"])]
+            for e, E in ESTS.items():
+                r = rows[E][i]
+                assert r["scene"] == rows["sc2"][i]["scene"]
+                cells += [f"{r['speed_v2']:.2f}\\X", f"\\textbf{{{r['speed_v3']:.2f}\\X}}", f"{100 * r['risk_v3']:.2f}",
+                          f"{100 * r['gated']:.0f}"]
+            L.append(" & ".join(cells) + " \\\\")
+        L.append("\\midrule")
+        val(f"ev3.scene.{part}.n", str(len(rows["sc2"])))
+        for e, E in ESTS.items():
+            sv3 = [r["speed_v3"] for r in rows[E]]
+            val(f"ev3.scene.{part}.{e}.min", min(sv3))
+            val(f"ev3.scene.{part}.{e}.max", max(sv3))
+            val(f"ev3.scene.{part}.{e}.faster", str(sum(x > 1.0 for x in sv3)))
+            val(f"ev3.scene.{part}.{e}.vs2", str(sum(r["speed_v3"] > r["speed_v2"] for r in rows[E])))
+            val(f"ev3.scene.{part}.{e}.risk.max", 100 * max(r["risk_v3"] for r in rows[E]), "{:.2f}")
+            val(f"ev3.scene.{part}.{e}.risk.n", str(sum(r["risk_v3"] > 0 for r in rows[E])))
+    L[-1] = "\\bottomrule"
+    (TAB / "supp_v3_scenes.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    # per difficulty group (hard, middle, easy: terciles of the explained correspondences after the first stage)
+    order = ("v3_blind_hi", "v3_blind_lo", "v2_blind_hi", "v2_blind_lo", "kitti_raw_blind", "3DMatch", "3DLoMatch",
+             "kitti_test", "fcgfown_3DMatch", "fcgfown_3DLoMatch")
+    code = {DS[d][0]: d for d in DS}
+    L, n_groups, over = [], 0, []
+    for log in order:
+        d = code[log]
+        cells = [dlabel(d)]
+        for e, E in ESTS.items():
+            for g in ev["groups"][log][E]:
+                n_groups += 1
+                risk = 100 * g["lost"] / g["n"]
+                if risk > 1.0:
+                    over.append((risk, g["lost"], g["n"], e, d, g["group"]))
+                txt = f"{risk:.2f}\\,({g['lost']}/{g['n']})"
+                cells.append(f"\\textbf{{{txt}}}" if risk > 1.0 else txt)
+        L.append(" & ".join(cells) + " \\\\")
+        if log == "v3_blind_lo":
+            L.append("\\midrule")
+    L.append("\\bottomrule")
+    (TAB / "supp_v3_groups.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+    val("ev3.groups.n", str(n_groups))
+    val("ev3.groups.over", str(len(over)))
+    if over:
+        risk, lost, n, e, d, g = max(over)
+        val("ev3.groups.over.risk", risk, "{:.2f}")
+        val("ev3.groups.over.lost", str(lost))
+        val("ev3.groups.over.n", str(n))
+        val("ev3.groups.over.where", f"{ENAME[e]} on {dlabel(d)}, {('hard', 'middle', 'easy')[g]} group")
+    # re-fitted controllers and gates (10 bootstrap resamples of the fitting pairs), development benchmarks
+    rk = []
+    for e, E in ESTS.items():
+        for d, log in (("m", "3DMatch"), ("lo", "3DLoMatch")):
+            sp = [r[log]["speed"] for r in ev["refit"][E]]
+            rk += [100 * r[log]["risk"] for r in ev["refit"][E]]
+            val(f"ev3.refit.{e}.{d}.min", min(sp))
+            val(f"ev3.refit.{e}.{d}.max", max(sp))
+            val(f"ev3.refit.{e}.{d}.med", float(np.median(sp)))
+        val("ev3.refit.n", str(len(ev["refit"][E])))
+    val("ev3.refit.risk.max", max(rk), "{:.2f}")
+    val("ev3.refit.over", str(sum(x > 1.0 for x in rk)))
 
 
 def worst_case():
@@ -1665,8 +2036,15 @@ def fidelity():
                 val(f"fid.{e}.{desc}.{d}.gap", p - o, "{:.1f}")
             cells = [f"{ENAME[e]}, {desc.upper()}"] + [x for o, p in zip(ours, pub) for x in (f"{o:.1f}", f"{p:.1f}")]
             L.append(" & ".join(cells) + " \\\\")
-    for desc in ("fpfh", "fcgf"):  # gap ranges for the text (indoor sets, both estimators)
-        g = [num(f"fid.{e}.{desc}.{d}.gap") for e in ESTS for d in ("m", "lo")]
+    for desc in ("fpfh", "fcgf"):  # MAC (addenda A and B), where its results exist
+        if any(f"fid.mc.{desc}.{d}.ours" in VALS for d in ("m", "lo", "ki")):
+            cells = [f"MAC, {desc.upper()}"]
+            for d in ("m", "lo", "ki"):
+                k = f"fid.mc.{desc}.{d}.ours"
+                cells += [VALS[k], f"{MAC_PUBLISHED[(desc, d)]:.1f}"] if k in VALS else ["--", "--"]
+            L.append(" & ".join(cells) + " \\\\")
+    for desc in ("fpfh", "fcgf"):  # gap ranges for the text (indoor sets, every estimator with results)
+        g = [num(f"fid.{e}.{desc}.{d}.gap") for e in ESTS_ALL for d in ("m", "lo") if f"fid.{e}.{desc}.{d}.gap" in VALS]
         val(f"fid.{desc}.indoor.gap.min", min(g), "{:.1f}")
         val(f"fid.{desc}.indoor.gap.max", max(g), "{:.1f}")
         gk = [num(f"fid.{e}.{desc}.ki.gap") for e in ESTS]
@@ -1681,7 +2059,11 @@ def main():
     FIG.mkdir(parents=True, exist_ok=True)
     setup_style()
     ds, logs, _ = cab_results()
+    mac_results()
+    live_agreement()
     v3_results(ds)
+    v3_evidence()
+    gpu_results()
     anchors_and_headroom(ds, logs)
     equal_time(logs)
     qualitative()

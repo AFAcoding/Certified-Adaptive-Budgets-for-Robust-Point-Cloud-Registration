@@ -20,7 +20,7 @@ import numpy as np
 from acpr import RESULTS_ROOT
 from acpr.data import load_pairs
 
-BLIND = {"v2_blind_hi", "v2_blind_lo", "v2_blind", "kitti_raw_blind"}
+BLIND = {"v2_blind_hi", "v2_blind_lo", "v2_blind", "v3_blind_hi", "v3_blind_lo", "v4_blind_hi", "v4_blind_lo", "kitti_raw_blind"}
 _PAIRS = {}
 
 

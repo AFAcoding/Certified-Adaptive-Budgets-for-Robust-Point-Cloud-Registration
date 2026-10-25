@@ -208,4 +208,86 @@ for d, (sub, fam) in SETS.items():
         if stall > 10:
             print(f"STALL left in {path.name} {E} {sub}: {stall:.0f}x the median")
             bad += 1
+# ---- MAC (protocol v3, addenda A and B; every family): CAB without the gate (selections *_mac) and the final method
+# (*_ctlauto_gate_mac), with the same independent outcome and cost accounting as above
+mac_risks = []
+for d in ("th", "tl", "bh", "bl", "kr", "fkr", "m", "lo", "ki", "fm", "flo", "fki"):
+    log, fam = SETS[d]
+    D = S.DATASETS[fam]
+    for o, prefix in (("ratio", "budget"), ("compat", "budgetc")):
+        paths = {kind: RB / f"ladder_selection{S.SUFFIX[prefix]}_ext_{fam}{sfx}.json"
+                 for kind, sfx in (("v2", "_mac"), ("v3", "_ctlauto_gate_mac"))}
+        if not all(q.exists() for q in paths.values()):
+            continue
+        logs = {"train": B.load(D["train"], prefix), "val": B.load(D["val"], prefix), log: B.load(log, prefix)}
+        recs = logs[log]
+        E = "mac"
+        full_ok = np.array([bool(r[E][4]["ok15"]) for r in recs])
+        fs = np.array([cost(r, E, (4,), 0, "s") for r in recs])
+        fops = np.array([cost(r, E, (4,), 0, "ops") for r in recs])
+        if o == "ratio" and d in ("m", "lo", "ki", "fm", "flo", "fki"):
+            desc, base = ("fcgf", d[1:]) if d.startswith("f") else ("fpfh", d)
+            check(f"fid.mc.{desc}.{base}.ours", 100 * full_ok.mean(), "{:.1f}", 0.05)
+        for kind, path in paths.items():
+            sel = json.loads(path.read_text())[E]
+            for cert, tag in (("group", "mondrian"), ("marg", "marginal")):
+                x = sel["selected"][tag]
+                A.CLASSIFIER = x.get("classifier") or "logit"
+                ladder = B.LADDERS_EXT[x["ladder"]]
+                tr, mdps = S.build(logs, E, ladder)
+                stops = S.policy_outcome(tr[log], mdps, x["policy"], x["param"]).stop
+                gated = np.zeros(len(recs), bool)
+                sig = order = pred = 0.0
+                sig_ops = np.zeros(len(recs))
+                if kind == "v3":
+                    gate = S.fit_gate_for(logs, D, E, x, (tr, mdps), prefix)
+                    if gate.kind != x["gate"]["kind"]:
+                        print(f"MISMATCH gate kind MAC {fam} {o} {tag}")
+                        bad += 1
+                    if gate.clf is not None:
+                        F = {}
+                        for line in open(ROOT / "results" / "gate" / f"features_{log}.jsonl"):
+                            q = json.loads(line)
+                            F[q["pair_id"]] = [q[f] for f in GF]
+                        gated = gate.predict(np.array([F[r["pair_id"]] for r in recs]))
+                        sig, order, pred = GC["signals_ms"] / 1e3, GC["order_ms"] / 1e3, GC["predict_ms"][gate.kind] / 1e3
+                        n_all = np.array([r["N_all"] for r in recs], dtype=float)
+                        sig_ops = np.minimum(n_all, 500) ** 2 + n_all * 100 + n_all * 100 * 100
+                A.CLASSIFIER = "logit"
+                extra_open = ((max(sig - order, 0.0) + pred) if prefix == "budgetc" else sig + pred) if kind == "v3" else 0.0
+                ok = np.where(gated, full_ok, [bool(r[E][ladder[k]]["ok15"]) for r, k in zip(recs, stops)])
+                s_ = np.where(gated, fs + sig + pred, [cost(r, E, ladder, k, "s") + extra_open for r, k in zip(recs, stops)])
+                ops = np.where(gated, fops + sig_ops,
+                               [cost(r, E, ladder, k, "ops") + (0 if prefix == "budgetc" else so)
+                                for r, k, so in zip(recs, stops, sig_ops)])
+                k = f"{'v3.' if kind == 'v3' else ''}mc.{d}.{o}.{cert}"
+                rr, loss, risk = 100 * ok.mean(), 100 * (full_ok.mean() - ok.mean()), 100 * np.mean(full_ok & ~ok)
+                check(k + ".rr", rr, "{:.1f}", 0.05)
+                check(k + ".loss", loss, "{:.2f}", 0.005)
+                check(k + ".risk", risk, "{:.2f}", 0.005)
+                check(k + ".speed", fs.mean() / s_.mean(), "{:.2f}", 0.005)
+                check(k + ".ops", fops.mean() / ops.mean(), "{:.2f}", 0.005)
+                if cert == "group" and kind == "v3":
+                    mac_risks.append((risk, k))
+if mac_risks:
+    print(f"MAC, final method, group-conditional test risks: max {max(mac_risks)[0]:.2f} % ({max(mac_risks)[1]}), "
+          f"all <= 1 %: {all(r <= 1.0 for r, _ in mac_risks)}")
+for fam in ("v3_indoor_fpfh", "v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf", "v2_kitti_fcgf"):
+    path = RB / f"live_budget_compare_ext_{fam}_v3_mac.json"
+    if not path.exists():
+        continue
+    rows = json.loads(path.read_text())
+    for d in [d for d, (_, f) in SETS.items() if f == fam]:
+        rs = [r for r in rows if r["est"] == "mac" and r["subset"] == SETS[d][0]]
+        if not rs:
+            continue
+        f = np.mean([r["full"]["s"] for r in rs])
+        check(f"mc.{d}.compat.live.speed", f / np.mean([r["budgetc"]["s"] for r in rs]), "{:.2f}", 0.005)
+        check(f"v3.mc.{d}.compat.live.speed", f / np.mean([r["budgetc+v3"]["s"] for r in rs]), "{:.2f}", 0.005)
+        own = {q["pair_id"]: next(st["s"] for st in q["mac"] if st["n"] >= q["N_all"] and not st.get("repeat"))
+               for q in B.load(SETS[d][0], "budgetc")}  # MAC: the pair's own logged full-budget time
+        stall = max(max(r[j]["s"] for j in r["run_order"]) / own[r["pair_id"]] for r in rs)
+        if stall > 10:
+            print(f"STALL left in {path.name} mac {d}: {stall:.0f}x the pair's logged full-budget time")
+            bad += 1
 print("checks done;", "no mismatches" if bad == 0 else f"{bad} problems")
