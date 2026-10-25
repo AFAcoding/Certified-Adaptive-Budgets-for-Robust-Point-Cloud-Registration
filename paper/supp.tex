@@ -295,22 +295,23 @@ None of the re-fitted certificates exceeds 1\,\% on either test set (largest ris
 \label{supp:gpu}
 
 \paragraphb{Setup.}
-A pre-registered additional measurement (protocol~v3, addendum~C): nothing is chosen, fitted or certified on its results.
+A pre-registered additional measurement (protocol~v3, addendum~C and its amendment for MAC): nothing is chosen, fitted or certified on its results.
 PyTorch ports of \SCP, TurboReg and MAC's graph stages, of the compatibility ordering, of the gate's signals and of the controller follow the CPU code operation by operation (distances in double precision, graph products in single precision); MAC's maximal-clique search stays on the CPU, as in the authors' implementations.
 The certified controllers and gates are exported as arrays whose probabilities equal the fitted classifiers' (checked to $10^{-9}$), and the correspondences of the CPU live-timing samples (300 pairs per test set) are exported single-threaded, exactly as logged.
 Every run is timed with the device synchronised, the order of the runs rotated from pair to pair, after untimed warm-up runs, on a \val{gpu.device} (Google Colab).
 Before the run, the ports reproduced the CPU decisions and outcomes on fitting pairs; \SCP's local search ranks integer scores whose ties PyTorch breaks differently from NumPy, which the GPU runs keep.
-The run covers the fresh blind test (all three estimators) and the held-out scenes (\SCP and TurboReg); the six further test sets of addendum~C (KITTI raw drives and odometry, 3DMatch, 3DLoMatch and their FCGF versions) were exported but not timed.
+\SCP and TurboReg are timed on all \val{gpu.sets.n} test sets of addendum~C, MAC on \val{gpu.mc.sets.n} of them (with FCGF on KITTI every configuration is the full budget).
 
 \paragraphb{Results.}
 \Cref{tab:gpu} lists the full budget's time and the speed-ups of both configurations.
 The savings carry over: on the fresh pairs above 30\,\% overlap, \method is \val{gpu.sc.th.v3.speed}\X, \val{gpu.tr.th.v3.speed}\X and \val{gpu.mc.th.v3.speed}\X faster than the full budget for \SCP, TurboReg and MAC (CPU: \val{v3.sc.th.compat.live.speed}\X, \val{v3.tr.th.compat.live.speed}\X and \val{v3.mc.th.compat.live.speed}\X), and at low overlap it costs about the full budget, as on the CPU.
+For \SCP and TurboReg the GPU speed-up of the final method is within \val{gpu.cpugap.max} of the CPU's on every test set, and on the timed samples it loses at most \val{gpu.v3.risk.max}\,\% of the pairs that the full budget registers (\val{gpu.v3.risk.max.where}: \val{gpu.v3.risk.max.lost} of \val{gpu.v3.risk.max.n}), within the certified level.
 The GPU stopping decisions equal the CPU's offline decisions on \val{gpu.agree.mean}\,\% of the pairs on average (at least \val{gpu.agree.min}\,\% per set), and the full-budget outcomes agree on at least \val{gpu.fullagree.min}\,\%.
-The ports are not tuned for speed (one pair at a time, with host synchronisations), so their absolute times are not those of an optimised GPU implementation; the speed-ups compare each configuration with the full budget of the same code on the same pairs.
+The ports are not tuned for speed (one pair at a time, with host synchronisations); the speed-ups compare each configuration with the full budget of the same code on the same pairs.
 
 \begin{table*}[t]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{\textbf{Live timing on a GPU} (\val{gpu.device}; the same 300 pairs per test set as on the CPU; compatibility order, group-conditional certificates). Full: mean time of the full budget (ms); v2: speed-up of \method without the gate; \method: speed-up of the final method. MAC on the fresh blind test only (its clique search runs on the CPU).}
+\caption{\textbf{Live timing on a GPU} (\val{gpu.device}; the same 300 pairs per test set as on the CPU; compatibility order, group-conditional certificates). Full: mean time of the full budget (ms); v2: speed-up of \method without the gate; \method: speed-up of the final method. MAC's clique search runs on the host CPU, as in the authors' code.}
 \label{tab:gpu}
 \begin{fitbox}
 \begin{tabular}{@{}l ccc ccc ccc@{}}
@@ -442,7 +443,7 @@ Method & RR & Loss [UB] & Time & Ops & Risk & RR & Loss [UB] & Time & Ops & Risk
 \end{fitbox}
 \end{table*}
 
-\paragraphb{Which pairs benefit.}
+\paragraphb{Which pairs benefit.}\looseness=1
 \Cref{tab:anchorsupp} groups pairs by the number of true correspondences among the 100 anchors and compares \SCP's success at $N=250$ under both orderings.
 
 \begin{table}[h]
@@ -458,7 +459,7 @@ Data & True anchors & Pairs & Full & Ratio & Compat. & Gain\\
 \end{tabular}
 \end{table}
 
-\paragraphb{Per-pair latency.}\looseness=-1
+\paragraphb{Per-pair latency.}\looseness=1
 \method lowers the mean time per pair, not the worst case (\cref{tab:latency}).
 On 3DMatch most pairs stop after the first stage, so its median latency is a small fraction of the full budget's (\val{lat.sc.m.cab.p50} vs.\ \val{lat.sc.m.full.p50}\,ms for \SCP).
 A pair that needs the whole ladder also pays for the stages tried before, so on such pairs \method is slower than one full run: its 99th-percentile latency is up to \val{lat.overhead.p99.max}\,\% above the full budget's (\val{lat.overhead.p99.where}), and on 3DLoMatch, where most pairs run the whole ladder, it is slower on \val{lat.lo.slower}\,\% of the pairs, by a few percent.
@@ -480,7 +481,7 @@ An application with a hard per-pair deadline should therefore plan for the whole
 \end{table}
 
 \paragraphb{Headroom.}
-\Cref{tab:headroom} compares \method with two oracles.
+\Cref{tab:headroom} compares \method with two oracles on the same ladder (\mainref{sec:conclusion}{Sec.~5}).
 
 \begin{table}[h]
 \centering\footnotesize\setlength{\tabcolsep}{2.2pt}
@@ -528,19 +529,21 @@ This is why the ordering buys TurboReg accuracy more than time, and why wall-clo
 \label{supp:limits}
 Four questions about the protocol can be answered with the logs we already have: how many calibration pairs a certificate needs, how the guarantee holds group by group, how much the choice of $\varepsilon$ and $G$ matters, and what bounding the worst case costs. The studies that re-run the selection (calibration size, sensitivity, re-fitted controllers) use the development benchmarks only, so the blind test sets are evaluated once.
 
-\paragraphb{How many calibration pairs a certificate needs.}\looseness=1
+\paragraphb{How many calibration pairs a certificate needs.}\looseness=-1
 With no loss observed among $n$ calibration pairs, the exact binomial test certifies a 1\,\% level at $\delta=0.1$ only if $n\ge230$, and the group-conditional certificate needs $339$ pairs in each of its three groups at level $\delta/3$.
 \Cref{tab:calsize} checks this on random subsets of the calibration pools of 3DMatch and KITTI (20 subsets per size, from 100 pairs to the whole pool), re-certifying the thresholds of \method's selected configuration and evaluating each certificate once on test.
-The group-conditional certificate first appears between 900 and 1{,}200 pairs, as the bound predicts ($3\times339=1{,}017$); below that, \method runs the full budget.
+The group-conditional certificate first appears between 900 and 1{,}200 pairs, as the bound predicts ($3\times339=1{,}017$).
+
 The marginal certificate appears from 300 pairs, but on KITTI up to \val{cal.kitti.marg.over.max}\,\% of the marginal certificates (TurboReg) exceed the 1\,\% level on test, while no group-conditional certificate does at any size (largest risk \val{cal.group.worst.max}\,\%).
 The safety of the group-conditional certificate is paid for with a calibration set of about a thousand pairs.
 
-\paragraphb{Checks of the guarantee.}\looseness=1
+\paragraphb{Checks of the guarantee.}
 Proposition~1 bounds the risk of every difficulty group, and hence of any mixture of easy and hard pairs; the worst mixture puts all its weight on the group with the largest risk.
 \Cref{tab:evidence} reports this worst-case risk on test.
-For \method it is at most \val{ev.worst.group.fpfh.max}\,\% on the FPFH test sets and \val{ev.worst.group.max}\,\% overall; the marginal certificate, evaluated on the same groups, reaches up to \val{ev.worst.marg.max}\,\%, which a test set made only of such pairs would lose.
+
+{\clubpenalty=10000 For \method it is at most \val{ev.worst.group.fpfh.max}\,\% on the FPFH test sets and \val{ev.worst.group.max}\,\% overall; the marginal certificate, evaluated on the same groups, reaches up to \val{ev.worst.marg.max}\,\%, which a test set made only of such pairs would lose.
 Of the \val{ev.groups.n} test groups, \val{ev.groups.over} exceed 1\,\% for \method (at most \val{ev.groups.over.risk}\,\%, \val{ev.groups.over.lost} of \val{ev.groups.over.n} pairs); the certificate bounds the expected risk of each group, and in a group of \val{ev.groups.over.n} pairs a single pair moves the realized risk by \val{ev.groups.over.step}\pp.
-Scenes are not certified groups, and with few pairs each their risks scatter more (up to the value in the table).
+Scenes are not certified groups, and with few pairs each their risks scatter more (up to the value in the table).\par}
 
 \paragraphb{Re-fitted controllers (protocol~v2).}\looseness=1
 Re-fitting the controller on ten bootstrap resamples of the fitting pairs and re-certifying its thresholds changes the speed-up moderately (development benchmarks); \val{ev.refit.over} of the \val{ev.refit.n} re-fitted certificates exceed 1\,\% on test (at most \val{ev.refit.risk.max}\,\%), consistent with a guarantee that holds with probability \mbox{$1-\delta=0.9$}.
@@ -571,8 +574,8 @@ With one or two groups the chosen candidates also stay within the level on these
 \paragraphb{Bounding the worst case.}\looseness=1
 The pre-registered worst-case variant admits a ladder only if running all its stages costs at most $1+\rho$ times the full budget on 95\,\% of the fitting pairs, and otherwise leaves the selection unchanged (\cref{tab:worstcase}); the protocol fixed $\rho\in\{0.10,0.25\}$ in advance.
 
-With $\rho=0.25$, the outdoor ladder changes to the $\times4$ ladder, which removes \method's slowdown on the KITTI raw drives (\val{wc.sc.0.25.kitti_raw_blind.speed}\X and \val{wc.tr.0.25.kitti_raw_blind.speed}\X instead of \val{wc.sc.none.kitti_raw_blind.speed}\X and \val{wc.tr.none.kitti_raw_blind.speed}\X, offline) at a smaller speed-up on KITTI odometry, while the indoor selection is unchanged; with $\rho=0.10$ the indoor speed-ups shrink or vanish.
-Every variant stays within the risk level on every test set.
+{\interlinepenalty=10000 \clubpenalty=10000 With $\rho=0.25$, the outdoor ladder changes to the $\times4$ ladder, which removes \method's slowdown on the KITTI raw drives (\val{wc.sc.0.25.kitti_raw_blind.speed}\X and \val{wc.tr.0.25.kitti_raw_blind.speed}\X instead of \val{wc.sc.none.kitti_raw_blind.speed}\X and \val{wc.tr.none.kitti_raw_blind.speed}\X, offline) at a smaller speed-up on KITTI odometry, while the indoor selection is unchanged; with $\rho=0.10$ the indoor speed-ups shrink or vanish.
+Every variant stays within the risk level on every test set.\par}
 
 \begin{table*}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3.6pt}

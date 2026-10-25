@@ -1474,6 +1474,21 @@ def gpu_results(gpu_dir=None, bundle=None):
             L.append(" & ".join(cells) + " \\\\")
             if code in ("tl", "kr"):  # fresh blind test | blind sets of protocol v2 | development benchmarks
                 L.append("\\midrule")
+    # final method on the GPU: largest realized risk on the timed samples, and the largest gap between the GPU and the
+    # CPU live speed-up (SC2-PCR and TurboReg; MAC's GPU runs are a hybrid with its clique search on the host CPU)
+    risks = [(num(f"gpu.{e}.{c}.v3.risk"), e, c) for e in ESTS_ALL for c in cfg["sets"] if f"gpu.{e}.{c}.v3.risk" in VALS]
+    if risks:
+        w = max(risks)
+        val("gpu.v3.risk.max", w[0], "{:.2f}")
+        val("gpu.v3.risk.max.where", f"{ENAME[w[1]]} on {dsent(w[2])}")
+        val("gpu.v3.risk.max.lost", str(int(round(w[0] / 100 * int(VALS[f"gpu.{w[1]}.{w[2]}.n"])))))
+        val("gpu.v3.risk.max.n", VALS[f"gpu.{w[1]}.{w[2]}.n"])
+    gaps = [abs(num(f"gpu.{e}.{c}.v3.speed") - num(f"v3.{e}.{c}.compat.live.speed")) for e in ESTS for c in cfg["sets"]
+            if f"gpu.{e}.{c}.v3.speed" in VALS and f"v3.{e}.{c}.compat.live.speed" in VALS]
+    if gaps:
+        val("gpu.cpugap.max", max(gaps), "{:.2f}")
+        val("gpu.sets.n", str(len({c for e in ESTS for c in cfg["sets"] if f"gpu.{e}.{c}.v3.speed" in VALS})))
+        val("gpu.mc.sets.n", str(len([c for c in cfg["sets"] if f"gpu.mc.{c}.v3.speed" in VALS])))
     if agree_all:
         val("gpu.agree.min", 100 * min(agree_all), "{:.0f}")
         val("gpu.agree.mean", 100 * float(np.mean(agree_all)), "{:.0f}")
