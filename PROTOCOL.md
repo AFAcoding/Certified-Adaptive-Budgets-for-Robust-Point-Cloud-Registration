@@ -266,3 +266,13 @@ fitted or certified on GPU results.
 - Reported, whatever they are: the GPU model, mean time per pair, the speed-up of each configuration over the full
   budget with scene-stratified bootstrap intervals, the recall of every run, and the agreement of the GPU stopping
   decisions and full-budget outcomes with the CPU logs (a few sorts can break ties differently on the GPU).
+
+# Protocol v3, addendum C, amendment 1: MAC on every timed test set (2026-10-25, before any MAC GPU run beyond the fresh blind test)
+
+So that all three estimators are compared on the same test sets, MAC is also timed on the GPU on the eight further test
+sets on which its certified configurations are timed on the CPU: held-out scenes (both overlap parts), KITTI raw
+drives, 3DMatch, 3DLoMatch, KITTI odometry, FCGF 3DMatch and FCGF 3DLoMatch (with FCGF on KITTI every configuration is
+the full budget). Same pairs (the CPU live-timing samples), implementation, timing procedure and reporting as above;
+MAC's maximal-clique search runs on the host CPU of the GPU machine, so these speed-ups measure that hybrid. Nothing
+is chosen, fitted or certified on the results, and they are reported whatever they are. Bundles are exported
+single-threaded, as above.
