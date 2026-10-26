@@ -652,24 +652,24 @@ Test set & min.\ $n$ & ${>}1$\,\% & max & min.\ $n$ & ${>}1$\,\% & max\\
 \label{supp:equaltime}
 \paragraphb{Variants.}
 \emph{Fewer seeds}: \SCP on all correspondences with a maximum seed ratio of 0.025 or 0.01 instead of 0.2 (non-maximum suppression already limits the seeds to a few hundred).
-\emph{Fewer cliques}: TurboReg with $K_1=500$ or $250$ instead of 2{,}000.
+\emph{Fewer cliques}: TurboReg with $K_1=500$ or $250$ instead of 2{,}000; MAC with the Top-$K$ clique selection of its authors' ablation~\cite{zhang2023mac}, $K=200$ or $100$: only the $K$ heaviest node-guided cliques become hypotheses (protocol~v3, addendum~D).
 
 {\clubpenalty=10000 \emph{Uniform sampling}: a random subset of $N$ correspondences.
 \emph{FastMAC-style sampling}~\cite{zhang2024fastmac}: compatibility weights $W_{ij}=1-S_{ij}^2/(2d^2)$, kept if above 0.999, on all correspondences (second-order graph $W\odot WW$ as published, or the first-order graph $W$ as a cheaper variant); the degree signal $s=W\mathbf 1$ is high-pass filtered, $f=(\mathrm{Diag}(s)-W)s$, and $N$ correspondences are drawn without replacement with probability $\propto f_i^2$.
 The signal is computed once per pair and charged to every budget.\par}
 
 {\clubpenalty=10000 \paragraphb{Measurement.}
-Recall is measured on every second test pair (by index; \val{eq.n.bh} pairs of the held-out scenes and \val{eq.n.lo} 3DLoMatch pairs; FastMAC-style second order on every fourth, fewer seeds/cliques on every eighth), and time live on \val{eq.sc.live.n} test pairs.\par}
+Recall is measured on every second test pair (by index; \val{eq.n.bh} pairs of the held-out scenes and \val{eq.n.lo} 3DLoMatch pairs; FastMAC-style second order on every fourth, fewer seeds/cliques and MAC's Top-$K$ on every eighth), and time live on \val{eq.sc.live.n} test pairs.\par}
 
 \begin{table*}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\caption{\textbf{3DLoMatch, equal-time comparison.} Time: offline time relative to the full budget on the same pairs (sampling signal included). $\Delta$: recall minus that of the full budget on the same pairs (pp; full budget on all \val{eq.n.lo} pairs: \val{eq.sc.lo.fullrr}\,\% for \SCP, \val{eq.tr.lo.fullrr}\,\% for TurboReg). (a)/(b): seed ratio 0.025/0.01 or $K_1=500/250$.}
+\caption{\textbf{3DLoMatch, equal-time comparison.} Time: offline time relative to the full budget on the same pairs (sampling signal included). $\Delta$: recall minus that of the full budget on the same pairs (pp; full budget on all \val{eq.n.lo} pairs: \val{eq.sc.lo.fullrr}\,\% for \SCP, \val{eq.tr.lo.fullrr}\,\% for TurboReg, \val{eq.mc.lo.fullrr}\,\% for MAC). Risk: share of the pairs registered by the full budget that are lost (\%; \method certifies 1\,\%). (a)/(b): seed ratio 0.025/0.01, $K_1=500/250$ or Top-$K$ with $K=200/100$ (MAC, protocol~v3, addendum~D).}
 \label{tab:eqlo}
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}lccccccccc@{}}
 \toprule
-& \multicolumn{2}{c}{\SCP} & \multicolumn{2}{c}{TurboReg}\\
-\cmidrule(lr){2-3}\cmidrule(l){4-5}
-Variant & time & $\Delta$ & time & $\Delta$\\
+& \multicolumn{3}{c}{\SCP} & \multicolumn{3}{c}{TurboReg} & \multicolumn{3}{c}{MAC}\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(l){8-10}
+Variant & time & $\Delta$ & risk & time & $\Delta$ & risk & time & $\Delta$ & risk\\
 \midrule
 \tablebody{tables/supp_equal_time_lo.tex}
 \bottomrule

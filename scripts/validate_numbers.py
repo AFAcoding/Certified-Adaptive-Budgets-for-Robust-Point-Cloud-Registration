@@ -290,4 +290,34 @@ for fam in ("v3_indoor_fpfh", "v2_indoor_fpfh", "v2_kitti_fpfh", "v2_indoor_fcgf
         if stall > 10:
             print(f"STALL left in {path.name} mac {d}: {stall:.0f}x the pair's logged full-budget time")
             bad += 1
+# equal-time comparison on the held-out scenes above 30 % overlap (MAC: addendum D): the recall of every sampled variant
+# on its schedule of pairs (every 2nd test pair; FastMAC second order every 4th), the full budget's recall on those
+# pairs (ratio-order logs, last stage), uniform sampling of 2,000 correspondences (risk), and the live mean times
+from acpr.data import load_pairs  # noqa: E402
+
+index = {p.pair_id: p.index for p in load_pairs("v2_blind_hi")}
+budget_logs = {r["pair_id"]: r for r in B.load("v2_blind_hi", "budget")}
+base = ROOT / "logs" / "eqtime_v2_blind_hi.jsonl"
+if base.exists():
+    base_ids = [json.loads(x)["pair_id"] for x in open(base) if x.strip()]
+    live = [r for f in ("live_equal_time_v2_blind_hi_v3.json", "live_equal_time_v2_blind_hi_v3_mac.json")
+            if (RB / f).exists() for r in json.loads((RB / f).read_text())]
+    for est, e, fname in (("sc2", "sc", base.name), ("turbo", "tr", base.name), ("mac", "mc", "eqtime_mac_v2_blind_hi.jsonl")):
+        path = ROOT / "logs" / fname
+        eq = {r["pair_id"]: r for r in map(json.loads, open(path))} if path.exists() else {}
+        ids = [pid for pid in base_ids if index[pid] % 2 == 0]
+        if not ids or not all(pid in eq for pid in ids):
+            continue
+        full = np.array([bool(budget_logs[pid][est][4]["ok15"]) for pid in ids])
+        check(f"eq.{e}.bh.full.rr", 100 * full.mean(), "{:.1f}", 0.05)
+        for v, every in (("rand", 2), ("fm1", 2), ("fm2", 4)):
+            sub = [pid for pid in ids if index[pid] % every == 0]
+            for b in (250, 500, 1000, 2000):
+                check(f"eq.{e}.bh.{v}.{b}.rr", 100 * np.mean([eq[pid][v][str(b)][est]["ok15"] for pid in sub]), "{:.1f}", 0.05)
+        u = np.array([bool(eq[pid]["rand"]["2000"][est]["ok15"]) for pid in ids])
+        check(f"eq.{e}.bh.rand2000.risk", 100 * np.mean(full & ~u), "{:.2f}", 0.005)
+        rs = [r for r in live if r["est"] == est]
+        if rs:
+            check(f"eq.{e}.full.ms", 1e3 * np.mean([r["full"] for r in rs]), "{:.0f}", 0.5)
+            check(f"eq.{e}.cab.ms", 1e3 * np.mean([r["cab"] for r in rs]), "{:.0f}", 0.5)
 print("checks done;", "no mismatches" if bad == 0 else f"{bad} problems")

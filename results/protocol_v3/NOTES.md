@@ -118,3 +118,20 @@ The 40-48 ms of the blind run is not reproduced on development pairs; its cause 
   realized risk on the 300-pair samples 1.00 % (3 of
   300, in 2 conditions); the final method faster than CAB without the gate in
   23 of 30 conditions, SC2-PCR above 30 % overlap included (unlike the CPU live run).
+
+## Addendum D: MAC in the equal-time comparison (2026-10-26)
+- Pre-registered and pushed (4acca12) before any MAC equal-time run on a test pair. Smoke tests on fitting pairs only
+  (v2_fit; their outputs deleted). The smoke test showed that a fresh worker's first MAC call pays for importing igraph
+  (about 0.8 s); every worker process of the offline logs now starts with an untimed run (in the addendum as pushed).
+- Offline variant logs: held-out scenes above 30 % overlap 10:11-10:50 (1,046 pairs), 3DLoMatch 10:50-11:18
+  (891 pairs), 6 worker processes.
+- Live timing: a first start at 11:18 was stopped within its first 25 pairs, because a validation run
+  (scripts/validate_numbers.py) was still using about five cores; it wrote nothing. Restarted from the first pair at
+  11:19 with the machine otherwise idle.
+- Live timing finished 12:54 (300 pairs; MAC full budget 4,195 ms, final method 1,645 ms per pair). Every variant that
+  runs as fast as CAB registers fewer pairs at its time (MAC: FastMAC-style second order 0.7 pp, uniform 1.1 pp, fixed
+  budgets 2.5-3.5 pp); Top-K cliques takes 1,695-1,773 ms and needs 1.1x CAB's time to match its recall. On 3DLoMatch
+  FastMAC-style second-order sampling of 2,000 correspondences keeps MAC's net recall (+0.0 pp at 0.79x the offline
+  time) but loses 1.79 % of the pairs the full budget registers; every cheaper variant saving at least 5 % of the time
+  loses at least 1.35 % (MAC), 2.69 % (TurboReg), 4.04 % (SC2-PCR) of them. scripts/validate_numbers.py (now also
+  recomputing the equal-time recalls, risks and live times from the raw logs): no mismatches.

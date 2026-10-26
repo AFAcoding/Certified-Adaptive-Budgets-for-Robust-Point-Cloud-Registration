@@ -85,6 +85,7 @@ BLUE_L, VIOLET, MAGENTA, RED, LIGHT = "#86b6ef", "#6250d6", "#e87ba4", "#e34948"
 DARK, AXIS = "#6f6d66", "#8f8d86"  # dark grey fill; spines and tick marks
 # figures are drawn at their printed width (7.0 in for full-width, 3.35 in for one column), so these are point sizes
 FS_TICK, FS_LABEL, FS_TITLE, FS_LEGEND = 7.5, 8.0, 8.5, 7.5
+FS_CELL = 6.2  # values inside the cells of a grid
 
 
 def setup_style():
@@ -576,6 +577,9 @@ def anchors_and_headroom(ds, logs):
 
 
 # ============================================================================ equal-time comparison
+# cheaper setting of each estimator on all correspondences: SC2-PCR fewer seeds (seed ratio), TurboReg fewer cliques
+# (K1), MAC its Top-K clique selection (addendum D); (log key, values (a) and (b))
+CHEAP = {"sc": ("seeds", ("0.025", "0.01")), "tr": ("k1", ("500", "250")), "mc": ("topk", ("200", "100"))}
 def equal_time(logs):
     """Cheaper variants of the estimators vs CAB at equal time (blind held-out scenes: live time; 3DLoMatch: offline, supp)."""
     variants = [("rand", "Uniform sampling"), ("fm1", "FastMAC-style, 1st-order graph"),
@@ -587,6 +591,8 @@ def equal_time(logs):
         if not path.exists() or (d, "compat") not in logs:
             continue
         eq = {r["pair_id"]: r for r in map(json.loads, open(path))}
+        mac_path = LOG_ROOT / f"eqtime_mac_{subset}.jsonl"  # addendum D: MAC's variants, logged separately
+        eq_mac = {r["pair_id"]: r for r in map(json.loads, open(mac_path))} if mac_path.exists() else {}
         index = {r["pair_id"]: i for i, r in enumerate(logs[(d, "ratio")])}
         # keep the schedule: every 2nd pair (rand, fm1), every 4th (fm2), every 8th (seeds, k1)
         from acpr.data import load_pairs
@@ -595,12 +601,16 @@ def equal_time(logs):
         val(f"eq.n.{d}", f"{len(ids):,}")
         ratio_logs = {r["pair_id"]: r for r in logs[(d, "ratio")]}
         compat_logs = {r["pair_id"]: r for r in logs[(d, "compat")]}
-        for e, E in ESTS.items():
+        for e, E in ESTS_ALL.items():
+            if E == "mac" and not all(pid in eq_mac for pid in ids):
+                continue  # MAC's variant logs not complete yet
+            eqe = eq_mac if E == "mac" else eq
             # CAB outcome per pair: the final method (protocol v3: classifier chosen on the fitting pairs and the
             # hardness gate; compat order, group-conditional), as timed live in live_equal_time_v2_blind_hi_v3.json
             import select_ladder as S
             from acpr import analysis as AN
-            sel = json.loads((RB / "ladder_selection_compat_ext_v2_indoor_fpfh_ctlauto_gate.json").read_text())
+            sel = json.loads((RB / f"ladder_selection_compat_ext_v2_indoor_fpfh_ctlauto_gate{'_mac' if E == 'mac' else ''}"
+                                   ".json").read_text())
             sel = sel[E]["selected"]["mondrian"]
             ladder = B.LADDERS_EXT[sel["ladder"]]
             AN.CLASSIFIER = sel["classifier"]
@@ -625,15 +635,15 @@ def equal_time(logs):
                         sub = ids
                         oks = [bool(src[pid][E][i]["ok15"]) for pid in sub]
                     else:
-                        sub = [pid for pid in ids if v in eq[pid] and (v != "fm2" or idx_of[pid] % 4 == 0)]
-                        oks = [eq[pid][v][str(b)][E]["ok15"] for pid in sub]
+                        sub = [pid for pid in ids if v in eqe[pid] and (v != "fm2" or idx_of[pid] % 4 == 0)]
+                        oks = [eqe[pid][v][str(b)][E]["ok15"] for pid in sub]
                     curve.append((b, 100 * np.mean(oks), sub))
                 res[v] = curve
             res["cheap"] = []
-            key, params = ("seeds", ("0.025", "0.01")) if e == "sc" else ("k1", ("500", "250"))
-            sub8 = [pid for pid in ids if key in eq[pid] and idx_of[pid] % 8 == 0]
+            key, params = CHEAP[e]
+            sub8 = [pid for pid in ids if key in eqe[pid] and idx_of[pid] % 8 == 0]
             for prm in params:
-                res["cheap"].append((prm, 100 * np.mean([eq[pid][key][prm]["ok15"] for pid in sub8]), sub8))
+                res["cheap"].append((prm, 100 * np.mean([eqe[pid][key][prm]["ok15"] for pid in sub8]), sub8))
             for v, curve in res.items():
                 for b, rr, sub in curve:
                     val(f"eq.{e}.{d}.{v}.{b}.rr", rr, "{:.1f}")
@@ -645,7 +655,7 @@ def equal_time(logs):
             # the strongest cheap baseline: uniform sampling of 2,000 correspondences, paired with CAB (McNemar)
             from scipy.stats import binomtest
             a = np.array([cab_ok[p] for p in ids])
-            u = np.array([bool(eq[p]["rand"]["2000"][E]["ok15"]) for p in ids])
+            u = np.array([bool(eqe[p]["rand"]["2000"][E]["ok15"]) for p in ids])
             n10, n01 = int((a & ~u).sum()), int((~a & u).sum())
             val(f"eq.{e}.{d}.rand2000.rr", 100 * u.mean(), "{:.1f}")
             val(f"eq.{e}.{d}.rand2000.p", pfmt(binomtest(n10, n10 + n01, 0.5).pvalue if n10 + n01 else 1.0))
@@ -656,38 +666,51 @@ def equal_time(logs):
             if d == "lo":  # offline table (supp): relative time = ratio of summed times on the variant's own pairs
                 full_s = {pid: B.trajectory_ladder(ratio_logs[pid], E, (4,))[-1]["s"] for pid in ids}
                 cab_s = {r["pair_id"]: s for r, s in zip(logs[(d, "compat")], o.s)}
-                # rows: (group, label, relative time, recall minus the full budget's on the same pairs, pp)
+                # rows: (group, label, relative time, recall minus the full budget's on the same pairs (pp), risk:
+                # share of the pairs the full budget registers that the row loses (%))
                 rows = lo_rows.setdefault(e, [])
                 fr = lambda sub: 100 * np.mean([full_ok[p] for p in sub])  # noqa: E731
+                risk = lambda sub, ok: 100 * np.mean([full_ok[p] and not ok(p) for p in sub])  # noqa: E731
                 rows.append((None, "\\method (ours)", sum(cab_s[p] for p in ids) / sum(full_s.values()),
-                             100 * np.mean([cab_ok[p] for p in ids]) - fr(ids)))
+                             100 * np.mean([cab_ok[p] for p in ids]) - fr(ids), risk(ids, lambda p: cab_ok[p])))
                 for v, name in variants:
                     for i, b in enumerate(BUDGETS[:4]):
                         sub = res[v][i][2]
                         if v in ("ratio", "compat"):
                             src = ratio_logs if v == "ratio" else compat_logs
                             t = sum(B.trajectory_ladder(src[p], E, (i,))[-1]["s"] for p in sub)
+                            ok = lambda p, src=src, i=i: bool(src[p][E][i]["ok15"])  # noqa: E731
                         else:
                             sig = {"rand": None, "fm1": "t_fm1", "fm2": "t_fm2"}[v]
-                            t = sum(eq[p][v][str(b)][E]["s"] + (eq[p][sig] if sig else 0.0) for p in sub)
+                            t = sum(eqe[p][v][str(b)][E]["s"] + (eqe[p][sig] if sig else 0.0) for p in sub)
+                            ok = lambda p, v=v, b=b: bool(eqe[p][v][str(b)][E]["ok15"])  # noqa: E731
                         rows.append((name, f"$N{{=}}{b:,}$".replace(",", "{,}"), t / sum(full_s[p] for p in sub),
-                                     res[v][i][1] - fr(sub)))
+                                     res[v][i][1] - fr(sub), risk(sub, ok)))
                 for prm, rr, sub in res["cheap"]:
-                    t = sum(eq[p][key][prm]["s"] for p in sub)
-                    rows.append(("Fewer seeds (\\SCP) / cliques (TurboReg)", "(a)" if prm == params[0] else "(b)",
-                                 t / sum(full_s[p] for p in sub), rr - fr(sub)))
+                    t = sum(eqe[p][key][prm]["s"] for p in sub)
+                    rows.append(("Fewer seeds (\\SCP) / cliques (TurboReg, MAC)", "(a)" if prm == params[0] else "(b)",
+                                 t / sum(full_s[p] for p in sub), rr - fr(sub),
+                                 risk(sub, lambda p, prm=prm: bool(eqe[p][key][prm]["ok15"]))))
                 val(f"eq.{e}.lo.fullrr", fr(ids), "{:.1f}")
-    for e, rows in lo_rows.items():  # smallest recall loss of any cheaper variant that saves >= 5 % of the time
+    for e, rows in lo_rows.items():  # cheaper variants that save >= 5 % of the time: smallest loss, smallest risk
         cheaper = [r for r in rows if r[0] is not None and r[2] <= 0.95]
         val(f"eq.{e}.lo.minloss", -max(r[3] for r in cheaper), "{:.1f}")
+        val(f"eq.{e}.lo.minrisk", min(r[4] for r in cheaper), "{:.2f}")
+        best = max(cheaper, key=lambda r: (r[3], -r[2]))  # the best recall, then the cheapest
+        val(f"eq.{e}.lo.best.trel", best[2], "{:.2f}")
+        val(f"eq.{e}.lo.best.d", best[3], "{:+.1f}")
+        val(f"eq.{e}.lo.best.risk", best[4], "{:.2f}")
         val(f"eq.{e}.lo.cab.trel", rows[0][2], "{:.2f}")
-    if len(lo_rows) == 2:
+        val(f"eq.{e}.lo.cab.risk", rows[0][4], "{:.2f}")
+    if {"sc", "tr"} <= set(lo_rows):  # one column pair per estimator (MAC once its logs are complete)
         L, group = [], None
-        for (g, name, ts, ds_), (_, _, tt, dt) in zip(lo_rows["sc"], lo_rows["tr"]):
+        ests_lo = [e for e in ("sc", "tr", "mc") if e in lo_rows]
+        for parts in zip(*(lo_rows[e] for e in ests_lo)):
+            g, name = parts[0][0], parts[0][1]
             if g is not None and g != group:
-                L.append(f"\\multicolumn{{5}}{{@{{}}l}}{{\\textit{{{g}}}}} \\\\")
+                L.append(f"\\multicolumn{{{1 + 3 * len(ests_lo)}}}{{@{{}}l}}{{\\textit{{{g}}}}} \\\\")
             group = g
-            cells = [f"{ts:.2f}", f"{ds_:+.1f}", f"{tt:.2f}", f"{dt:+.1f}"]
+            cells = [c for _, _, t_, d_, r_ in parts for c in (f"{t_:.2f}", f"{d_:+.1f}", f"{r_:.1f}")]
             cells = [c.replace("-", "\\ensuremath{-}") for c in cells]
             L.append(("\\quad " if g else "") + " & ".join([name] + cells) + " \\\\")
             if g is None:
@@ -720,14 +743,41 @@ def controller_calibration():
         val(f"conf.{k}.correct", f"{a}" if a == b else f"{a}--{b}")
 
 
-def risk_ledger(ax):
+SHORT = {"th": "Fresh scenes", "tl": "Fresh, low", "bh": "Held-out", "bl": "Held-out low", "kr": "KITTI raw",
+         "fkr": "KITTI raw F", "m": "3DMatch", "lo": "3DLoMatch", "ki": "KITTI", "fm": "3DMatch F", "flo": "3DLoMatch F",
+         "fki": "KITTI F"}  # row labels of the teaser's panels (b) and (c)
+
+
+def teaser_sets():
+    """Rows of the teaser's panels (b) and (c): the blind sets of protocol v3, then every earlier test set."""
+    return [d for d in BLIND3 + BLIND + ("m", "lo", "ki", "fm", "flo", "fki") if f"v3.sc.{d}.compat.group.risk" in VALS]
+
+
+def set_rows(ax, sets_, descriptors=False):
+    """Row labels of the teaser's panels (b) and (c) (bold: the blind test of the final method), the rules between rows
+    and, optionally, a rotated descriptor of each block left of the labels."""
+    for i in range(len(sets_) - 1):
+        ax.axhline(i + 0.5, color=GRID, lw=0.6, zorder=1)
+    for name, rows_ in (("Blind", [i for i, d in enumerate(sets_) if d in BLIND3]),
+                        ("Earlier test sets", [i for i, d in enumerate(sets_) if d not in BLIND3])):
+        if rows_ and descriptors:  # descriptor of each block of rows, left of the row labels
+            ax.annotate(name, xy=(0, np.mean(rows_)), xycoords=("axes fraction", "data"), xytext=(-58, 0),
+                        textcoords="offset points", rotation=90, ha="center", va="center", fontsize=FS_LABEL,
+                        weight="bold", color=INK)
+        if rows_ and name == "Earlier test sets":
+            ax.axhline(min(rows_) - 0.5, color=AXIS, lw=0.8, zorder=4)
+    ax.set_yticks(range(len(sets_)), [SHORT[d] for d in sets_])
+    for lab, d in zip(ax.get_yticklabels(), sets_):
+        lab.set_fontweight("bold" if d in BLIND3 else "normal")
+    ax.set_ylim(len(sets_) - 0.5, -1.15)  # band above the rows for the column and level labels
+    ax.tick_params(axis="y", length=0)
+
+
+def risk_ledger(ax, sets_):
     """Realized test risk (pairs the full budget registers but the configuration loses) on every test set, for
     CAB with group-conditional certificates against the alternatives that carry no valid guarantee there."""
-    sets_ = [d for d in BLIND3 + BLIND + ("m", "lo", "ki", "fm", "flo", "fki") if f"v3.sc.{d}.compat.group.risk" in VALS]
     if not sets_:
         return [], []
-    short = {"th": "Fresh scenes", "tl": "Fresh, low", "bh": "Held-out", "bl": "Held-out low", "kr": "KITTI raw", "fkr": "KITTI raw F", "m": "3DMatch",
-             "lo": "3DLoMatch", "ki": "KITTI", "fm": "3DMatch F", "flo": "3DLoMatch F", "fki": "KITTI F"}
     series = [  # (label, key pattern over estimator e and ordering o, color, marker, filled)
         ("CAB, group-cond. (ours)", "v3.{e}.{d}.{o}.group.risk", BLUE, "o", True),
         ("CAB, marginal cert.", "v3.{e}.{d}.{o}.marg.risk", BLUE, "o", False),
@@ -760,48 +810,112 @@ def risk_ledger(ax):
                     mfc=col if filled else "white", mec=col if mk == "X" or not filled else "white",
                     mew={"X": 0.3}.get(mk, 0.6 if filled else 1.3), label=label,
                     zorder=6 if si == 0 else 4, clip_on=False)
-    for i in range(len(sets_) - 1):
-        ax.axhline(i + 0.5, color=GRID, lw=0.6, zorder=1)
-    for name, rows_ in (("Blind", [i for i, d in enumerate(sets_) if d in BLIND3]),
-                        ("Earlier test sets", [i for i, d in enumerate(sets_) if d not in BLIND3])):
-        if rows_:  # descriptor of each block of rows, left of the row labels
-            ax.annotate(name, xy=(0, np.mean(rows_)), xycoords=("axes fraction", "data"), xytext=(-58, 0),
-                        textcoords="offset points", rotation=90, ha="center", va="center", fontsize=FS_LABEL,
-                        weight="bold", color=INK)
-            if name == "Earlier test sets":
-                ax.axhline(min(rows_) - 0.5, color=AXIS, lw=0.8, zorder=1)
+    set_rows(ax, sets_)
+    ax.tick_params(labelleft=False)  # the row labels are those of panel (b), on its left
     ax.text(0.93, -0.8, "level ε = 1 %", fontsize=FS_LEGEND, color=INK, ha="right", va="center")
     ax.text(1.12, -0.8, "exceeds ε", fontsize=FS_LEGEND, color=INK, ha="left", va="center", style="italic")
     ax.set_xscale("symlog", linthresh=1.0, linscale=1.0)
     ax.set_xlim(-0.05, XMAX)
     ax.set_xticks([0, 0.5, 1, 2, 5, 10])
     ax.set_xticklabels(["0", "0.5", "1", "2", "5", "10"])
-    ax.set_yticks(range(len(sets_)), [short[d] for d in sets_])
-    ax.set_ylim(len(sets_) - 0.5, -1.15)  # band above the rows for the level labels
-    ax.set_xlabel("pairs lost vs. the full budget (%)")
-    ax.set_title("(c) Risk on every test set", loc="left")
+    ax.set_xlabel("pairs lost (%)")
+    ax.set_title("(c) Risk", loc="left")
     style(ax)
     ax.grid(False, axis="y")
-    ax.tick_params(axis="y", length=0)
+    ax.tick_params(axis="y", length=0)  # style() restores tick marks; the rows carry no ticks
     return ax.get_legend_handles_labels()
 
 
-def _equal_time_live(variants):
-    path = RB / "live_equal_time_v2_blind_hi_v3.json"  # timed with the final method (protocol v3)
-    if not path.exists():
+def speedup_dots(ax, sets_):
+    """Teaser (b): live speed-up of CAB over the full budget on every test set (rows, as in panel (c)), one marker per
+    estimator (shape and shade), filled on the CPU and open on the GPU. With FCGF on KITTI the certified method is the
+    full budget itself and was not timed. Returns the legend handles and labels."""
+    NAVY = "#173f73"
+    marks = {"sc": ("o", BLUE_L), "tr": ("s", BLUE), "mc": ("^", NAVY)}
+    key = {"CPU": "v3.{e}.{d}.compat.live.speed", "GPU": "gpu.{e}.{d}.v3.speed"}
+    XLIM = (0.85, 3.9)
+    ax.axvline(1.0, color=INK, lw=0.9, ls=(0, (3, 2)), zorder=2)
+    ax.text(1.06, -0.8, "faster →", fontsize=FS_LEGEND, color=INK, ha="left", va="center", style="italic")
+    handles = []
+    for e, (mk, col) in marks.items():
+        for dev in ("GPU", "CPU"):  # CPU drawn on top
+            pts = [(num(key[dev].format(e=e, d=d)), i) for i, d in enumerate(sets_) if key[dev].format(e=e, d=d) in VALS]
+            if not pts:
+                continue
+            filled = dev == "CPU"
+            h, = ax.plot(*zip(*pts), mk, ls="none", ms={"o": 5.6, "s": 5.0, "^": 5.8}[mk], color=col,
+                         mfc=col if filled else "white", mec="white" if filled else col, mew=0.5 if filled else 1.1,
+                         zorder=5 if filled else 4, clip_on=False)
+            if filled:
+                handles.append((h, ENAME[e].replace("$^2$", "²")))
+    for i, d in enumerate(sets_):
+        if not any(key["CPU"].format(e=e, d=d) in VALS for e in marks):
+            ax.text(1.06, i, "full budget itself", fontsize=FS_CELL, color=MUTED, ha="left", va="center",
+                    style="italic")
+    set_rows(ax, sets_)
+    ax.set_xscale("log")
+    ax.set_xlim(*XLIM)
+    ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([1, 1.5, 2, 3]))
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["1×", "1.5×", "2×", "3×"]))
+    ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+    ax.set_xlabel("live speed-up")
+    ax.set_title("(b) Speed-up of CAB", loc="left")
+    style(ax)
+    ax.grid(False, axis="y")
+    ax.tick_params(axis="y", length=0)
+    dev = [matplotlib.lines.Line2D([], [], marker="o", ls="none", ms=5.2, color=INK2, mec="white", mew=0.5),
+           matplotlib.lines.Line2D([], [], marker="o", ls="none", ms=5.2, mfc="white", mec=INK2, mew=1.1)]
+    return [h for h, _ in handles] + dev, [l for _, l in handles] + ["CPU", "GPU"]
+
+
+def speedup_grid(ax, sets_):
+    """Teaser (b): live speed-up of CAB over the full budget on every test set (rows, as in panel (c)), for each
+    estimator on the CPU and on the GPU (columns); the shade darkens with the speed-up (log scale, from 1x). With FCGF
+    on KITTI the certified method is the full budget itself and was not timed ("full")."""
+    NAVY = "#173f73"
+    key = {"CPU": "v3.{e}.{d}.compat.live.speed", "GPU": "gpu.{e}.{d}.v3.speed"}
+    cols = [(e, dev) for e in ("sc", "tr", "mc") for dev in ("CPU", "GPU")]
+    x0 = [j + 0.3 * (j // 2) for j in range(len(cols))]  # a narrow gap between estimators
+    cells = {(i, j): num(key[dev].format(e=e, d=d)) for i, d in enumerate(sets_) for j, (e, dev) in enumerate(cols)
+             if key[dev].format(e=e, d=d) in VALS}
+    if not cells:
         return
-    rows = json.loads(path.read_text())
-    L = []
-    # layout in inches: (a), (b) share the recall axis; (c) leaves room for its row and descriptor labels;
-    # the band below the panels holds the two legends
-    W, H, BOT, HGT = 7.0, 2.94, 1.12, 1.58
-    fig = plt.figure(figsize=(W, H))
-    axes = [fig.add_axes((l / W, BOT / H, w / W, HGT / H)) for l, w in ((0.44, 1.88), (2.40, 1.88), (5.42, 1.54))]
-    colors = {"rand": ORANGE, "fm1": VIOLET, "fm2": MAGENTA, "ratio": GRAY, "compat": BLUE_L, "cheap": INK2}
-    legend_name = {"rand": "uniform sampling", "fm1": "FastMAC-style, 1st order",
-                   "fm2": "FastMAC-style, 2nd order", "ratio": "fixed budget, ratio order",
-                   "compat": "fixed budget, our ordering", "cheap": "fewer seeds / cliques"}
-    for ax, (e, E), letter in zip(axes[:2], ESTS.items(), "ab"):
+    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("cab", ["#f3f7fc", BLUE_L, BLUE, NAVY])
+    norm = matplotlib.colors.LogNorm(1.0, max(cells.values()))
+    for i, d in enumerate(sets_):
+        for j in range(len(cols)):
+            sp = cells.get((i, j))
+            shade = float(norm(min(max(sp, 1.0), norm.vmax))) if sp is not None else 0.0
+            ax.add_patch(matplotlib.patches.Rectangle((x0[j], i - 0.5), 1, 1, fc=cmap(shade), ec="white", lw=1.0,
+                                                      zorder=2))
+            ax.text(x0[j] + 0.5, i, f"{sp:.2f}" if sp is not None else "full", ha="center", va="center", zorder=3,
+                    fontsize=FS_CELL, color="white" if shade > 0.6 else (INK if sp is not None else MUTED),
+                    style="normal" if sp is not None else "italic")
+    for k, e in enumerate(("sc", "tr", "mc")):
+        ax.text(x0[2 * k] + 1.0, -0.8, ENAME[e].replace("$^2$", "²"), ha="center", va="center", fontsize=FS_CELL + 0.6,
+                color=INK)
+    set_rows(ax, sets_)
+    ax.set_xlim(x0[0], x0[-1] + 1)
+    ax.set_xticks([x + 0.5 for x in x0], [dev for _, dev in cols])
+    ax.tick_params(axis="x", length=0, pad=2, labelsize=FS_CELL)
+    for sp_ in ax.spines.values():
+        sp_.set_visible(False)
+    ax.set_xlabel("live speed-up (×)")
+    ax.set_title("(b) Speed-up of CAB", loc="left")
+
+
+def _equal_time_live(variants):
+    paths = [RB / "live_equal_time_v2_blind_hi_v3.json",  # timed with the final method (protocol v3)
+             RB / "live_equal_time_v2_blind_hi_v3_mac.json"]  # MAC (addendum D)
+    if not paths[0].exists():
+        return
+    rows = [r for path in paths if path.exists() for r in json.loads(path.read_text())]
+    ests = [e for e, E in ESTS_ALL.items() if any(r["est"] == E for r in rows) and f"eq.{e}.bh.cab.rr" in VALS]
+    cheap_name = {"sc": "Fewer seeds (ratio 0.025, 0.01)", "tr": "Fewer cliques ($K_1{=}500, 250$)",
+                  "mc": "Top-$K$ cliques ($K{=}200, 100$)"}
+    L, panels = [], []
+    for e in ests:
+        E = ESTS_ALL[e]
         rs = [r for r in rows if r["est"] == E]
         t = {k: 1e3 * np.mean([r[k] for r in rs]) for k in rs[0] if isinstance(rs[0][k], float)}
         val(f"eq.{e}.live.n", str(len(rs)))
@@ -817,9 +931,9 @@ def _equal_time_live(variants):
         cab_t, cab_rr, full_rr = t["cab"], num(f"eq.{e}.bh.cab.rr"), num(f"eq.{e}.bh.full.rr")
         L.append(f"\\multicolumn{{5}}{{@{{}}l}}{{\\textit{{{ENAME[e]}: full budget {t['full']:,.0f}\\,ms, {full_rr:.1f}\\,\\%; "
                  f"\\method {cab_t:,.0f}\\,ms, {cab_rr:.1f}\\,\\%}}}} \\\\")
-        key, params = ("seeds", ("0.025", "0.01")) if e == "sc" else ("k1", ("500", "250"))
-        cheap_name = "Fewer seeds (ratio 0.025, 0.01)" if e == "sc" else "Fewer cliques ($K_1{=}500, 250$)"
-        for v, name in [("cheap", cheap_name)] + variants:
+        key, params = CHEAP[e]
+        curves = {}  # variant -> points (time relative to the full budget, recall minus the full budget's, pp)
+        for v, name in [("cheap", cheap_name[e])] + variants:
             if v == "cheap":
                 pts = [(t[f"{key}@{prm}"], num(f"eq.{e}.bh.cheap.{prm}.rr")) for prm in params]
                 ref_full = num(f"eq.{e}.bh.cheap.{params[0]}.fullrr")
@@ -850,61 +964,91 @@ def _equal_time_live(variants):
                      (gap.replace("-", "\\ensuremath{-}") if gap else "--"),
                      f"{reach:,.0f} ({reach / cab_t:.1f}\\X)" if reach is not None else "never"]
             L.append(" & ".join(cells) + " \\\\")
-            xs, ys = [p[0] for p in curve], [p[1] for p in curve]
-            if v == "cheap":
-                ax.plot([p[0] for p in pts], [p[1] for p in pts], "v", color=colors[v], ms=6.0, mec="white", mew=0.6,
-                        label=legend_name[v], zorder=4)
-            else:
-                ax.plot(xs, ys, "-o", color=colors[v], lw=1.5, ms=3.8, mec="white", mew=0.6, label=legend_name[v],
-                        zorder=3)
-        # equal time: the guide marks CAB's time; every curve is read where it crosses the guide. The arrow above
-        # the curves goes from the full budget's time to CAB's time at (nearly) the same recall.
-        y_top = max([full_rr, cab_rr] + [ln.get_ydata().max() for ln in ax.get_lines()]) + 2.6  # arrow above all
-        y_ar = y_top - 1.6
-        ax.plot([cab_t, cab_t], [70, y_ar], color=BLUE, lw=0.9, ls=(0, (3, 2)), zorder=2)
-        ax.plot([t["full"], t["full"]], [full_rr + 0.5, y_ar], color=INK, lw=0.7, ls=(0, (1, 1.5)), zorder=2)
-        ax.annotate("", xy=(cab_t, y_ar), xytext=(t["full"], y_ar), zorder=6,
-                    arrowprops=dict(arrowstyle="-|>,head_length=0.45,head_width=0.22", fc=INK, ec=INK, lw=1.0,
-                                    shrinkA=0, shrinkB=0))
-        ax.text(np.sqrt(cab_t * t["full"]), y_ar + 0.3, f"{t['full'] / cab_t:.2f}× faster", ha="center", va="bottom",
-                fontsize=FS_LEGEND, color=INK, weight="bold")
-        ax.plot([t["full"]], [full_rr], "D", color=INK, ms=5.6, mec="white", mew=0.6, label="full budget", zorder=5)
-        ax.plot([cab_t], [cab_rr], "*", color=BLUE, ms=13, mec=INK, mew=0.6, label="CAB (ours)", zorder=7)
-        ax.set_xscale("log")
-        ax.set_xlim(100, 1300)
-        ax.set_ylim(70, y_top)
-        ax.set_yticks([70, 75, 80, 85])
-        ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([100, 200, 500, 1000]))
-        ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["100", "200", "500", "1000"]))
-        ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-        ax.set_xlabel("live time per pair (ms, log scale)")
-        if e == "sc":
-            ax.set_ylabel("recall (%)")
-        else:
-            ax.tick_params(labelleft=False)
-        ax.set_title(f"({letter}) {ENAME[e].replace('$^2$', '²')} on held-out scenes", loc="left")
-        style(ax)
-        L.append("\\midrule" if e == "sc" else "\\bottomrule")
+            curves[v] = [(x / t["full"], y - ref_full) for x, y in (pts if v == "cheap" else curve)]
+        L.append("\\bottomrule" if e == ests[-1] else "\\midrule")
+        panels.append((e, curves, cab_t / t["full"], cab_rr - full_rr))
     reach = [num(k) for k in list(VALS) if k.startswith("eq.") and k.endswith(".reach.x")]
-    if reach:  # "Match" column: time to reach CAB's recall relative to CAB's time, over both estimators
+    if reach:  # "Match" column: time to reach CAB's recall relative to CAB's time, over every estimator
         val("eq.reach.x.min", min(reach), "{:.1f}")
         val("eq.reach.x.max", max(reach), "{:.1f}")
+    (TAB / "equal_time.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
+
+    # ---- the teaser. Layout in inches: (a) one panel per estimator, the same axes in each; (b) and (c) share the
+    # rows, labelled left of (b); the band below the panels holds the legends
+    W, H, BOT, HGT = 7.0, 2.98, 1.12, 1.62
+    AL, AW, AG = 0.42, 0.94, 0.07
+    fig = plt.figure(figsize=(W, H))
+    ax_eq = [fig.add_axes(((AL + k * (AW + AG)) / W, BOT / H, AW / W, HGT / H)) for k in range(3)]
+    ax_b = fig.add_axes((4.14 / W, BOT / H, 1.42 / W, HGT / H))
+    ax_c = fig.add_axes((5.66 / W, BOT / H, 1.28 / W, HGT / H))
+    colors = {"rand": ORANGE, "fm1": VIOLET, "fm2": MAGENTA, "ratio": GRAY, "compat": BLUE_L, "cheap": INK2}
+    legend_name = {"rand": "uniform sampling", "fm1": "FastMAC-style, 1st order",
+                   "fm2": "FastMAC-style, 2nd order", "ratio": "fixed budget, ratio order",
+                   "compat": "fixed budget, our ordering", "cheap": "fewer seeds / cliques"}
+    XLIM = (0.1, 1.5)  # cheaper configurations below a tenth of the full budget's time lie off the panel (Table 3)
+    # the recall axis is zoomed on what the comparison reads: every curve where it crosses CAB's time, with room below;
+    # the cheapest configurations leave the panel at the bottom (Table 3 lists them all)
+    at_cab = [np.interp(np.log(xc), np.log([x for x, _ in c]), [y for _, y in c]) for _, curves, xc, _ in panels
+              for v, c in curves.items() if v != "cheap" and min(x for x, _ in c) <= xc]
+    y_lo = 2 * np.floor((min(at_cab) - 3) / 2)
+    y_ar = max([y for _, curves, xc, _ in panels for c in curves.values() for x, y in c if xc <= x <= XLIM[1]]
+               + [0.0]) + 1.4  # the speed-up arrow, above every curve between CAB's time and the full budget's
+    for ax, (e, curves, x_cab, y_cab) in zip(ax_eq, panels):
+        for v, c in curves.items():
+            if v == "cheap":
+                ax.plot(*zip(*c), "v", color=colors[v], ms=5.2, mec="white", mew=0.6, label=legend_name[v], zorder=4)
+            else:  # the alternatives slightly recede, so that CAB's star reads first
+                ax.plot(*zip(*c), "-o", color=colors[v], lw=1.2, ms=3.0, mec="white", mew=0.4, alpha=0.9,
+                        label=legend_name[v], zorder=3)
+        # equal time: the guide marks CAB's time, where every curve is read; the arrow above the curves goes from the
+        # full budget's time to CAB's, at (nearly) the same recall (unlabelled: panel (b) gives the speed-ups of the
+        # main live run, and this run's are in Table 3)
+        ax.axhline(0.0, color=MUTED, lw=0.6, ls=(0, (1, 1.5)), zorder=1)
+        ax.plot([x_cab, x_cab], [y_lo, y_ar], color=BLUE, lw=0.9, ls=(0, (3, 2)), zorder=2)
+        ax.annotate("", xy=(x_cab, y_ar), xytext=(1.0, y_ar), zorder=6,
+                    arrowprops=dict(arrowstyle="-|>,head_length=0.4,head_width=0.2", fc=INK, ec=INK, lw=1.0,
+                                    shrinkA=0, shrinkB=0))
+        ax.plot([1.0], [0.0], "D", color=INK, ms=5.2, mec="white", mew=0.6, label="full budget", zorder=5)
+        ax.plot([x_cab], [y_cab], "*", color="white", ms=16, mec="white", mew=0, zorder=7)  # halo over the curves
+        ax.plot([x_cab], [y_cab], "*", color=BLUE, ms=12.5, mec=INK, mew=0.6, label="CAB (ours)", zorder=8)
+        ax.text(0.05, 0.96, ENAME[e].replace("$^2$", "²"), transform=ax.transAxes, ha="left", va="top",
+                fontsize=FS_LABEL, weight="bold", color=INK, zorder=9)  # top left: clear of every curve
+        ax.set_xscale("log")
+        ax.set_xlim(*XLIM)
+        ax.set_ylim(y_lo, y_ar + 1.2)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2))
+        ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([0.1, 0.2, 0.5, 1]))
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["0.1", "0.2", "0.5", "1"]))
+        ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        if ax is ax_eq[0]:
+            ax.set_ylabel("recall vs. full budget (pp)")
+            ax.set_title("(a) Recall at equal live time", loc="left")
+        else:
+            ax.tick_params(labelleft=False)
+        style(ax)
+    for ax in ax_eq[len(panels):]:
+        ax.set_visible(False)
+    fig.text((AL + 1.5 * AW + AG) / W, (BOT - 0.33) / H, "live time per pair, relative to the full budget",
+             ha="center", va="center", fontsize=FS_LABEL, color=INK)
     handles = {}
-    for ax in axes[:2]:
+    for ax in ax_eq[:len(panels)]:
         for hh, ll in zip(*ax.get_legend_handles_labels()):
             handles.setdefault(ll, hh)
+    sets_ = teaser_sets()
+    bh, bl = speedup_dots(ax_b, sets_)
     order = ["CAB (ours)", "full budget", legend_name["compat"], legend_name["ratio"], legend_name["rand"],
              legend_name["cheap"], legend_name["fm1"], legend_name["fm2"]]  # two columns of four
     order = [o for o in order if o in handles]
-    rh, rl = risk_ledger(axes[2])
-    # legends in the band below the panels: equal time under (a)-(b), risk under (c)
+    rh, rl = risk_ledger(ax_c, sets_)
+    # legends in the band below the panels: equal time under (a), risk under (b) and (c)
     y_leg = 0.37 / H
-    fig.legend([handles[o] for o in order], order, loc="center", ncol=2, bbox_to_anchor=(2.42 / W, y_leg),
-               handlelength=1.9, columnspacing=2.0, labelspacing=0.25)
-    fig.legend(rh, rl, loc="center", ncol=1, bbox_to_anchor=(6.0 / W, y_leg), handlelength=1.0, labelspacing=0.25)
+    fig.legend([handles[o] for o in order], order, loc="center", ncol=2, bbox_to_anchor=((AL + 1.5 * AW + AG) / W, y_leg),
+               handlelength=1.5, columnspacing=0.9, labelspacing=0.25)
+    fig.legend(bh, bl, loc="center", ncol=2, bbox_to_anchor=(4.62 / W, y_leg), handlelength=1.0, labelspacing=0.25,
+               columnspacing=0.8)
+    fig.legend(rh, rl, loc="center", ncol=1, bbox_to_anchor=(6.18 / W, y_leg), handlelength=1.0, labelspacing=0.25)
     fig.savefig(FIG / "teaser.pdf", facecolor="white")
     plt.close(fig)
-    (TAB / "equal_time.tex").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 # ============================================================================ qualitative figure

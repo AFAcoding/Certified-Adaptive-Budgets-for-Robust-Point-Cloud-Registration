@@ -3,7 +3,7 @@
 With the logs, every number, table and figure can be regenerated in minutes (scripts/paper_assets.py and the
 selection scripts) without re-running the experiments, which take days on a CPU.
 
-logs-v4.0.zip adds the MAC logs (addenda A and B) and the exploration logs to logs-v3.0.zip. If release v4.0 is not
+logs-v4.0.zip adds the MAC logs (addenda A, B and D) and the exploration logs to logs-v3.0.zip. If release v4.0 is not
 available, the script falls back to v3.0, which has every log except MAC's.
 
 Usage: python -I scripts/download_logs.py
@@ -18,7 +18,7 @@ from pathlib import Path
 
 BASE = "https://github.com/AFAcoding/Certified-Adaptive-Budgets-for-Robust-Point-Cloud-Registration/releases/download"
 ARCHIVES = [  # (tag, sha256), newest first
-    ("v4.0", "b63360f182cbe3834cef84b958f9d01deb25e96b12be0055c4570df45d38d4ae"),
+    ("v4.0", "cfa820fc950fc9a3145353657d1e2036b5e3d54f81acd06bf59c513c3de79324"),
     ("v3.0", "71fdba2e6c662e94ae9b6dcd4a619c3a42b18bd5f1cde5f96b222d1bb84ccbd1"),
 ]
 ROOT = Path(__file__).resolve().parents[1]
