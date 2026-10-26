@@ -144,9 +144,11 @@ def _reduce(SCG, A):
     return A, -1, ops
 
 
-def mac(P, Q, inlier_thr=0.10, t_cmp=0.99, min_clique=3, refine=True):
+def mac(P, Q, inlier_thr=0.10, t_cmp=0.99, min_clique=3, refine=True, top_k=None):
     """Returns (4x4 transform mapping P to Q, info) with info = {N, ops, inliers, cliques, selected, kept}; kept is the
-    number of nodes left by the graph reduction, -1 if the graph was not reduced."""
+    number of nodes left by the graph reduction, -1 if the graph was not reduced. top_k: keep only the top_k heaviest
+    of the node-guided cliques as hypotheses (the authors' Top-K ablation, MAC paper, Table 5; ties to the clique found
+    first); None keeps them all (MAC as published, used everywhere except the equal-time comparison)."""
     import igraph
     from acpr.estimators import post_refinement
     P = np.asarray(P, np.float64)
@@ -215,6 +217,10 @@ def mac(P, Q, inlier_thr=0.10, t_cmp=0.99, min_clique=3, refine=True):
         info.update(ops=int(ops), inliers=0, selected=0)
         return np.eye(4), info
     selected = np.unique(best_c[best_c >= 0])
+    if top_k is not None and len(selected) > top_k:
+        weight = np.zeros(len(selected))
+        np.maximum.at(weight, np.searchsorted(selected, best_c[best_c >= 0]), best_w[best_c >= 0])
+        selected = selected[np.sort(np.argsort(-weight, kind="stable")[:top_k])]
     members = [kept[int(c)] for c in selected]
     info["selected"] = int(len(selected))
     # instance-equal SVD per selected clique (batched by padding with zero weights)

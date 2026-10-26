@@ -276,3 +276,32 @@ the full budget). Same pairs (the CPU live-timing samples), implementation, timi
 MAC's maximal-clique search runs on the host CPU of the GPU machine, so these speed-ups measure that hybrid. Nothing
 is chosen, fitted or certified on the results, and they are reported whatever they are. Bundles are exported
 single-threaded, as above.
+
+# Protocol v3, addendum D: MAC in the equal-time comparison (pre-registered 2026-10-26, before any MAC equal-time run on a test pair)
+
+The equal-time comparison (main paper, Table 3 and Figure 1(a); supplementary 3DLoMatch table) was run for SC2-PCR and
+TurboReg before the MAC addenda. It is completed for MAC with the same design. An additional measurement, not part of
+any evaluation: nothing is chosen, fitted or certified on it, and CAB's MAC configuration is the final method
+certified under addendum B, unchanged.
+- Variants, as for the other estimators (`scripts/build_equal_time_logs.py --estimator mac`,
+  `scripts/live_equal_time.py --estimators mac`): uniform random subsets and FastMAC-style sampling on the first- and
+  second-order graph of N in {250, 500, 1000, 2000} correspondences (the same subsets: same seeds and signals), fixed
+  budgets of the ratio and compatibility orders (offline: MAC's budget logs of addendum B), and, in place of fewer seeds
+  (SC2-PCR) or fewer cliques (TurboReg), MAC's own cheaper setting: the Top-K clique selection of the authors' ablation
+  (MAC paper, Table 5) with its two smallest values, K = 200 and 100, on all correspondences (`acpr.mac.mac(top_k=K)`:
+  the K heaviest node-guided cliques become hypotheses). MAC runs with the indoor setting of addendum B. Checks on
+  fitting pairs only (v2_fit): top_k=None reproduces MAC as used everywhere else exactly (5 pairs); Top-200 and
+  Top-100 take 0.3-0.4 of the full run's time (graph construction is about 0.75 s of a 4-5 s run; the rest is the clique
+  search and the hypotheses).
+- Pairs and schedule, as for the other estimators: offline logs of every 2nd pair (uniform, FastMAC first order), every
+  4th (FastMAC second order) and every 8th (Top-K) of the held-out scenes above 30 % overlap (v2_blind_hi, 1,046 pairs)
+  and of 3DLoMatch (891 pairs), with 6 worker processes (replaced every 25 pairs, each starting with an
+  untimed run); live timing, on an otherwise idle machine, of the same 300
+  pairs of v2_blind_hi as for SC2-PCR and TurboReg: the full budget, the final method, every fixed budget and every
+  variant, the order of the runs rotated from pair to pair (one worker process, replaced every 25 pairs because of
+  igraph's open streams, each starting with an untimed full-budget run).
+- Analysis: the code of the other estimators (`scripts/paper_assets.py`, equal_time), extended to MAC without other
+  changes; MAC appears in Table 3, Figure 1(a), the 3DLoMatch table and every summary over estimators (e.g. the risk
+  of uniform sampling in Figure 1(c)). Reported whatever it shows.
+- Status of the data: MAC has run on these test pairs before (addendum B: every budget of both orderings and the
+  certified configurations, offline and live); none of the variants above has run on a test pair.
