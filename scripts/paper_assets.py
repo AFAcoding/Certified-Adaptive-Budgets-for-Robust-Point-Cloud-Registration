@@ -849,7 +849,10 @@ def speedup_dots(ax, sets_):
             if filled:
                 handles.append((h, ENAME[e].replace("$^2$", "²")))
     for i, d in enumerate(sets_):
-        if not any(key["CPU"].format(e=e, d=d) in VALS for e in marks):
+        sp = [num(key[dev].format(e=e, d=d)) for e in marks for dev in key if key[dev].format(e=e, d=d) in VALS]
+        if sp:  # the row's bar: from the full budget to its fastest configuration, so the gain reads as a length
+            ax.plot([1.0, max(sp)], [i, i], color=BLUE_L, lw=4.0, alpha=0.45, solid_capstyle="butt", zorder=3)
+        else:
             ax.text(1.06, i, "full budget itself", fontsize=FS_CELL, color=MUTED, ha="left", va="center",
                     style="italic")
     set_rows(ax, sets_)
@@ -933,6 +936,7 @@ def _equal_time_live(variants):
                  f"\\method {cab_t:,.0f}\\,ms, {cab_rr:.1f}\\,\\%}}}} \\\\")
         key, params = CHEAP[e]
         curves = {}  # variant -> points (time relative to the full budget, recall minus the full budget's, pp)
+        cross = {}  # variant -> (its recall at CAB's time minus the full budget's, CAB's lead on the same pairs), pp
         for v, name in [("cheap", cheap_name[e])] + variants:
             if v == "cheap":
                 pts = [(t[f"{key}@{prm}"], num(f"eq.{e}.bh.cheap.{prm}.rr")) for prm in params]
@@ -965,8 +969,10 @@ def _equal_time_live(variants):
                      f"{reach:,.0f} ({reach / cab_t:.1f}\\X)" if reach is not None else "never"]
             L.append(" & ".join(cells) + " \\\\")
             curves[v] = [(x / t["full"], y - ref_full) for x, y in (pts if v == "cheap" else curve)]
+            if at_cab is not None and v != "cheap":
+                cross[v] = (at_cab - ref_full, round(cab_same - at_cab, 1))
         L.append("\\bottomrule" if e == ests[-1] else "\\midrule")
-        panels.append((e, curves, cab_t / t["full"], cab_rr - full_rr))
+        panels.append((e, curves, cab_t / t["full"], cab_rr - full_rr, cross))
     reach = [num(k) for k in list(VALS) if k.startswith("eq.") and k.endswith(".reach.x")]
     if reach:  # "Match" column: time to reach CAB's recall relative to CAB's time, over every estimator
         val("eq.reach.x.min", min(reach), "{:.1f}")
@@ -975,7 +981,7 @@ def _equal_time_live(variants):
 
     # ---- the teaser. Layout in inches: (a) one panel per estimator, the same axes in each; (b) and (c) share the
     # rows, labelled left of (b); the band below the panels holds the legends
-    W, H, BOT, HGT = 7.0, 2.98, 1.12, 1.62
+    W, H, BOT, HGT = 7.0, 2.86, 1.02, 1.62
     AL, AW, AG = 0.42, 0.94, 0.07
     fig = plt.figure(figsize=(W, H))
     ax_eq = [fig.add_axes(((AL + k * (AW + AG)) / W, BOT / H, AW / W, HGT / H)) for k in range(3)]
@@ -988,26 +994,39 @@ def _equal_time_live(variants):
     XLIM = (0.1, 1.5)  # cheaper configurations below a tenth of the full budget's time lie off the panel (Table 3)
     # the recall axis is zoomed on what the comparison reads: every curve where it crosses CAB's time, with room below;
     # the cheapest configurations leave the panel at the bottom (Table 3 lists them all)
-    at_cab = [np.interp(np.log(xc), np.log([x for x, _ in c]), [y for _, y in c]) for _, curves, xc, _ in panels
-              for v, c in curves.items() if v != "cheap" and min(x for x, _ in c) <= xc]
-    y_lo = 2 * np.floor((min(at_cab) - 3) / 2)
-    y_ar = max([y for _, curves, xc, _ in panels for c in curves.values() for x, y in c if xc <= x <= XLIM[1]]
-               + [0.0]) + 1.4  # the speed-up arrow, above every curve between CAB's time and the full budget's
-    for ax, (e, curves, x_cab, y_cab) in zip(ax_eq, panels):
+    y_lo = 2 * np.floor((min(y for *_, cross in panels for y, _ in cross.values()) - 3) / 2)
+    # the speed-up arrow runs above every curve between CAB's time and the full budget's, with its label above it
+    y_ar = max([y for _, curves, xc, *_ in panels for c in curves.values() for x, y in c if xc <= x <= XLIM[1]]
+               + [0.0]) + 0.9
+    y_hi = y_ar + 2.0
+    for ax, (e, curves, x_cab, y_cab, cross) in zip(ax_eq, panels):
         for v, c in curves.items():
             if v == "cheap":
                 ax.plot(*zip(*c), "v", color=colors[v], ms=5.2, mec="white", mew=0.6, label=legend_name[v], zorder=4)
             else:  # the alternatives slightly recede, so that CAB's star reads first
                 ax.plot(*zip(*c), "-o", color=colors[v], lw=1.2, ms=3.0, mec="white", mew=0.4, alpha=0.9,
                         label=legend_name[v], zorder=3)
-        # equal time: the guide marks CAB's time, where every curve is read; the arrow above the curves goes from the
-        # full budget's time to CAB's, at (nearly) the same recall (unlabelled: panel (b) gives the speed-ups of the
-        # main live run, and this run's are in Table 3)
+        # equal time: the guide marks CAB's time; every alternative is marked where it stands there (Table 3, "At
+        # CAB"), and the solid segment from CAB's star down to the best of them is CAB's lead at equal time
         ax.axhline(0.0, color=MUTED, lw=0.6, ls=(0, (1, 1.5)), zorder=1)
-        ax.plot([x_cab, x_cab], [y_lo, y_ar], color=BLUE, lw=0.9, ls=(0, (3, 2)), zorder=2)
+        ax.plot([x_cab, x_cab], [y_lo, y_ar], color=BLUE, lw=0.8, ls=(0, (3, 2)), zorder=2)  # up to the arrow
+        for v, (y, _) in cross.items():
+            ax.plot([x_cab], [y], "o", ms=4.4, mfc="white", mec=colors[v], mew=1.3, zorder=6)
+        if cross:
+            best = max(cross, key=lambda v: cross[v][0])
+            ax.plot([x_cab, x_cab], [cross[best][0], y_cab], color=BLUE, lw=2.0, solid_capstyle="butt", zorder=5)
+            ax.text(x_cab / 1.22, (cross[best][0] + y_cab) / 2 - 0.15, f"+{cross[best][1]:.1f} pp", ha="right",
+                    va="center", fontsize=FS_LEGEND, color=BLUE, weight="bold", zorder=9)
+        if ax is ax_eq[0]:
+            ax.text(x_cab * 1.07, y_lo + 0.35, "CAB's time", rotation=90, ha="left", va="bottom", fontsize=FS_CELL,
+                    color=BLUE, style="italic")
+        # the speed-up: an arrow from the full budget's time to CAB's, labelled with the ratio (this timing run)
+        ax.plot([1.0, 1.0], [0.0, y_ar], color=INK, lw=0.7, ls=(0, (1, 1.5)), zorder=2)
         ax.annotate("", xy=(x_cab, y_ar), xytext=(1.0, y_ar), zorder=6,
-                    arrowprops=dict(arrowstyle="-|>,head_length=0.4,head_width=0.2", fc=INK, ec=INK, lw=1.0,
+                    arrowprops=dict(arrowstyle="-|>,head_length=0.45,head_width=0.24", fc=BLUE, ec=BLUE, lw=1.6,
                                     shrinkA=0, shrinkB=0))
+        ax.text(np.sqrt(x_cab), y_ar + 0.3, f"{1 / x_cab:.2f}×", ha="center", va="bottom", fontsize=FS_LABEL + 0.5,
+                color=BLUE, weight="bold", zorder=9)
         ax.plot([1.0], [0.0], "D", color=INK, ms=5.2, mec="white", mew=0.6, label="full budget", zorder=5)
         ax.plot([x_cab], [y_cab], "*", color="white", ms=16, mec="white", mew=0, zorder=7)  # halo over the curves
         ax.plot([x_cab], [y_cab], "*", color=BLUE, ms=12.5, mec=INK, mew=0.6, label="CAB (ours)", zorder=8)
@@ -1015,7 +1034,7 @@ def _equal_time_live(variants):
                 fontsize=FS_LABEL, weight="bold", color=INK, zorder=9)  # top left: clear of every curve
         ax.set_xscale("log")
         ax.set_xlim(*XLIM)
-        ax.set_ylim(y_lo, y_ar + 1.2)
+        ax.set_ylim(y_lo, y_hi)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2))
         ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator([0.1, 0.2, 0.5, 1]))
         ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(["0.1", "0.2", "0.5", "1"]))
@@ -1028,7 +1047,7 @@ def _equal_time_live(variants):
         style(ax)
     for ax in ax_eq[len(panels):]:
         ax.set_visible(False)
-    fig.text((AL + 1.5 * AW + AG) / W, (BOT - 0.33) / H, "live time per pair, relative to the full budget",
+    fig.text((AL + 1.5 * AW + AG) / W, (BOT - 0.33) / H, "live time per pair, relative to the full budget (← faster)",
              ha="center", va="center", fontsize=FS_LABEL, color=INK)
     handles = {}
     for ax in ax_eq[:len(panels)]:
@@ -1041,7 +1060,7 @@ def _equal_time_live(variants):
     order = [o for o in order if o in handles]
     rh, rl = risk_ledger(ax_c, sets_)
     # legends in the band below the panels: equal time under (a), risk under (b) and (c)
-    y_leg = 0.37 / H
+    y_leg = 0.33 / H
     fig.legend([handles[o] for o in order], order, loc="center", ncol=2, bbox_to_anchor=((AL + 1.5 * AW + AG) / W, y_leg),
                handlelength=1.5, columnspacing=0.9, labelspacing=0.25)
     fig.legend(bh, bl, loc="center", ncol=2, bbox_to_anchor=(4.62 / W, y_leg), handlelength=1.0, labelspacing=0.25,

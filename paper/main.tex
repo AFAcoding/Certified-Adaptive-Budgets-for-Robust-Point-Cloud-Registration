@@ -50,7 +50,7 @@
 \centering
 \includegraphics[width=\linewidth]{figures/teaser.pdf}
 \captionsetup{hypcap=false}
-\captionof{figure}{\textbf{Cheaper is easy; safe is not.} (a)~Recall against live time per pair, both relative to the full budget on the same pairs, on the held-out scenes of protocol v2 (overlap above 30\,\%), for every cheaper way of running each estimator (legend, \cref{tab:equaltime}); \method (star) adapts the budget to each pair, and the arrow marks its saving. (b)~Live speed-up of \method over the full budget on every test set (bold: blind; F: FCGF), for each estimator on a CPU (filled) and a GPU (open); with FCGF on KITTI the certified method is the full budget itself. Its recall is non-inferior in every case (\cref{tab:blind,tab:main}). (c)~Risk: the share of pairs registered by the full estimator but lost, for each method at its worst over estimators and orderings. Only \method with group-conditional certificates (filled blue) stays below the certified level of 1\,\% everywhere; marginal certificates (open) and uniform sampling of 2{,}000 correspondences exceed it on some test sets.}
+\captionof{figure}{\textbf{Cheaper is easy; safe is not.} (a)~Recall against live time per pair, both relative to the full budget on the same pairs, on the held-out scenes of protocol v2 (overlap above 30\,\%), for every cheaper way of running each estimator (legend, \cref{tab:equaltime}). \method (star) adapts the budget to each pair: the arrow gives its speed-up, circles mark each alternative at \method's time (dashed), and the blue bar \method's lead over the best of them. (b)~Live speed-up of \method on every test set (bold: blind; F: FCGF), for each estimator on a CPU (filled) and a GPU (open); bars reach the largest. With FCGF on KITTI the certified method is the full budget itself. The recall of \method is non-inferior in every case (\cref{tab:blind,tab:main}). (c)~Risk: the share of pairs registered by the full estimator but lost, for each method at its worst over estimators and orderings. Only \method with group-conditional certificates (filled) stays below the certified 1\,\% everywhere; marginal certificates (open) and uniform sampling of 2{,}000 correspondences exceed it.}
 \captionsetup{hypcap=true}
 \label{fig:teaser}
 \end{strip}
@@ -336,7 +336,6 @@ With FCGF the guarantee holds again, but the savings are small (\cref{tab:main})
 
 \subsection{Equal-time comparison}
 \label{sec:equaltime}
-Is adaptivity needed, or would any cheaper way of running the estimator do as well?
 \Cref{fig:teaser}(a) and \cref{tab:equaltime} compare \method with five alternatives on the same pairs and the same live clock, for all three estimators (MAC: protocol~v3, addendum~D).
 Every alternative that runs as fast as \method registers fewer pairs at its time, and to match \method's recall each needs \val{eq.reach.x.min}--\val{eq.reach.x.max} times \method's time.
 \begin{table}[h]
@@ -350,11 +349,11 @@ Variant & Min. & At \method & $\Delta$ & Match\\
 \tablebody{tables/equal_time.tex}
 \end{tabular}
 \end{table}
-\emph{Fewer seeds or cliques} barely save time for \SCP and TurboReg (cheapest settings \val{eq.sc.cheap.min.ms} and \val{eq.tr.cheap.min.ms}\,ms, full budgets \val{eq.sc.full.ms} and \val{eq.tr.full.ms}\,ms), because building the compatibility graph over all correspondences dominates; MAC's own Top-$K$ clique selection saves more (\val{eq.mc.cheap.min.ms} of \val{eq.mc.full.ms}\,ms) and comes closest, but still needs \val{eq.mc.cheap.reach.x}\X \method's time to match its recall.
+\emph{Fewer seeds or cliques} barely save time for \SCP and TurboReg (cheapest settings \val{eq.sc.cheap.min.ms} and \val{eq.tr.cheap.min.ms}\,ms, full budgets \val{eq.sc.full.ms} and \val{eq.tr.full.ms}\,ms), because building the compatibility graph over all correspondences dominates; MAC's own Top-$K$ clique selection saves more and comes closest, but still needs \val{eq.mc.cheap.reach.x}\X \method's time to match its recall.
 \emph{FastMAC-style sampling} as published pays for its signal on the full second-order graph (\val{eq.sc.fm2.signal.ms}\,ms on a CPU); it is strongest for MAC, for which it was designed, yet at \method's time it registers \val{eq.mc.fm2.gapu}\pp fewer pairs.
 \emph{Fixed budgets} reach any time but trail \method by \val{eq.sc.ratio.gapu}--\val{eq.sc.compat.gapu}\pp (\SCP), \val{eq.tr.compat.gapu}--\val{eq.tr.ratio.gapu}\pp (TurboReg) and \val{eq.mc.compat.gapu}--\val{eq.mc.ratio.gapu}\pp (MAC) at its time, because a fixed rule must serve the hardest pairs it keeps, while \method adds correspondences only where the first budget failed.
 \emph{Uniform sampling} registers \val{eq.sc.rand.gapu}, \val{eq.tr.rand.gapu} and \val{eq.mc.rand.gapu}\pp fewer pairs at \method's time; with $N=2{,}000$ it is faster than \method but registers fewer pairs (McNemar $p=\val{eq.sc.bh.rand2000.p}$, $\val{eq.tr.bh.rand2000.p}$ and $\val{eq.mc.bh.rand2000.p}$).
-On 3DLoMatch (\suppref{supp:equaltime}) a net recall difference can hide losses: FastMAC-style sampling of 2{,}000 correspondences keeps MAC's recall (\val{eq.mc.lo.best.d}\pp at \val{eq.mc.lo.best.trel}\X the time) but loses \val{eq.mc.lo.best.risk}\,\% of the pairs the full budget registers, and every cheaper variant that saves at least 5\,\% of the time loses at least \val{eq.sc.lo.minrisk}, \val{eq.tr.lo.minrisk} and \val{eq.mc.lo.minrisk}\,\% of them (\SCP, TurboReg, MAC), above the certified 1\,\%; \method runs almost every pair to the full budget (\val{eq.sc.lo.cab.trel}, \val{eq.tr.lo.cab.trel} and \val{eq.mc.lo.cab.trel}\X the full time).
+On 3DLoMatch (\suppref{supp:equaltime}) a net recall difference can hide losses: FastMAC-style sampling of 2{,}000 correspondences keeps MAC's recall (\val{eq.mc.lo.best.d}\pp at \val{eq.mc.lo.best.trel}\X the time) but loses \val{eq.mc.lo.best.risk}\,\% of the pairs the full budget registers, and every cheaper variant that saves at least 5\,\% of the time loses at least \val{eq.sc.lo.minrisk}, \val{eq.tr.lo.minrisk} and \val{eq.mc.lo.minrisk}\,\% of them (\SCP, TurboReg, MAC), above the certified 1\,\%, while \method runs almost every pair to the full budget.
 
 \subsection{When it pays off, and why}
 \label{sec:why}
@@ -414,6 +413,7 @@ Combined, the final method is faster on \val{abl3.v3.faster} and slower on \val{
 \label{sec:conclusion}
 
 \paragraphb{Limitations.}
+\looseness=-1
 Our estimators are re-implementations; on a GPU our PyTorch ports keep the savings (\suppref{supp:gpu}), but they are not tuned for speed, and in an optimised GPU implementation fixed per-run costs could narrow the gap between small and large budgets.
 \method lowers the mean time per pair, not the worst case: a pair that needs the whole ladder also pays for the stages tried before, up to \val{v3.lat.p99.max}\,\% more than one full run at the 99th percentile (\val{v3.lat.p99.where}).
 Live, the gate costs \val{v3.gate.live.overhead.min}--\val{v3.gate.live.overhead.max}\,ms per pair (median over pairs with identical decisions), far more than the \val{gate.pred.hgb.ms}\,ms of its prediction timed alone, for a reason we could not establish (\suppref{supp:v3}); it makes \method slower than without the gate for \SCP above 30\,\% overlap, and the blind results include it (on the GPU it does not, \cref{sec:ablations}).
@@ -421,6 +421,7 @@ Only the fresh test is blind for the final method, whose gate and classifier cho
 A certificate needs calibration data (the group-conditional one appeared from about a thousand pairs on random subsets, \suppref{supp:limits}) and, to be fast, fitting data with failures; FCGF has seen every 3DMatch training scene, so learned descriptors are tested blind only outdoors.
 
 \paragraphb{Conclusion.}
+\looseness=-1
 Not every pair needs every correspondence, but a cheaper estimator is only useful if one knows what it loses.
 Consistency-ordered budgets, a difficulty-conditional certificate of a candidate chosen beforehand and a pre-estimation gate make graph-based estimators markedly faster where the data allow, at statistically non-inferior recall and within the certified risk on every test set, including pairs that no experiment had processed before; marginal certificates and fixed shortcuts give no such assurance.
 A certificate is only as fast as its controller, which needs fitting data with failures.
